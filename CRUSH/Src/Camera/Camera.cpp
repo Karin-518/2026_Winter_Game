@@ -33,7 +33,7 @@ void Camera::Update(void)
 
 void Camera::SetBeforeDraw(void)
 {
-	// クリップ距離を設定する(SetDrawScreenでリセットされる)
+	// クリップ距離を設定する
 	SetCameraNearFar(VIEW_NEAR, VIEW_FAR);
 
 	switch (mode_)
@@ -41,9 +41,11 @@ void Camera::SetBeforeDraw(void)
 	case Camera::MODE::FIXED_POINT:
 		SetBeforeDrawFixedPoint();
 		break;
+
 	case Camera::MODE::FREE:
 		SetBeforeDrawFree();
 		break;
+
 	case Camera::MODE::FOLLOW:
 		SetBeforeDrawFollow();
 		break;
@@ -63,19 +65,19 @@ void Camera::SetBeforeDrawFixedPoint(void)
 
 void Camera::SetBeforeDrawFree(void)
 {
-	// ゲームパッドが接続数で処理を分ける
-	if (GetJoypadNum() == 0)
+	// 方向回転によるXYZの移動
+	if (InputManager::GetInstance()->GetActiveDevice() == InputManager::ActiveDevice::KEY_MOUSE)
 	{
-		// 方向回転によるXYZの移動
+		// キーボード・マウス
 		MoveXYZDirection();
 	}
 	else
 	{
-		// 方向回転によるXYZの移動(ゲームパッド)
+		// ゲームパッド
 		MoveXYZDirectionPad();
 	}
 
-	// カメラの設定(位置と角度による制御)
+	// カメラの設定
 	SetCameraPositionAndAngle(
 		pos_,
 		angle_.x,
@@ -101,20 +103,19 @@ void Camera::DrawDebug(void)
 	);
 
 	DrawSphere3D(targetPos_, 20.0f, 10, 0xff0000, 0xff0000, true);
-
 }
 
 void Camera::SetBeforeDrawFollow(void)
 {
-
-	if (GetJoypadNum() == 0)
+	// 方向回転によるXYZの移動
+	if (InputManager::GetInstance()->GetActiveDevice() == InputManager::ActiveDevice::KEY_MOUSE)
 	{
-		// 方向回転によるXYZの移動
+		// キーボード・マウス
 		MoveXYZDirection();
 	}
 	else
 	{
-		// 方向回転によるXYZの移動(ゲームパッド)
+		// ゲームパッド
 		MoveXYZDirectionPad();
 	}
 
@@ -168,8 +169,10 @@ void Camera::ChangeMode(MODE mode)
 	{
 	case Camera::MODE::FIXED_POINT:
 		break;
+
 	case Camera::MODE::FREE:
 		break;
+
 	case Camera::MODE::FOLLOW:
 		break;
 	}
@@ -195,10 +198,8 @@ void Camera::MoveXYZDirectionPad(void)
 	VECTOR dir = Math::VECTOR_ZERO;
 
 	const float ROT_POW_DEG = 2.0f;
-	const float rotPow = ROT_POW_DEG * DX_PI_F / 180.0f;
 
-	// 右スティックの傾き
-	//dir = InputManager::GetInstance()->GetDirectionXZAKey(padState.AKeyRX, padState.AKeyRY);
+	const float rotPow = ROT_POW_DEG * DX_PI_F / 180.0f;
 
 	// 右スティック左右の傾き
 	angle_.y += dir.x * rotPow;
