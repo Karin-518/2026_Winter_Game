@@ -1,18 +1,16 @@
-#include "GameScene.h"
-
 #include <DxLib.h>
 
 #include "../../Application.h"
 #include "../../Camera/Camera.h"
-
 #include "../../Object/Actor/ActorBase.h"
 #include "../../Object/Actor/Player/Player.h"
 #include "../../Object/Actor/Enemy/Enemy.h"
 #include "../../Object/Actor/Enemy/Enemis/EnemyFactory.h"
 #include "../../Object/Actor/Enemy/Enemis/EnemyPool.h"
 #include "../../Object/Actor/Enemy/Enemis/EnemyManager.h"
-
 #include "../../Object/Actor/Stage/Stage.h"
+
+#include "GameScene.h"
 
 GameScene::GameScene(void)
 {
@@ -43,15 +41,15 @@ void GameScene::Load(void)
 	// 生成処理
 	camera_ = new Camera();					// カメラの生成
 	stage_ = new Stage();					// ステージの生成
-	Player* player_ = new Player(camera_);	// プレイヤーの生成
-	Enemy* enemy_ = new Enemy(player_);		// 敵の生成
+	Player* player = new Player(camera_);	// プレイヤーの生成
+	Enemy* enemy = new Enemy(player);		// 敵の生成
 
 	// アクター配列に入れる
-	allActor_.push_back(player_);
-	allActor_.push_back(enemy_);
+	allActor_.push_back(player);
+	allActor_.push_back(enemy);
 
 	// カメラモード変更
-	camera_->SetFollow(player_);
+	camera_->SetFollow(player);
 	camera_->ChangeMode(Camera::MODE::FOLLOW);
 
 	// ステージの読み込み
