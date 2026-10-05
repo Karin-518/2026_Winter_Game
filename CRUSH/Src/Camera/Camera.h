@@ -31,7 +31,7 @@ public:
 	static constexpr float PAD_ROT_SPEED_DEG = 2.0f;
 
 	// カメラのピッチ角度の制限
-	static constexpr float PITCH_LIMIT_DEG = 30.0f;
+	static constexpr float PITCH_LIMIT_DEG = 20.0f;
 	
 	// カメラモード
 	enum class MODE
