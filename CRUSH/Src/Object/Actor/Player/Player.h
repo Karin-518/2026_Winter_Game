@@ -8,7 +8,6 @@ class Camera;
 
 class Player : public ActorBase
 {
-
 public:
 
 	// アニメーション種別
@@ -52,6 +51,7 @@ private:
 	void Move(void) override;
 
 private:
+
 	// カメラ
 	Camera* camera_;
 };

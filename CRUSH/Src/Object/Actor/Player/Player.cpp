@@ -1,12 +1,11 @@
-#include "Player.h"
-
 #include "../../../Application.h"
 #include "../../../Input/InputManager.h"
 #include "../../../Common/Math/Math.h"
 #include "../../../Common/Transform/MatrixUtility.h"
 #include "../../Common/AnimationController.h"
-
 #include "../../../Camera/Camera.h"
+
+#include "Player.h"
 
 Player::Player(Camera* camera)
 {
