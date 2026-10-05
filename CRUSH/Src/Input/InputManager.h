@@ -1,9 +1,9 @@
 #pragma once
 #include <array>
 #include <map>
-#include <Dxlib.h>
 #include <vector>
 #include <string>
+#include <Dxlib.h>
 
 #include "InputInfo.h"
 #include "../Common/Math/Vector2.h"
@@ -84,7 +84,8 @@ public:
 		PAD
 	};
 
-	ActiveDevice GetActiveDevice() const { return activeDevice_; }
+	// 現在アクティブな入力装置を取得
+	ActiveDevice GetActiveDevice(void) const { return activeDevice_; }
 
 private:
 
@@ -124,6 +125,9 @@ public:
 
 	// マウス
 	Vector2 GetMousePos(void) const;
+	Vector2 GetMouseMove(void) const;
+	void SetMouseLock(bool isLock);
+	bool IsMouseLock(void) const;
 	bool IsMouse(INPUT_INFO::MouseBtn btn) const;			// 押しっぱなし
 	bool IsMouseDown(INPUT_INFO::MouseBtn btn) const;		// 押した瞬間
 	bool IsMouseUp(INPUT_INFO::MouseBtn btn) const;			// 離した瞬間
@@ -141,6 +145,7 @@ public:
 	// アナログキーの入力値から方向を取得
 	VECTOR GetDirectionXZAKey(INPUT_INFO::JOYPAD_NO pad) const;
 	VECTOR GetRightStickDirection(INPUT_INFO::JOYPAD_NO pad) const;
+	Vector2 GetRightStickAnalog(INPUT_INFO::JOYPAD_NO pad) const;
 
 	// キー割り当て
 	void SetActionKey(INPUT_INFO::ACTION action, const std::vector<int>& keys);
@@ -177,11 +182,13 @@ private:
 
 	KeyState mouseStates_[(int)INPUT_INFO::MouseBtn::MAX];
 	Vector2 mousePos_;
+	Vector2 mouseMove_;
+	bool isMouseLock_;
 
 	PadState padStates_[5];
 
-	void UpdateKeyboard();
-	void UpdateMouse();
+	void UpdateKeyboard(void);
+	void UpdateMouse(void);
 	void UpdatePad(INPUT_INFO::JOYPAD_NO pad);
 	static void UpdateKeyState(bool isPressed, KeyState& st);
 	bool IsInputAlreadyUsed(const BindInput& input, INPUT_INFO::ACTION ignoreAction) const;

@@ -23,6 +23,15 @@ public:
 	// カメラのクリップ範囲
 	static constexpr float VIEW_NEAR = 20.0f;
 	static constexpr float VIEW_FAR = 5000.0f;
+
+	// マウスの感度
+	static constexpr float MOUSE_SENSITIVITY_DEG = 0.1f;
+
+	// ゲームパッドの感度
+	static constexpr float PAD_ROT_SPEED_DEG = 2.0f;
+
+	// カメラのピッチ角度の制限
+	static constexpr float PITCH_LIMIT_DEG = 30.0f;
 	
 	// カメラモード
 	enum class MODE
@@ -89,10 +98,12 @@ private:
 	// 注視点
 	VECTOR targetPos_;
 	
-	// 方向回転によるXYZの移動
+	// 方向回転によるXYZの移動（マウス）
 	void MoveXYZDirection(void);
 
-	// 方向回転によるXYZの移動(ゲームパッド)
+	// 方向回転によるXYZの移動（ゲームパッド）
 	void MoveXYZDirectionPad(void);
 
+	// ピッチ角度の制限
+	void ClampPitch(void);
 };

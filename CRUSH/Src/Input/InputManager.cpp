@@ -1,4 +1,5 @@
 ﻿#include <DxLib.h>
+#include "../Application.h"
 #include "InputManager.h"
 
 InputManager* InputManager::instance_ = nullptr;
@@ -113,7 +114,7 @@ void InputManager::Update(void)
 	UpdatePad(INPUT_INFO::JOYPAD_NO::PAD4);
 }
 
-void InputManager::UpdateKeyboard()
+void InputManager::UpdateKeyboard(void)
 {
 	char keyBuf[256];
 	GetHitKeyStateAll(keyBuf);
@@ -138,15 +139,52 @@ void InputManager::UpdateKeyboard()
 	}
 }
 
-void InputManager::UpdateMouse()
+void InputManager::UpdateMouse(void)
 {
 	int x, y;
-
-	Vector2 preMousePos = mousePos_;
 	GetMousePoint(&x, &y);
-	mousePos_ = { (float)x, (float)y };
 
-	if (preMousePos.x != mousePos_.x || preMousePos.y != mousePos_.y)
+	if (isMouseLock_)
+	{
+		// マウスの画面固定モード
+		// 画面中央からのずれが移動量
+		int screenWidth, screenHeight, colorBit;
+		GetScreenState(&screenWidth, &screenHeight, &colorBit);
+		const int centerX = screenWidth / 2;
+		const int centerY = screenHeight / 2;
+
+		mouseMove_ = 
+		{
+			static_cast<float>(x - centerX), 
+			static_cast<float>(y - centerY) 
+		};	
+
+		SetMousePoint(centerX, centerY);
+
+		mousePos_ =
+		{
+			static_cast<float>(centerX),
+			static_cast<float>(centerY)
+		};
+	}
+	else
+	{
+		// マウスの通常モード
+		// 前フレームとの差が移動量
+		mouseMove_ =
+		{
+			static_cast<float>(x) - mousePos_.x,
+			static_cast<float>(y) - mousePos_.y
+		};
+
+		mousePos_ =
+		{
+			static_cast<float>(x),
+			static_cast<float>(y)
+		};
+	}
+
+	if (mouseMove_.x != 0.0f || mouseMove_.y != 0.0f)
 	{
 		activeDevice_ = ActiveDevice::KEY_MOUSE;
 	}
@@ -273,6 +311,11 @@ void InputManager::UpdatePad(INPUT_INFO::JOYPAD_NO pad)
 	}
 
 	if (fabs(lx) > 0.4f || fabs(ly) > 0.4f)
+	{
+		activeDevice_ = ActiveDevice::PAD;
+	}
+
+	if (sqrtf(rx * rx + ry * ry) > DEAD_ZONE)
 	{
 		activeDevice_ = ActiveDevice::PAD;
 	}
@@ -622,9 +665,50 @@ void InputManager::SetActionPadTrigger(INPUT_INFO::ACTION action, INPUT_INFO::JO
 	}
 }
 
-Vector2 InputManager::GetMousePos() const
+Vector2 InputManager::GetMousePos(void) const
 {
 	return mousePos_;
+}
+
+Vector2 InputManager::GetMouseMove(void) const
+{
+	return mouseMove_;
+}
+
+void InputManager::SetMouseLock(bool isLock)
+{
+	if (isMouseLock_ == isLock) return;
+
+	isMouseLock_ = isLock;
+
+	if (isMouseLock_)
+	{
+		// カーソルを非表示にして画面中央へ設定
+		int screenWidth, screenHeight, colorBit;
+
+		GetScreenState(&screenWidth, &screenHeight, &colorBit);
+
+		SetMousePoint(screenWidth / 2, screenHeight / 2);
+
+		mousePos_ = 
+		{ 
+			static_cast<float>(screenWidth / 2), 
+			static_cast<float>(screenHeight / 2) 
+		};
+
+		SetMouseDispFlag(FALSE);
+	}
+	else
+	{
+		SetMouseDispFlag(TRUE);
+	}
+
+	mouseMove_ = { 0.0f, 0.0f };
+}
+
+bool InputManager::IsMouseLock(void) const
+{
+	return isMouseLock_;
 }
 
 bool InputManager::IsMouse(INPUT_INFO::MouseBtn btn) const
@@ -709,6 +793,24 @@ VECTOR InputManager::GetRightStickDirection(INPUT_INFO::JOYPAD_NO pad) const
 	z = (z / len) * scale;
 
 	return VNorm(VGet(x, 0, -z));
+}
+
+Vector2 InputManager::GetRightStickAnalog(INPUT_INFO::JOYPAD_NO pad) const
+{
+	const auto& st = padStates_[(int)pad];
+
+	float x = st.rx / ANALOG_MAX;
+	float y = st.ry / ANALOG_MAX;
+
+	float len = sqrtf(x * x + y * y);
+	if (len < DEAD_ZONE) return { 0.0f, 0.0f };
+
+	// 傾きの大きさ(1.0を上限)をデッドゾーン分だけ差し引いて 0.0 ~ 1.0 に直す
+	float mag = len > 1.0f ? 1.0f : len;
+	float scale = (mag - DEAD_ZONE) / (1.0f - DEAD_ZONE);
+
+	// 向きは保ったまま、大きさだけを scale にする(上に倒すとYがマイナス)
+	return { (x / len) * scale, -(y / len) * scale };
 }
 
 void InputManager::ClearActionBind(INPUT_INFO::ACTION action)

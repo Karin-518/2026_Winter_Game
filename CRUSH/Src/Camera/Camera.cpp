@@ -151,6 +151,10 @@ void Camera::SetBeforeDrawFollow(void)
 
 void Camera::Release(void)
 {
+	if (InputManager::GetInstance() != nullptr)
+	{
+		InputManager::GetInstance()->SetMouseLock(false);
+	}
 }
 
 void Camera::ChangeMode(MODE mode)
@@ -162,12 +166,14 @@ void Camera::ChangeMode(MODE mode)
 	switch (mode_)
 	{
 	case Camera::MODE::FIXED_POINT:
+		InputManager::GetInstance()->SetMouseLock(false);
 		break;
 
 	case Camera::MODE::FREE:
 		break;
 
 	case Camera::MODE::FOLLOW:
+		InputManager::GetInstance()->SetMouseLock(true);
 		break;
 	}
 }
@@ -185,19 +191,33 @@ void Camera::MoveXYZDirection(void)
 	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::CAMERA_UP)) { angle_.x -= rotPow; }
 	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::CAMERA_RIGHT)) { angle_.y += rotPow; }
 	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::CAMERA_LEFT))	{ angle_.y -= rotPow; }
+
+	// マウスの移動量でカメラの角度を変える
+	const Vector2 mouseMove = InputManager::GetInstance()->GetMouseMove();
+	const float mouseRot = MOUSE_SENSITIVITY_DEG * DX_PI_F / 180.0f;
+	angle_.y += mouseMove.x * mouseRot;
+	angle_.x += mouseMove.y * mouseRot;
+
+	ClampPitch();
 }
 
 void Camera::MoveXYZDirectionPad(void)
 {
-	VECTOR dir = Math::VECTOR_ZERO;
+	const Vector2 stick = InputManager::GetInstance()->
+						GetRightStickAnalog(INPUT_INFO::JOYPAD_NO::PAD1);
 
-	const float ROT_POW_DEG = 2.0f;
+	const float rotPow = PAD_ROT_SPEED_DEG * DX_PI_F / 180.0f;
 
-	const float rotPow = ROT_POW_DEG * DX_PI_F / 180.0f;
+	angle_.y += stick.x * rotPow;
+	angle_.x += stick.y * rotPow;
 
-	// 右スティック左右の傾き
-	angle_.y += dir.x * rotPow;
+	ClampPitch();
+}
 
-	// 右スティック上下の傾き
-	angle_.x += dir.z * rotPow;
+void Camera::ClampPitch(void)
+{
+	const float limit = PITCH_LIMIT_DEG * DX_PI_F / 180.0f;
+
+	if (angle_.x > limit) { angle_.x = limit; }
+	if (angle_.x < -limit) { angle_.x = -limit; }
 }
