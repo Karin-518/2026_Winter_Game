@@ -113,39 +113,31 @@ void Camera::SetBeforeDrawFollow(void)
 		MoveXYZDirectionPad();
 	}
 
-	// カメラの回転行列を作成
+	// カメラの回転行列を作成（ピッチ+ヨー）
 	MATRIX mat = MGetIdent();
 	mat = MMult(mat, MGetRotX(angle_.x));
 	mat = MMult(mat, MGetRotY(angle_.y));
-	//mat = MMult(mat, MGetRotZ(angles_.z));
-	
-	// カメラの回転行列(X抜き)を作成
+
+	// 注視点用の回転行列を作成（ヨーのみ）
 	MATRIX matY = MGetIdent();
-	//mat = MMult(mat, MGetRotX(angles_.x));
 	matY = MMult(matY, MGetRotY(angle_.y));
-	//mat = MMult(mat, MGetRotZ(angles_.z));
 
 	// 注視点の移動
 	VECTOR followPos = follow_->GetPos();
-	//VECTOR targetLocalRotPos = VTransform(FOLLOW_TARGET_LOCAL_POS, matY);
-	VECTOR targetLocalRotPos = VTransform(FOLLOW_TARGET_LOCAL_POS, mat);
+	VECTOR targetLocalRotPos = VTransform(FOLLOW_TARGET_LOCAL_POS, matY);
 	targetPos_ = VAdd(followPos, targetLocalRotPos);
 
 	// カメラの移動
-	// 相対座標を回転させて、回転後の相対座標を取得する
 	VECTOR cameraLocalRotPos = VTransform(FOLLOW_CAMERA_LOCAL_POS, mat);
 
 	// 相対座標からワールド座標に直して、カメラ座標とする
 	pos_ = VAdd(followPos, cameraLocalRotPos);
 
-	// カメラの上方向を計算
-	VECTOR up = VTransform(Math::DIR_U, mat);
-
 	// カメラの設定(位置と注視点による制御)
 	SetCameraPositionAndTargetAndUpVec(
 		pos_,
 		targetPos_,
-		up
+		Math::DIR_U
 	);
 }
 
