@@ -54,4 +54,5 @@ private:
 
 	// ƒJƒƒ‰
 	Camera* camera_;
+	
 };

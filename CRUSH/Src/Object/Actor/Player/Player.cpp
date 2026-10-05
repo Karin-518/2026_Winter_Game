@@ -7,6 +7,30 @@
 
 #include "Player.h"
 
+namespace
+{
+	// 初期ローカル角度
+	constexpr float DEFAULT_LOCAL_ANGLE_DEG_Y = 180.0f;
+
+	// 当たり判定のカプセルの開始位置
+	constexpr VECTOR START_CAPSULE_POS = { 0.0f, 110.0f, 0.0f };
+
+	// 当たり判定のカプセルの終了位置
+	constexpr VECTOR END_CAPSULE_POS = { 0.0f, 30.0f, 0.0f };
+
+	// 当たり判定のカプセルの半径
+	constexpr float CAPSULE_RADIUS = 20.0f;
+
+	// アニメーションの速度
+	constexpr float ANIMATION_SPEED = 0.5f;
+
+	// 移動速度
+	const float MOVE_POW = 5.0f;
+
+	// 入力値の補間地（小さいほど慣性が強い）
+	const float SMOOTH = 0.25f;
+}
+
 Player::Player(Camera* camera)
 {
 	camera_ = camera;
@@ -25,8 +49,8 @@ void Player::InitLoad(void)
 void Player::InitTransform(void)
 {
 	// モデルの角度
-	angle_ = { 0.0f, 0.0f, 0.0f };
-	localAngle_ = { 0.0f, Math::Deg2Rad(180.0f), 0.0f };
+	angle_ = Math::VECTOR_ZERO;
+	localAngle_ = { 0.0f, Math::Deg2Rad(DEFAULT_LOCAL_ANGLE_DEG_Y), 0.0f };
 
 	// 角度から方向に変換する
 	moveDir_ = { sinf(angle_.y), 0.0f, cosf(angle_.y) };
@@ -43,9 +67,9 @@ void Player::InitTransform(void)
 	MV1SetPosition(modelId_, pos_);
 
 	// 当たり判定を作成
-	startCapsulePos_ = { 0.0f,110,0.0f };
-	endCapsulePos_ = { 0.0f,30.0f,0.0f };
-	capsuleRadius_ = 20.0f;
+	startCapsulePos_ = START_CAPSULE_POS;
+	endCapsulePos_ = END_CAPSULE_POS;
+	capsuleRadius_ = CAPSULE_RADIUS;
 	
 	// 当たり判定を取るか
 	isCollision_ = true;
@@ -58,9 +82,9 @@ void Player::InitAnimation(void)
 
 	// アニメーションの追加
 	animationController_->Add(
-		static_cast<int>(ANIM_TYPE::IDLE), 0.5f, Application::PATH_MODEL + "Player/Idle.mv1");
+		static_cast<int>(ANIM_TYPE::IDLE), ANIMATION_SPEED, Application::PATH_MODEL + "Player/Idle.mv1");
 	animationController_->Add(
-		static_cast<int>(ANIM_TYPE::WALK), 0.5f, Application::PATH_MODEL + "Player/Walk.mv1");
+		static_cast<int>(ANIM_TYPE::WALK), ANIMATION_SPEED, Application::PATH_MODEL + "Player/Walk.mv1");
 
 	// 初期アニメーションの再生
 	animationController_->Play(static_cast<int>(ANIM_TYPE::IDLE));
@@ -82,6 +106,7 @@ void Player::Draw(void)
 {
 	ActorBase::Draw();
 
+#ifdef _DEBUG
 	DrawFormatString(
 		0, 50, 0xffffff,
 		"キャラ角度　 ：(%.1f, %.1f, %.1f)",
@@ -89,6 +114,7 @@ void Player::Draw(void)
 		Math::Rad2Deg(angle_.y),
 		Math::Rad2Deg(angle_.z)
 	);
+#endif //_DEBUG
 }
 
 void Player::Release(void)
@@ -102,18 +128,15 @@ void Player::Move(void)
 	VECTOR cameraAngles = camera_->GetAngle();
 
 	// 移動量
-	const float MOVE_POW = 5.0f;
 	VECTOR dir = Math::VECTOR_ZERO;
 
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_UP)) { dir = VAdd(dir, { 0.0f, 0.0f, 1.0f }); }
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_LEFT)) { dir = VAdd(dir, { -1.0f, 0.0f, 0.0f }); }
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_DOWN)) { dir = VAdd(dir, { 0.0f, 0.0f, -1.0f }); }
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_RIGHT)) { dir = VAdd(dir, { 1.0f, 0.0f, 0.0f }); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_UP)) { dir = VAdd(dir, Math::DIR_F); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_LEFT)) { dir = VAdd(dir, Math::DIR_L); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_DOWN)) { dir = VAdd(dir, Math::DIR_B); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_RIGHT)) { dir = VAdd(dir, Math::DIR_R); }
 
 	if (!Math::EqualsVZero(dir))
 	{
-		// 入力値の補間
-		const float SMOOTH = 0.25f; // 小さいほど慣性が強い
 		dir.x = preInputDir_.x + (dir.x - preInputDir_.x) * SMOOTH;
 		dir.z = preInputDir_.z + (dir.z - preInputDir_.z) * SMOOTH;
 		preInputDir_ = dir;
