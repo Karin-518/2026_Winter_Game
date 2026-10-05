@@ -12,6 +12,18 @@
 
 #include "GameScene.h"
 
+namespace
+{
+	// 線分のオフセット
+	constexpr float LINE_OFFSET = 10.0f;
+
+	// ポリゴンの検索回数
+	constexpr int POLYGON_SEARCH_COUNT = 10;
+
+	// 法線の移動量
+	constexpr float NORMAL_MOVE_AMOUNT = 1.0f;
+}
+
 GameScene::GameScene(void)
 {
 }
@@ -169,11 +181,11 @@ void GameScene::FieldCollision(ActorBase* actor)
 
 	// 線分の上座標
 	VECTOR startPos = actorPos;
-	startPos.y = actorPos.y + 10.0f;
+	startPos.y = actorPos.y + LINE_OFFSET;
 
 	// 線分の下座標
 	VECTOR endPos = actorPos;
-	endPos.y = actorPos.y - 10.0f;
+	endPos.y = actorPos.y - LINE_OFFSET;
 
 	// ステージのモデルを取得
 	int modelId = stage_->GetModelId();
@@ -215,8 +227,8 @@ void GameScene::WallCollision(ActorBase* actor)
 		// ポリゴンを1枚に分割
 		auto hit = hits.Dim[i];
 
-		// ポリゴン検索を制限(全てを検索すると重いので)
-		for (int tryCnt = 0; tryCnt < 10; tryCnt++)
+		// ポリゴン検索を制限(全てを検索すると重いため)
+		for (int tryCnt = 0; tryCnt < POLYGON_SEARCH_COUNT; tryCnt++)
 		{
 			// 最初の衝突判定で検出した衝突ポリゴン1枚と衝突判定を取る
 			int pHit = HitCheck_Capsule_Triangle
@@ -233,11 +245,11 @@ void GameScene::WallCollision(ActorBase* actor)
 			if (pHit)
 			{
 				// 当たっていたので座標をポリゴンの法線方向に移動させる
-				pos = VAdd(pos, VScale(hit.Normal, 1.0f));
+				pos = VAdd(pos, VScale(hit.Normal, NORMAL_MOVE_AMOUNT));
 
 				// 球体の座標も移動させる
-				capStartPos = VAdd(capStartPos, VScale(hit.Normal, 1.0f));
-				capEndPos = VAdd(capEndPos, VScale(hit.Normal, 1.0f));
+				capStartPos = VAdd(capStartPos, VScale(hit.Normal, NORMAL_MOVE_AMOUNT));
+				capEndPos = VAdd(capEndPos, VScale(hit.Normal, NORMAL_MOVE_AMOUNT));
 
 				// 複数当たっている可能性があるので再検索
 				continue;
