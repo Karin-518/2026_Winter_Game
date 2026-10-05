@@ -147,6 +147,9 @@ void GameScene::Draw(void)
 	}
 
 	enemyMng_->Draw();
+
+	// デバッグ描画
+	camera_->DrawDebug();
 }
 
 void GameScene::Release(void)
