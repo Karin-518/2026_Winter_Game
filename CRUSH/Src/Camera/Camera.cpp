@@ -1,17 +1,12 @@
-#include "Camera.h"
-
 #include "../Common/Math/Math.h"
 #include "../Input/InputManager.h"
-
 #include "../Object/Actor/ActorBase.h"
+
+#include "Camera.h"
+
 
 Camera::Camera(void)
 {
-	// DxLibの初期設定では、
-	// カメラの位置が x = 320.0f, y = 240.0f, z = (画面のサイズによって変化)、
-	// 注視点の位置は x = 320.0f, y = 240.0f, z = 1.0f
-	// カメラの上方向は x = 0.0f, y = 1.0f, z = 0.0f
-	// 右上位置からZ軸のプラス方向を見るようなカメラ
 }
 
 Camera::~Camera(void)
@@ -54,7 +49,7 @@ void Camera::SetBeforeDraw(void)
 
 void Camera::SetBeforeDrawFixedPoint(void)
 {
-	// カメラの設定(位置と角度による制御)
+	// カメラの設定
 	SetCameraPositionAndAngle(
 		pos_,
 		angle_.x,
@@ -88,7 +83,7 @@ void Camera::SetBeforeDrawFree(void)
 
 void Camera::DrawDebug(void)
 {
-
+#ifdef _DEBUG
 	DrawFormatString(
 		0, 10, 0xffffff,
 		"カメラ座標　 ：(%.1f, %.1f, %.1f)",
@@ -101,8 +96,7 @@ void Camera::DrawDebug(void)
 		Math::Rad2Deg(angle_.y),
 		Math::Rad2Deg(angle_.z)
 	);
-
-	DrawSphere3D(targetPos_, 20.0f, 10, 0xff0000, 0xff0000, true);
+#endif //_DEBUG
 }
 
 void Camera::SetBeforeDrawFollow(void)
