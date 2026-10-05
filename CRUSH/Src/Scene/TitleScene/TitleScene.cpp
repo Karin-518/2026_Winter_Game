@@ -35,7 +35,7 @@ void TitleScene::LoadEnd(void)
 void TitleScene::Update(void)
 {
 	// スペースが押されると次のシーンへ
-	if(InputManager::GetInstance()->IsTrgUp(KEY_INPUT_SPACE))
+	if(InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::DECIDE))
 	{
 		// ゲームシーンへ
 		SceneManager::GetInstance()->ChangeScene(std::make_shared<GameScene>());

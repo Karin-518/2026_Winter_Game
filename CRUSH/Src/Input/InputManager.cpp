@@ -1,396 +1,940 @@
-#include <DxLib.h>
+Ôªø#include <DxLib.h>
 #include "InputManager.h"
 
 InputManager* InputManager::instance_ = nullptr;
-
-void InputManager::Init(void)
-{
-	// ÉQÅ[ÉÄÇ≈égópÇµÇΩÇ¢ÉLÅ[ÇÅA
-	// éñëOÇ…Ç±Ç±Ç≈ìoò^ÇµÇƒÇ®Ç¢ÇƒÇ≠ÇæÇ≥Ç¢
-	Add(KEY_INPUT_SPACE);
-	Add(KEY_INPUT_RETURN);
-	Add(KEY_INPUT_LSHIFT);
-	Add(KEY_INPUT_LCONTROL);
-
-	Add(KEY_INPUT_W);
-	Add(KEY_INPUT_A);
-	Add(KEY_INPUT_S);
-	Add(KEY_INPUT_D);
-
-	Add(KEY_INPUT_Q);
-	Add(KEY_INPUT_E);
-	Add(KEY_INPUT_R);
-	Add(KEY_INPUT_F);
-	Add(KEY_INPUT_X);
-	Add(KEY_INPUT_Z);
-
-	Add(KEY_INPUT_LEFT);
-	Add(KEY_INPUT_RIGHT);
-	Add(KEY_INPUT_UP);
-	Add(KEY_INPUT_DOWN);
-
-	InputManager::MouseInfo info;
-
-	// ç∂ÉNÉäÉbÉN
-	info = InputManager::MouseInfo();
-	info.key = MOUSE_INPUT_LEFT;
-	info.keyOld = false;
-	info.keyNew = false;
-	info.keyTrgDown = false;
-	info.keyTrgUp = false;
-	mouseInfos_.emplace(info.key, info);
-
-	// âEÉNÉäÉbÉN
-	info = InputManager::MouseInfo();
-	info.key = MOUSE_INPUT_RIGHT;
-	info.keyOld = false;
-	info.keyNew = false;
-	info.keyTrgDown = false;
-	info.keyTrgUp = false;
-	mouseInfos_.emplace(info.key, info);
-}
-
-void InputManager::Update(void)
-{
-
-	// ÉLÅ[É{Å[Éhåüím
-	for (auto& p : keyInfos_)
-	{
-		p.second.keyOld = p.second.keyNew;
-		p.second.keyNew = CheckHitKey(p.second.key);
-		p.second.keyTrgDown = p.second.keyNew && !p.second.keyOld;
-		p.second.keyTrgUp = !p.second.keyNew && p.second.keyOld;
-	}
-
-	// É}ÉEÉXåüím
-	mouseInput_ = GetMouseInput();
-
-	int mousePosX = 0;
-	int mousePosY = 0;
-
-	GetMousePoint(&mousePosX, &mousePosY);
-
-	mousePos_.x = static_cast<float>(mousePosX);
-	mousePos_.y = static_cast<float>(mousePosY);
-
-	for (auto& p : mouseInfos_)
-	{
-		p.second.keyOld = p.second.keyNew;
-		p.second.keyNew = mouseInput_ == p.second.key;
-		p.second.keyTrgDown = p.second.keyNew && !p.second.keyOld;
-		p.second.keyTrgUp = !p.second.keyNew && p.second.keyOld;
-	}
-
-	// ÉpÉbÉhèÓïÒ
-	SetJPadInState(JOYPAD_NO::KEY_PAD1);
-	SetJPadInState(JOYPAD_NO::PAD1);
-	SetJPadInState(JOYPAD_NO::PAD2);
-	SetJPadInState(JOYPAD_NO::PAD3);
-	SetJPadInState(JOYPAD_NO::PAD4);
-
-}
-
-void InputManager::Destroy(void)
-{
-	// ÉCÉìÉXÉ^ÉìÉXÇÃÉÅÉÇÉäâï˙
-	delete instance_;
-}
-
-void InputManager::Add(int key)
-{
-	InputManager::Info info = InputManager::Info();
-	info.key = key;
-	info.keyOld = false;
-	info.keyNew = false;
-	info.keyTrgDown = false;
-	info.keyTrgUp = false;
-	keyInfos_.emplace(key, info);
-}
-
-void InputManager::Clear(void)
-{
-	keyInfos_.clear();
-}
-
-bool InputManager::IsNew(int key) const
-{
-	return Find(key).keyNew;
-}
-
-bool InputManager::IsTrgDown(int key) const
-{
-	return Find(key).keyTrgDown;
-}
-
-bool InputManager::IsTrgUp(int key) const
-{
-	return Find(key).keyTrgUp;
-}
-
-Vector2 InputManager::GetMousePos(void) const
-{
-	return mousePos_;
-}
-
-int InputManager::GetMouse(void) const
-{
-	return mouseInput_;
-}
-
-bool InputManager::IsClickMouseLeft(void) const
-{
-	return mouseInput_ == MOUSE_INPUT_LEFT;
-}
-
-bool InputManager::IsClickMouseRight(void) const
-{
-	return mouseInput_ == MOUSE_INPUT_RIGHT;
-}
-
-bool InputManager::IsTrgMouseLeft(void) const
-{
-	return FindMouse(MOUSE_INPUT_LEFT).keyTrgDown;
-}
-
-bool InputManager::IsTrgMouseRight(void) const
-{
-	return FindMouse(MOUSE_INPUT_RIGHT).keyTrgDown;
-}
-
-InputManager::InputManager(void)
-{
-	mouseInput_ = -1;
-}
 
 InputManager::~InputManager(void)
 {
 }
 
-const InputManager::Info& InputManager::Find(int key) const
+void InputManager::Init(void)
 {
-
-	auto it = keyInfos_.find(key);
-	if (it != keyInfos_.end())
+	// --- ÂÖ®„Ç≠„ÉºÁôªÈå≤ ---
+	for (int k = 0; k < 256; ++k)
 	{
-		return it->second;
+		keyStates_[k] = KeyState{};
 	}
 
-	return infoEmpty_;
+	// --- „Ç¢„ÇØ„Ç∑„Éß„É≥ÂàùÊúüÂâ≤„ÇäÂΩì„Å¶ ---
+	// --- „Ç≠„Éº„Éú„Éº„Éâ ---
+	// „Éó„É¨„Ç§„É§„Éº
+	SetActionKey(INPUT_INFO::ACTION::MOVE_UP,		{ KEY_INPUT_W });
+	SetActionKey(INPUT_INFO::ACTION::MOVE_DOWN,		{ KEY_INPUT_S });
+	SetActionKey(INPUT_INFO::ACTION::MOVE_LEFT,		{ KEY_INPUT_A });
+	SetActionKey(INPUT_INFO::ACTION::MOVE_RIGHT,	{ KEY_INPUT_D });
+	SetActionKey(INPUT_INFO::ACTION::ATTACK,		{ KEY_INPUT_J });
+	SetActionKey(INPUT_INFO::ACTION::AVOID,			{ KEY_INPUT_SPACE });
+	SetActionKey(INPUT_INFO::ACTION::SPRINT,		{ KEY_INPUT_LSHIFT });
+	SetActionKey(INPUT_INFO::ACTION::ROCK,			{ KEY_INPUT_Q });
+	SetActionKey(INPUT_INFO::ACTION::CAMERA_RESET,	{ KEY_INPUT_R });
+	SetActionKey(INPUT_INFO::ACTION::ITEM,			{ KEY_INPUT_E });
+	SetActionKey(INPUT_INFO::ACTION::CAMERA_UP, { KEY_INPUT_UP });
+	SetActionKey(INPUT_INFO::ACTION::CAMERA_DOWN, { KEY_INPUT_DOWN });
+	SetActionKey(INPUT_INFO::ACTION::CAMERA_LEFT, { KEY_INPUT_LEFT });
+	SetActionKey(INPUT_INFO::ACTION::CAMERA_RIGHT, { KEY_INPUT_RIGHT});
 
+	// UI
+	SetActionKey(INPUT_INFO::ACTION::UI_MOVE_UP, { KEY_INPUT_W });
+	SetActionKey(INPUT_INFO::ACTION::UI_MOVE_DOWN, { KEY_INPUT_S });
+	SetActionKey(INPUT_INFO::ACTION::UI_MOVE_LEFT, { KEY_INPUT_A });
+	SetActionKey(INPUT_INFO::ACTION::UI_MOVE_RIGHT, { KEY_INPUT_D });
+	SetActionKey(INPUT_INFO::ACTION::DECIDE, { KEY_INPUT_RETURN });
+	SetActionKey(INPUT_INFO::ACTION::CANCEL, { KEY_INPUT_BACK });
+
+	// „Ç∑„Çπ„ÉÜ„É†
+	SetActionKey(INPUT_INFO::ACTION::PAUSE, { KEY_INPUT_ESCAPE });
+
+	// --- „Éû„Ç¶„Çπ ---
+	// „Éó„É¨„Ç§„É§„Éº
+	SetActionMouse(INPUT_INFO::ACTION::ATTACK, INPUT_INFO::MouseBtn::LEFT);
+	SetActionMouse(INPUT_INFO::ACTION::ROCK, INPUT_INFO::MouseBtn::MIDDLE);
+
+	// UI
+	SetActionMouse(INPUT_INFO::ACTION::DECIDE, INPUT_INFO::MouseBtn::LEFT);
+	SetActionMouse(INPUT_INFO::ACTION::CANCEL, INPUT_INFO::MouseBtn::RIGHT);
+
+	// --- „Éë„ÉÉ„Éâ ---
+	// „Éó„É¨„Ç§„É§„Éº
+	BindInput stickInput;
+	stickInput.type = BindType::PAD_STICK;
+	stickInput.pad = INPUT_INFO::JOYPAD_NO::PAD1;
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::LEFT_UP;
+	AddBind(INPUT_INFO::ACTION::MOVE_UP, 0, stickInput);
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::LEFT_DOWN;
+	AddBind(INPUT_INFO::ACTION::MOVE_DOWN, 0, stickInput);
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::LEFT_LEFT;
+	AddBind(INPUT_INFO::ACTION::MOVE_LEFT, 0, stickInput);
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::LEFT_RIGHT;
+	AddBind(INPUT_INFO::ACTION::MOVE_RIGHT, 0, stickInput);
+	SetActionPadBtn(INPUT_INFO::ACTION::ATTACK, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_BTN::X);
+	SetActionPadBtn(INPUT_INFO::ACTION::AVOID, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_BTN::A);
+	SetActionPadTrigger(INPUT_INFO::ACTION::SPRINT, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_TRIGGER::LT);
+	SetActionPadBtn(INPUT_INFO::ACTION::ROCK, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_BTN::R3);
+	SetActionPadBtn(INPUT_INFO::ACTION::CAMERA_RESET, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_BTN::LB);
+	SetActionPadBtn(INPUT_INFO::ACTION::ITEM, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_BTN::Y);
+
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::RIGHT_UP;
+	AddBind(INPUT_INFO::ACTION::CAMERA_UP, 0, stickInput);
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::RIGHT_DOWN;
+	AddBind(INPUT_INFO::ACTION::CAMERA_DOWN, 0, stickInput);
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::RIGHT_LEFT;
+	AddBind(INPUT_INFO::ACTION::CAMERA_LEFT, 0, stickInput);
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::RIGHT_RIGHT;
+	AddBind(INPUT_INFO::ACTION::CAMERA_RIGHT, 0, stickInput);
+
+	// --- UI„Éª„Ç∑„Çπ„ÉÜ„É†Á≥ª ---
+	SetActionPadDir(INPUT_INFO::ACTION::UI_MOVE_UP, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_DIR::UP);
+	SetActionPadDir(INPUT_INFO::ACTION::UI_MOVE_DOWN, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_DIR::DOWN);
+	SetActionPadDir(INPUT_INFO::ACTION::UI_MOVE_LEFT, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_DIR::LEFT);
+	SetActionPadDir(INPUT_INFO::ACTION::UI_MOVE_RIGHT, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_DIR::RIGHT);
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::LEFT_UP;
+	AddBind(INPUT_INFO::ACTION::UI_MOVE_UP, 1, stickInput);
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::LEFT_DOWN;
+	AddBind(INPUT_INFO::ACTION::UI_MOVE_DOWN, 1, stickInput);
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::LEFT_LEFT;
+	AddBind(INPUT_INFO::ACTION::UI_MOVE_LEFT, 1, stickInput);
+	stickInput.code = (int)INPUT_INFO::PAD_STICK::LEFT_RIGHT;
+	AddBind(INPUT_INFO::ACTION::UI_MOVE_RIGHT, 1, stickInput);
+	SetActionPadBtn(INPUT_INFO::ACTION::DECIDE, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_BTN::A);
+	SetActionPadBtn(INPUT_INFO::ACTION::CANCEL, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_BTN::B);
+
+	// „Ç∑„Çπ„ÉÜ„É†
+	SetActionPadBtn(INPUT_INFO::ACTION::PAUSE, INPUT_INFO::JOYPAD_NO::PAD1, INPUT_INFO::PAD_BTN::START);
 }
 
-const InputManager::MouseInfo& InputManager::FindMouse(int key) const
+void InputManager::Update(void)
 {
-	auto it = mouseInfos_.find(key);
-	if (it != mouseInfos_.end())
+	UpdateKeyboard();
+	UpdateMouse();
+
+	UpdatePad(INPUT_INFO::JOYPAD_NO::PAD1);
+	UpdatePad(INPUT_INFO::JOYPAD_NO::PAD2);
+	UpdatePad(INPUT_INFO::JOYPAD_NO::PAD3);
+	UpdatePad(INPUT_INFO::JOYPAD_NO::PAD4);
+}
+
+void InputManager::UpdateKeyboard()
+{
+	char keyBuf[256];
+	GetHitKeyStateAll(keyBuf);
+
+	for (int i = 0; i < 256; ++i)
 	{
-		return it->second;
+		auto& st = keyStates_[i];
+
+		st.old = st.now;
+		st.now = keyBuf[i] != 0;
+		st.down = st.now && !st.old;
+		st.up = !st.now && st.old;
 	}
 
-	return mouseInfoEmpty_;
-}
-
-InputManager::JOYPAD_TYPE InputManager::GetJPadType(JOYPAD_NO no)
-{
-	return static_cast<InputManager::JOYPAD_TYPE>(GetJoypadType(static_cast<int>(no)));
-}
-
-DINPUT_JOYSTATE InputManager::GetJPadDInputState(JOYPAD_NO no)
-{
-	// ÉRÉìÉgÉçÅ[ÉâèÓïÒ
-	GetJoypadDirectInputState(static_cast<int>(no), &joyDInState_);
-	return joyDInState_;
-}
-
-XINPUT_STATE InputManager::GetJPadXInputState(JOYPAD_NO no)
-{
-	// ÉRÉìÉgÉçÅ[ÉâèÓïÒ
-	GetJoypadXInputState(static_cast<int>(no), &joyXInState_);
-	return joyXInState_;
-}
-
-void InputManager::SetJPadInState(JOYPAD_NO jpNo)
-{
-
-	int no = static_cast<int>(jpNo);
-	auto stateNew = GetJPadInputState(jpNo);
-	auto& stateNow = padInfos_[no];
-
-	int max = static_cast<int>(JOYPAD_BTN::MAX);
-	for (int i = 0; i < max; i++)
+	for (int i = 0; i < 256; ++i)
 	{
+		if (keyStates_[i].down)
+		{
+			activeDevice_ = ActiveDevice::KEY_MOUSE;
+			break;
+		}
+	}
+}
 
-		stateNow.ButtonsOld[i] = stateNow.ButtonsNew[i];
-		stateNow.ButtonsNew[i] = stateNew.ButtonsNew[i];
+void InputManager::UpdateMouse()
+{
+	int x, y;
 
-		stateNow.IsOld[i] = stateNow.IsNew[i];
-		//stateNow.IsNew[i] = stateNow.ButtonsNew[i] == 128 || stateNow.ButtonsNew[i] == 255;
-		stateNow.IsNew[i] = stateNow.ButtonsNew[i] > 0;
+	Vector2 preMousePos = mousePos_;
+	GetMousePoint(&x, &y);
+	mousePos_ = { (float)x, (float)y };
 
-		stateNow.IsTrgDown[i] = stateNow.IsNew[i] && !stateNow.IsOld[i];
-		stateNow.IsTrgUp[i] = !stateNow.IsNew[i] && stateNow.IsOld[i];
-
-
-		stateNow.AKeyLX = stateNew.AKeyLX;
-		stateNow.AKeyLY = stateNew.AKeyLY;
-		stateNow.AKeyRX = stateNew.AKeyRX;
-		stateNow.AKeyRY = stateNew.AKeyRY;
-
+	if (preMousePos.x != mousePos_.x || preMousePos.y != mousePos_.y)
+	{
+		activeDevice_ = ActiveDevice::KEY_MOUSE;
 	}
 
+	int input = GetMouseInput();
+
+	auto updateBtn = [&](INPUT_INFO::MouseBtn btn, int mask)
+		{
+			auto& st = mouseStates_[(int)btn];
+			st.old = st.now;
+			st.now = (input & mask) != 0;
+			st.down = st.now && !st.old;
+			st.up = !st.now && st.old;
+		};
+
+	updateBtn(INPUT_INFO::MouseBtn::LEFT, MOUSE_INPUT_LEFT);
+	updateBtn(INPUT_INFO::MouseBtn::RIGHT, MOUSE_INPUT_RIGHT);
+	updateBtn(INPUT_INFO::MouseBtn::MIDDLE, MOUSE_INPUT_MIDDLE);
+
+	// --- „Éõ„Ç§„Éº„É´ ---
+	int wheel = GetMouseWheelRotVol();
+
+	UpdateKeyState(
+		wheel > 0,
+		mouseStates_[(int)INPUT_INFO::MouseBtn::WHEEL_UP]);
+
+	UpdateKeyState(
+		wheel < 0,
+		mouseStates_[(int)INPUT_INFO::MouseBtn::WHEEL_DOWN]);
+
+	// „Ç¢„ÇØ„ÉÜ„Ç£„Éñ„Éá„Éê„Ç§„ÇπÊõ¥Êñ∞
+	for (int i = 0; i < (int)INPUT_INFO::MouseBtn::MAX; ++i)
+	{
+		if (mouseStates_[i].down)
+		{
+			activeDevice_ = ActiveDevice::KEY_MOUSE;
+			break;
+		}
+	}
 }
 
-InputManager::JOYPAD_IN_STATE InputManager::GetJPadInputState(JOYPAD_NO no)
+void InputManager::UpdatePad(INPUT_INFO::JOYPAD_NO pad)
 {
+	auto& st = padStates_[(int)pad];
 
-	JOYPAD_IN_STATE ret = JOYPAD_IN_STATE();
+	XINPUT_STATE xs{};
+	ZeroMemory(&xs, sizeof(xs));
 
-	auto type = GetJPadType(no);
+	if (GetJoypadXInputState(ToDxPad(pad), &xs) != 0)
+	{
+		return;
+	}
+
+	st.lx = (int)xs.ThumbLX;
+	st.ly = (int)xs.ThumbLY;
+	st.rx = (int)xs.ThumbRX;
+	st.ry = (int)xs.ThumbRY;
+
+	// --- ÂçÅÂ≠ó„Ç≠„Éº ---
+	for (int i = 0; i < (int)INPUT_INFO::PAD_DIR::MAX; ++i)
+	{
+		bool pressed = xs.Buttons[INPUT_INFO::PAD_DIR_MAP[i]] != 0;
+		UpdateKeyState(pressed, st.dir[i]);
+	}
+
+	// --- „Éú„Çø„É≥ ---
+	for (int i = 0; i < (int)INPUT_INFO::PAD_BTN::MAX; ++i)
+	{
+		bool pressed = xs.Buttons[INPUT_INFO::PAD_BTN_MAP[i]] != 0;
+		UpdateKeyState(pressed, st.btn[i]);
+	}
+
+	// --- „Éà„É™„Ç¨„Éº ---
+	st.ltValue = xs.LeftTrigger;
+	st.rtValue = xs.RightTrigger;
+
+	UpdateKeyState(st.ltValue > 30, st.lt);
+	UpdateKeyState(st.rtValue > 30, st.rt);
+
+	// „Éë„ÉÉ„Éâ„Çπ„ÉÜ„Ç£„ÉÉ„ÇØ
+	float lx = st.lx / ANALOG_MAX;
+	float ly = st.ly / ANALOG_MAX;
+
+	float rx = st.rx / ANALOG_MAX;
+	float ry = st.ry / ANALOG_MAX;
+
+	const float threshold = 0.4f;
+
+	UpdateKeyState(ly > threshold, st.stick[(int)INPUT_INFO::PAD_STICK::LEFT_UP]);
+	UpdateKeyState(ly < -threshold, st.stick[(int)INPUT_INFO::PAD_STICK::LEFT_DOWN]);
+	UpdateKeyState(lx < -threshold, st.stick[(int)INPUT_INFO::PAD_STICK::LEFT_LEFT]);
+	UpdateKeyState(lx > threshold, st.stick[(int)INPUT_INFO::PAD_STICK::LEFT_RIGHT]);
+
+	UpdateKeyState(ry > threshold, st.stick[(int)INPUT_INFO::PAD_STICK::RIGHT_UP]);
+	UpdateKeyState(ry < -threshold, st.stick[(int)INPUT_INFO::PAD_STICK::RIGHT_DOWN]);
+	UpdateKeyState(rx < -threshold, st.stick[(int)INPUT_INFO::PAD_STICK::RIGHT_LEFT]);
+	UpdateKeyState(rx > threshold, st.stick[(int)INPUT_INFO::PAD_STICK::RIGHT_RIGHT]);
+
+	// „Éú„Çø„É≥
+	for (int i = 0; i < (int)INPUT_INFO::PAD_BTN::MAX; ++i)
+	{
+		if (st.btn[i].down)
+		{
+			activeDevice_ = ActiveDevice::PAD;
+			return;
+		}
+	}
+
+	// ÂçÅÂ≠ó„Ç≠„Éº
+	for (int i = 0; i < (int)INPUT_INFO::PAD_DIR::MAX; ++i)
+	{
+		if (st.dir[i].down)
+		{
+			activeDevice_ = ActiveDevice::PAD;
+			return;
+		}
+	}
+
+	// „Éà„É™„Ç¨„Éº
+	if (st.lt.down || st.rt.down)
+	{
+		activeDevice_ = ActiveDevice::PAD;
+		return;
+	}
+
+	if (fabs(lx) > 0.4f || fabs(ly) > 0.4f)
+	{
+		activeDevice_ = ActiveDevice::PAD;
+	}
+}
+
+void InputManager::UpdateKeyState(bool isPressed, KeyState& st)
+{
+	st.old = st.now;
+	st.now = isPressed;
+	st.down = st.now && !st.old;
+	st.up = !st.now && st.old;
+}
+
+bool InputManager::IsInputAlreadyUsed(const BindInput& input, INPUT_INFO::ACTION ignoreAction) const
+{
+	for (const auto& [action, bind] : actionBinds_)
+	{
+		if (action == ignoreAction)
+			continue;
+
+		const auto& arr =
+			(input.type == BindType::KEY ||
+				input.type == BindType::MOUSE)
+			? bind.keyMouse
+			: bind.pad;
+
+		for (const auto& b : arr)
+		{
+			if (b.code == input.code &&
+				b.type == input.type &&
+				b.pad == input.pad)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+void InputManager::RemoveDuplicateOtherActions(INPUT_INFO::ACTION action, const BindInput& input)
+{
+	auto myCategory = INPUT_INFO::GetActionCategory(action);
+
+	for (auto& [act, bind] : actionBinds_)
+	{
+		if (act == action)
+			continue;
+
+		if (INPUT_INFO::GetActionCategory(act) != myCategory)
+			continue;
+
+		auto& arr =
+			(input.type == BindType::KEY ||
+				input.type == BindType::MOUSE)
+			? bind.keyMouse
+			: bind.pad;
+
+		for (auto& b : arr)
+		{
+			if (b.code == input.code &&
+				b.type == input.type &&
+				b.pad == input.pad)
+			{
+				b.code = -1;
+			}
+		}
+	}
+}
+
+bool InputManager::IsAction(INPUT_INFO::ACTION action) const
+{
+	const auto& bind = actionBinds_.at(action);
+
+	// „Ç≠„Éº„Éú„Éº„Éâ&„Éû„Ç¶„Çπ
+	for (const auto& b : bind.keyMouse)
+	{
+		if (b.code == -1) continue;
+
+		if (b.type == BindType::KEY &&
+			keyStates_.at(b.code).now)
+			return true;
+		
+		if (b.type == BindType::MOUSE &&
+			mouseStates_[b.code].now)
+			return true;
+	}
+
+	// „Éë„ÉÉ„Éâ
+	for (const auto& b : bind.pad)
+	{
+		if (b.code == -1) continue;
+
+		auto pad = b.pad;
+
+		switch (b.type)
+		{
+		case BindType::PAD_BTN:
+			if (padStates_[(int)pad].btn[b.code].now)
+				return true;
+			break;
+
+		case BindType::PAD_DIR:
+			if (padStates_[(int)pad].dir[b.code].now)
+				return true;
+			break;
+
+		case BindType::PAD_TRIGGER :
+		{
+			bool pressed = false;
+
+			if (b.code == (int)INPUT_INFO::PAD_TRIGGER::LT)
+				pressed = padStates_[(int)pad].lt.now;
+			else
+				pressed = padStates_[(int)pad].rt.now;
+
+			if (pressed)
+				return true;
+		}
+			break;
+
+		case BindType::PAD_STICK:
+		{
+			if (padStates_[(int)pad].stick[b.code].now)
+				return true;
+		}
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	return false;
+}
+
+bool InputManager::IsActionDown(INPUT_INFO::ACTION action) const
+{
+	const auto& bind = actionBinds_.at(action);
+
+	// „Ç≠„Éº„Éú„Éº„Éâ&„Éû„Ç¶„Çπ
+	for (const auto& b : bind.keyMouse)
+	{
+		if (b.code == -1) continue;
+
+		if (b.type == BindType::KEY &&
+			keyStates_.at(b.code).down)
+			return true;
+
+		if (b.type == BindType::MOUSE &&
+			mouseStates_[b.code].down)
+			return true;
+	}
+
+	// „Éë„ÉÉ„Éâ
+	for (const auto& b : bind.pad)
+	{
+		if (b.code == -1) continue;
+
+		auto pad = b.pad;
+
+		switch (b.type)
+		{
+		case BindType::PAD_BTN:
+			if (padStates_[(int)pad].btn[b.code].down)
+				return true;
+			break;
+
+		case BindType::PAD_DIR:
+			if (padStates_[(int)pad].dir[b.code].down)
+				return true;
+			break;
+
+		case BindType::PAD_TRIGGER:
+		{
+			bool pressed = false;
+
+			if (b.code == (int)INPUT_INFO::PAD_TRIGGER::LT)
+				pressed = padStates_[(int)pad].lt.down;
+			else
+				pressed = padStates_[(int)pad].rt.down;
+
+			if (pressed)
+				return true;
+		}
+			break;
+
+		case BindType::PAD_STICK:
+		{
+			if (padStates_[(int)pad].stick[b.code].down)
+				return true;
+		}
+		break;
+
+		default:
+			break;
+		}
+	}
+
+	return false;
+}
+
+bool InputManager::IsActionUp(INPUT_INFO::ACTION action) const
+{
+	const auto& bind = actionBinds_.at(action);
+
+	// „Ç≠„Éº„Éú„Éº„Éâ&„Éû„Ç¶„Çπ
+	for (const auto& b : bind.keyMouse)
+	{
+		if (b.code == -1) continue;
+
+		if (b.type == BindType::KEY &&
+			keyStates_.at(b.code).up)
+			return true;
+
+		if (b.type == BindType::MOUSE &&
+			mouseStates_[b.code].up)
+			return true;
+	}
+
+	// „Éë„ÉÉ„Éâ
+	for (const auto& b : bind.pad)
+	{
+		if (b.code == -1) continue;
+
+		auto pad = b.pad;
+
+		switch (b.type)
+		{
+		case BindType::PAD_BTN:
+			if (padStates_[(int)pad].btn[b.code].up)
+				return true;
+			break;
+
+		case BindType::PAD_DIR:
+			if (padStates_[(int)pad].dir[b.code].up)
+				return true;
+			break;
+
+		case BindType::PAD_TRIGGER:
+		{
+			bool pressed = false;
+
+			if (b.code == (int)INPUT_INFO::PAD_TRIGGER::LT)
+				pressed = padStates_[(int)pad].lt.up;
+			else
+				pressed = padStates_[(int)pad].rt.up;
+
+			if (pressed)
+				return true;
+		}
+			break;
+
+		case BindType::PAD_STICK:
+		{
+			if (padStates_[(int)pad].stick[b.code].up)
+				return true;
+		}
+		break;
+
+		default:
+			break;
+		}
+	}
+
+	return false;
+}
+
+void InputManager::SetActionKey(INPUT_INFO::ACTION action, const std::vector<int>& keys)
+{
+	auto& bind = actionBinds_[action];
+
+	for (int i = 0; i < MAX_BIND_PER_TYPE; ++i)
+	{
+		bind.keyMouse[i].code = -1;
+	}
+
+	for (int i = 0;
+		i < (int)keys.size() && i < MAX_BIND_PER_TYPE;
+		++i)
+	{
+		bind.keyMouse[i].type = BindType::KEY;
+		bind.keyMouse[i].code = keys[i];
+	}
+}
+
+void InputManager::SetActionMouse(INPUT_INFO::ACTION action, INPUT_INFO::MouseBtn btn)
+{
+	auto& bind = actionBinds_[action];
+
+	for (int i = 0; i < MAX_BIND_PER_TYPE; ++i)
+	{
+		if (bind.keyMouse[i].code == -1)
+		{
+			bind.keyMouse[i].type = BindType::MOUSE;
+			bind.keyMouse[i].code = (int)btn;
+			return;
+		}
+	}
+}
+
+void InputManager::SetActionPadBtn(INPUT_INFO::ACTION action, INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_BTN btn)
+{
+	auto& bind = actionBinds_[action];
+
+	for (int i = 0; i < MAX_BIND_PER_TYPE; ++i)
+	{
+		if (bind.pad[i].code == -1)
+		{
+			bind.pad[i].type = BindType::PAD_BTN;
+			bind.pad[i].pad = pad;
+			bind.pad[i].code = (int)btn;
+			return;
+		}
+	}
+}
+
+void InputManager::SetActionPadDir(INPUT_INFO::ACTION action, INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_DIR dir)
+{
+	auto& bind = actionBinds_[action];
+
+	for (int i = 0; i < MAX_BIND_PER_TYPE; ++i)
+	{
+		if (bind.pad[i].code == -1)
+		{
+			bind.pad[i].type = BindType::PAD_DIR;
+			bind.pad[i].pad = pad;
+			bind.pad[i].code = (int)dir;
+			return;
+		}
+	}
+}
+
+void InputManager::SetActionPadTrigger(INPUT_INFO::ACTION action, INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_TRIGGER trigger)
+{
+	auto& bind = actionBinds_[action];
+
+	for (int i = 0; i < MAX_BIND_PER_TYPE; ++i)
+	{
+		if (bind.pad[i].code == -1)
+		{
+			bind.pad[i].type = BindType::PAD_TRIGGER;
+			bind.pad[i].pad = pad;
+			bind.pad[i].code = (int)trigger;
+			return;
+		}
+	}
+}
+
+Vector2 InputManager::GetMousePos() const
+{
+	return mousePos_;
+}
+
+bool InputManager::IsMouse(INPUT_INFO::MouseBtn btn) const
+{
+	return mouseStates_[(int)btn].now;
+}
+
+bool InputManager::IsMouseDown(INPUT_INFO::MouseBtn btn) const
+{
+	return mouseStates_[(int)btn].down;
+}
+
+bool InputManager::IsMouseUp(INPUT_INFO::MouseBtn btn) const
+{
+	return mouseStates_[(int)btn].up;
+}
+
+bool InputManager::IsPadDir(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_DIR dir) const
+{
+	return padStates_[(int)pad].dir[(int)dir].now;
+}
+
+bool InputManager::IsPadDirDown(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_DIR dir) const
+{
+	return padStates_[(int)pad].dir[(int)dir].down;
+}
+
+bool InputManager::IsPadDirUp(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_DIR dir) const
+{
+	return padStates_[(int)pad].dir[(int)dir].up;
+}
+
+bool InputManager::IsPadLT(INPUT_INFO::JOYPAD_NO pad) const
+{
+	return padStates_[(int)pad].lt.now;
+}
+
+bool InputManager::IsPadRT(INPUT_INFO::JOYPAD_NO pad) const
+{
+	return padStates_[(int)pad].rt.now;
+}
+
+float InputManager::GetPadLTValue(INPUT_INFO::JOYPAD_NO pad) const
+{
+	return padStates_[(int)pad].ltValue / 255.0f;
+}
+
+float InputManager::GetPadRTValue(INPUT_INFO::JOYPAD_NO pad) const
+{
+	return padStates_[(int)pad].rtValue / 255.0f;
+}
+
+VECTOR InputManager::GetDirectionXZAKey(INPUT_INFO::JOYPAD_NO pad) const
+{
+	const auto& st = padStates_[(int)pad];
+
+	float x = st.lx / ANALOG_MAX;
+	float z = st.ly / ANALOG_MAX;
+
+	float len = sqrtf(x * x + z * z);
+	if (len < DEAD_ZONE) return VGet(0, 0, 0);
+
+	float scale = (len - DEAD_ZONE) / (1.0f - DEAD_ZONE);
+	x = (x / len) * scale;
+	z = (z / len) * scale;
+
+	return VNorm(VGet(x, 0, -z));
+}
+
+VECTOR InputManager::GetRightStickDirection(INPUT_INFO::JOYPAD_NO pad) const
+{
+	const auto& st = padStates_[(int)pad];
+
+	float x = st.rx / ANALOG_MAX;
+	float z = st.ry / ANALOG_MAX;
+
+	float len = sqrtf(x * x + z * z);
+	if (len < DEAD_ZONE) return VGet(0, 0, 0);
+
+	float scale = (len - DEAD_ZONE) / (1.0f - DEAD_ZONE);
+	x = (x / len) * scale;
+	z = (z / len) * scale;
+
+	return VNorm(VGet(x, 0, -z));
+}
+
+void InputManager::ClearActionBind(INPUT_INFO::ACTION action)
+{
+	actionBinds_[action] = ActionBind{};
+}
+
+void InputManager::ClearBindByType(INPUT_INFO::ACTION action, BindType type, INPUT_INFO::JOYPAD_NO pad)
+{
+	auto& bind = actionBinds_[action];
+
+	auto& arr =
+		(type == BindType::KEY ||
+			type == BindType::MOUSE)
+		? bind.keyMouse
+		: bind.pad;
+
+	for (auto& b : arr)
+	{
+		if (b.type == type)
+		{
+			if (type == BindType::PAD_BTN ||
+				type == BindType::PAD_DIR ||
+				type == BindType::PAD_TRIGGER)
+			{
+				if (b.pad == pad)
+					b.code = -1;
+			}
+			else
+			{
+				b.code = -1;
+			}
+		}
+	}
+}
+
+void InputManager::ClearKeyMouse(INPUT_INFO::ACTION action)
+{
+	auto& bind = actionBinds_[action];
+	for (auto& b : bind.keyMouse)
+		b.code = -1;
+}
+
+void InputManager::ClearPad(INPUT_INFO::ACTION action)
+{
+	auto& bind = actionBinds_[action];
+	for (auto& b : bind.pad)
+		b.code = -1;
+}
+
+int InputManager::CountPadBtn(const ActionBind& bind, INPUT_INFO::JOYPAD_NO pad) const
+{
+	int count = 0;
+	for (const auto& b : bind.pad)
+	{
+		if (b.type == BindType::PAD_BTN &&
+			b.pad == pad &&
+			b.code != -1)
+		{
+			count++;
+		}
+	}
+	return count;
+}
+
+int InputManager::CountPadDir(const ActionBind& bind, INPUT_INFO::JOYPAD_NO pad) const
+{
+	int count = 0;
+	for (const auto& b : bind.pad)
+	{
+		if (b.type == BindType::PAD_DIR &&
+			b.pad == pad &&
+			b.code != -1)
+		{
+			count++;
+		}
+	}
+	return count;
+}
+
+int InputManager::CountPadTrigger(const ActionBind& bind, INPUT_INFO::JOYPAD_NO pad) const
+{
+	int count = 0;
+	for (const auto& b : bind.pad)
+	{
+		if (b.type == BindType::PAD_TRIGGER &&
+			b.pad == pad &&
+			b.code != -1)
+		{
+			count++;
+		}
+	}
+	return count;
+}
+
+void InputManager::AddBind(INPUT_INFO::ACTION action, int slot,	const BindInput& input)
+{
+	if (slot < 0 || slot >= MAX_BIND_PER_TYPE)
+		return;
 	
-	switch (type)
+	auto& bind = actionBinds_[action];
+
+	auto& targetArray = (
+		input.type == BindType::KEY ||
+		input.type == BindType::MOUSE)
+		? bind.keyMouse
+		: bind.pad;
+
+	// Âêå„Åò„Çπ„É≠„ÉÉ„Éà„Å´Âêå„ÅòÂÖ•Âäõ„Å™„ÇâÂâäÈô§
+	if (targetArray[slot].code == input.code &&
+		targetArray[slot].type == input.type &&
+		targetArray[slot].pad == input.pad)
 	{
-	case InputManager::JOYPAD_TYPE::OTHER:
-		break;
-	case InputManager::JOYPAD_TYPE::XBOX_360:
-	{
-	}
-		break;
-	case InputManager::JOYPAD_TYPE::XBOX_ONE:
-	{
-
-		auto d = GetJPadDInputState(no);
-		auto x = GetJPadXInputState(no);
-
-		int idx;
-
-		//   Y
-		// X   B
-		//   A
-
-		idx = static_cast<int>(JOYPAD_BTN::TOP);
-		ret.ButtonsNew[idx] = d.Buttons[3];// Y
-
-		idx = static_cast<int>(JOYPAD_BTN::LEFT);
-		ret.ButtonsNew[idx] = d.Buttons[2];// X
-
-		idx = static_cast<int>(JOYPAD_BTN::RIGHT);
-		ret.ButtonsNew[idx] = d.Buttons[1];// B
-
-		idx = static_cast<int>(JOYPAD_BTN::DOWN);
-		ret.ButtonsNew[idx] = d.Buttons[0];// A
-
-		idx = static_cast<int>(JOYPAD_BTN::R_TRIGGER);
-		ret.ButtonsNew[idx] = x.RightTrigger;// R_TRIGGER
-
-		idx = static_cast<int>(JOYPAD_BTN::L_TRIGGER);
-		ret.ButtonsNew[idx] = x.LeftTrigger; // L_TRIGGER
-
-		// ç∂ÉXÉeÉBÉbÉN
-		ret.AKeyLX = d.X;
-		ret.AKeyLY = d.Y;
-		
-		// âEÉXÉeÉBÉbÉN
-		ret.AKeyRX = d.Rx;
-		ret.AKeyRY = d.Ry;
-
-	}
-		break;
-	case InputManager::JOYPAD_TYPE::DUAL_SHOCK_4:
-		break;
-	case InputManager::JOYPAD_TYPE::DUAL_SENSE:
-	{
-		
-		auto d = GetJPadDInputState(no);
-		int idx;
-
-		//   Å¢
-		// Å†  ÅZ
-		//   Å~
-
-		idx = static_cast<int>(JOYPAD_BTN::TOP);
-		ret.ButtonsNew[idx] = d.Buttons[3];// Å¢
-
-		idx = static_cast<int>(JOYPAD_BTN::LEFT);
-		ret.ButtonsNew[idx] = d.Buttons[0];// Å†
-
-		idx = static_cast<int>(JOYPAD_BTN::RIGHT);
-		ret.ButtonsNew[idx] = d.Buttons[2];// ÅZ
-
-		idx = static_cast<int>(JOYPAD_BTN::DOWN);
-		ret.ButtonsNew[idx] = d.Buttons[1];// Å~
-
-		// ç∂ÉXÉeÉBÉbÉN
-		ret.AKeyLX = d.X;
-		ret.AKeyLY = d.Y;
-		
-		// âEÉXÉeÉBÉbÉN
-		ret.AKeyRX = d.Z;
-		ret.AKeyRY = d.Rz;
-
-	}
-		break;
-	case InputManager::JOYPAD_TYPE::SWITCH_JOY_CON_L:
-		break;
-	case InputManager::JOYPAD_TYPE::SWITCH_JOY_CON_R:
-		break;
-	case InputManager::JOYPAD_TYPE::SWITCH_PRO_CTRL:
-		break;
-	case InputManager::JOYPAD_TYPE::MAX:
-		break;
+		targetArray[slot].code = -1;
+		return;
 	}
 
-	return ret;
+	// Âêå‰∏Ä„Ç¢„ÇØ„Ç∑„Éß„É≥ÂÜÖ„ÅÆÈáçË§á„ÉÅ„Çß„ÉÉ„ÇØ
+	for (int i = 0; i < MAX_BIND_PER_TYPE; ++i)
+	{
+		if(targetArray[i].code == input.code &&
+			targetArray[i].type == input.type &&
+			targetArray[i].pad == input.pad)
+		{
+			return;
+		}
+	}
 
+	// ‰ªñ„Ç¢„ÇØ„Ç∑„Éß„É≥„Åã„Çâ„ÅØÂâäÈô§
+	RemoveDuplicateOtherActions(action, input);
+
+	targetArray[slot] = input;
 }
 
-bool InputManager::IsPadBtnNew(JOYPAD_NO no, JOYPAD_BTN btn) const
+bool InputManager::DetectKey(int& outkey)
 {
-	return padInfos_[static_cast<int>(no)].IsNew[static_cast<int>(btn)];
-}
-
-bool InputManager::IsPadBtnTrgDown(JOYPAD_NO no, JOYPAD_BTN btn) const
-{
-	return padInfos_[static_cast<int>(no)].IsTrgDown[static_cast<int>(btn)];
-}
-
-bool InputManager::IsPadBtnTrgUp(JOYPAD_NO no, JOYPAD_BTN btn) const
-{
-	return padInfos_[static_cast<int>(no)].IsTrgUp[static_cast<int>(btn)];
-}
-
-VECTOR InputManager::GetDirectionXZAKey(int aKeyX, int aKeyY)
-{
-
-	VECTOR ret = { 0.0f, 0.0f, 0.0f };
-
-	// ÉXÉeÉBÉbÉNÇÃå¬ÅXÇÃì¸óÕílÇÕÅA
-	// -1000.0f Å` 1000.0f ÇÃîÕàÕÇ≈ï‘Ç¡ÇƒÇ≠ÇÈÇ™ÅA
-	// X:1000.0fÅAY:1000.0fÇ…Ç»ÇÈÇ±Ç∆ÇÕñ≥Ç¢(1000Ç∆500Ç≠ÇÁÇ¢Ç™ç≈ëÂ)
-	
-	// ÉXÉeÉBÉbÉNÇÃì¸óÕílÇ -1.0 Å` 1.0 Ç…ê≥ãKâª
-	float dirX = static_cast<float>(aKeyX) / AKEY_VAL_MAX;
-	float dirZ = static_cast<float>(aKeyY) / AKEY_VAL_MAX;
-
-	// ÉsÉ^ÉSÉâÉXÇÃíËóùÇ≈ÉjÉÖÅ[ÉgÉâÉãèÛë‘Ç©ÇÁÇÃí∑Ç≥ÉxÉNÉgÉãÇ…Ç∑ÇÈ
-	// ( â~å`ÇÃÉfÉbÉhÉ]Å[ÉìÇ…Ç»ÇÈ )
-
-	// ïΩï˚ç™Ç…ÇÊÇËÅAÇ®Ç®ÇÊÇªÇÃç≈ëÂílÇ™1.0Ç∆Ç»ÇÈ
-	float len = sqrtf(dirX * dirX + dirZ * dirZ);
-	if (len < THRESHOLD)
+	for (int i = 0; i < 256; ++i)
 	{
-		// (0.0f, 0.0f, 0.0f)
-		return ret;
+		if (keyStates_[i].down)
+		{
+			outkey = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool InputManager::DetectMouse(INPUT_INFO::MouseBtn& outBtn)
+{
+	for (int i = 0; i < (int)INPUT_INFO::MouseBtn::MAX; ++i)
+	{
+		if (mouseStates_[i].down)
+		{
+			outBtn = (INPUT_INFO::MouseBtn)i;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool InputManager::DetectPadBtn(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_BTN& outBtn)
+{
+	const auto& st = padStates_[(int)pad];
+
+	for (int i = 0; i < (int)INPUT_INFO::PAD_BTN::MAX; ++i)
+	{
+		if (st.btn[i].down)
+		{
+			outBtn = (INPUT_INFO::PAD_BTN)i;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool InputManager::DetectPadDir(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_DIR& outdir)
+{
+	const auto& st = padStates_[(int)pad];
+
+	for (int i = 0; i < (int)INPUT_INFO::PAD_DIR::MAX; ++i)
+	{
+		if (st.dir[i].down)
+		{
+			outdir = (INPUT_INFO::PAD_DIR)i;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool InputManager::DetectPadTrigger(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_TRIGGER& out)
+{
+	const auto& st = padStates_[(int)pad];
+
+	if (st.lt.down)
+	{
+		out = INPUT_INFO::PAD_TRIGGER::LT;
+		return true;
 	}
 
-	// ÉfÉbÉhÉ]Å[Éìã´äEÇ©ÇÁÇ…çƒÉXÉPÅ[ÉäÉìÉO(â¬ïœÉfÉbÉhÉ]Å[Éì)
-	// ( ÇµÇ´Ç¢íl 0.35 ÇÃèÍçáÇÕÅA 0.0 Å` 0.65 / 0.65 Ç…Ç»ÇÈ )
-	float scale = (len - THRESHOLD) / (1.0f - THRESHOLD);
-	dirX = (dirX / len) * scale;
-	dirZ = (dirZ / len) * scale;
+	if (st.rt.down)
+	{
+		out = INPUT_INFO::PAD_TRIGGER::RT;
+		return true;
+	}
 
-	// ZÇÕëOÇ…ì|Ç∑Ç∆É}ÉCÉiÉXílÇ™ï‘Ç¡ÇƒÇ≠ÇÈÇÃÇ≈îΩì]
-	ret = VNorm({ dirX, 0.0f, -dirZ });
+	return false;
+}
 
-	return ret;
+bool InputManager::DetectPadStick(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_STICK& out)
+{
+	const auto& st = padStates_[(int)pad];
 
+	for (int i = 0; i < (int)INPUT_INFO::PAD_STICK::MAX; ++i)
+	{
+		if (st.stick[i].down)
+		{
+			out = (INPUT_INFO::PAD_STICK)i;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void InputManager::SetActionBinds(const std::map<INPUT_INFO::ACTION, ActionBind>& binds)
+{
+	actionBinds_ = binds;
 }

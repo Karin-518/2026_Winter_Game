@@ -1,72 +1,15 @@
 #pragma once
+#include <array>
 #include <map>
 #include <Dxlib.h>
+#include <vector>
+#include <string>
+
+#include "InputInfo.h"
 #include "../Common/Math/Vector2.h"
 
 class InputManager
 {
-
-public:
-
-	// アナログキーの最大値
-	static constexpr float AKEY_VAL_MAX = 1000.0f;
-
-	// アナログキーの入力受付しきい値(0.0～1.0)
-	static constexpr float THRESHOLD = 0.35f;
-
-	// ゲームコントローラーの認識番号
-	// DxLib定数、DX_INPUT_PAD1等に対応
-	enum class JOYPAD_NO
-	{
-		KEY_PAD1,			// キー入力とパッド１入力
-		PAD1,				// パッド１入力
-		PAD2,				// パッド２入力
-		PAD3,				// パッド３入力
-		PAD4,				// パッド４入力
-		INPUT_KEY = 4096	// キー入力
-	};
-
-	// ゲームコントローラータイプ
-	// DxLib定数、DX_OTHER等に対応
-	enum class JOYPAD_TYPE
-	{
-		OTHER = 0,
-		XBOX_360,
-		XBOX_ONE,
-		DUAL_SHOCK_4,
-		DUAL_SENSE,
-		SWITCH_JOY_CON_L,
-		SWITCH_JOY_CON_R,
-		SWITCH_PRO_CTRL,
-		MAX
-	};
-
-	// ゲームコントローラーボタン
-	enum class JOYPAD_BTN
-	{
-		LEFT = 0,
-		RIGHT,
-		TOP,
-		DOWN,
-		R_TRIGGER,
-		L_TRIGGER,
-		MAX
-	};
-
-	// ゲームコントローラーの入力情報
-	struct JOYPAD_IN_STATE
-	{
-		unsigned char ButtonsOld[static_cast<int>(JOYPAD_BTN::MAX)];
-		unsigned char ButtonsNew[static_cast<int>(JOYPAD_BTN::MAX)];
-		bool IsOld[static_cast<int>(JOYPAD_BTN::MAX)];
-		bool IsNew[static_cast<int>(JOYPAD_BTN::MAX)];
-		bool IsTrgDown[static_cast<int>(JOYPAD_BTN::MAX)];
-		bool IsTrgUp[static_cast<int>(JOYPAD_BTN::MAX)];
-		int AKeyLX;
-		int AKeyLY;
-		int AKeyRX;
-		int AKeyRY;
-	};
 
 public:
 	// シングルトン（生成・取得・削除）
@@ -75,14 +18,11 @@ public:
 	static void DeleteInstance(void) { if (instance_ != nullptr) { delete instance_; instance_ = nullptr; } }
 
 private:
-
 	// インスタンス
 	static InputManager* instance_;
-
-	// デフォルトコンストラクタをprivateにして、
-	// 外部から生成できない様にする
-	InputManager(void);
-	~InputManager(void);
+	
+	InputManager(void) {};		// デフォルトコンストラクタをprivateにして、
+	~InputManager(void);		// 外部から生成できない様にする
 
 	// コピー・ムーブ操作を禁止
 	InputManager(const InputManager&) = delete;
@@ -90,125 +30,165 @@ private:
 	InputManager(InputManager&&) = delete;
 	InputManager& operator=(InputManager&&) = delete;
 
-	// 下記をコンパイルエラーさせるため 上記を追加
-	// InputManager copy = *InputManager::GetInstance();
-	// InputManager copied(*InputManager::GetInstance());
-	// InputManager moved = std::move(*InputManager::GetInstance());
 public:
-	// 初期化
-	void Init(void);
 
-	// 更新
-	void Update(void);
+	static constexpr int MAX_BIND_PER_TYPE = 3;
 
-	// リソースの破棄
-	void Destroy(void);
+	// 入力種別
+	enum class BindType
+	{
+		KEY,
+		PAD_BTN,
+		PAD_DIR,
+		PAD_STICK,
+		PAD_TRIGGER,
+		MOUSE
+	};
 
-	// 判定を行うキーを追加
-	void Add(int key);
+	struct BindInput
+	{
+		BindType type = BindType::KEY;
+		int code = -1;
+		INPUT_INFO::JOYPAD_NO pad = INPUT_INFO::JOYPAD_NO::PAD1;
+	};
 
-	// 判定を行うキーをクリア
-	void Clear(void);
+	// 各アクションの入力装置の登録用
+	struct ActionBind
+	{
+		std::array<BindInput, MAX_BIND_PER_TYPE> keyMouse;
+		std::array<BindInput, MAX_BIND_PER_TYPE> pad;
 
-	// キーの押下判定
-	bool IsNew(int key) const;
+		ActionBind()
+		{
+			for (int i = 0; i < MAX_BIND_PER_TYPE; ++i)
+			{
+				keyMouse[i].code = -1;
+				pad[i].code = -1;
+			}
+		}
+	};
 
-	// キーの押下判定(押しっぱなしはNG)
-	bool IsTrgDown(int key) const;
+	// アクション登録
+	void AddBind(INPUT_INFO::ACTION action, int slot, const BindInput& input);
 
-	// キーを離した時の判定
-	bool IsTrgUp(int key) const;
+	// アクション判定
+	bool IsAction(INPUT_INFO::ACTION action) const;			// 押しっぱなし
+	bool IsActionDown(INPUT_INFO::ACTION action) const;		// 押した瞬間
+	bool IsActionUp(INPUT_INFO::ACTION action) const;		// 離した瞬間
 
-	// マウス座標の取得
-	Vector2 GetMousePos(void) const;
+	const std::map<INPUT_INFO::ACTION, ActionBind>& GetActionBinds() const { return actionBinds_; }
 
-	// マウスのクリック状態を取得(MOUSE_INPUT_LEFT、RIGHT)
-	int GetMouse(void) const;
+	enum class ActiveDevice
+	{
+		KEY_MOUSE,
+		PAD
+	};
 
-	// マウスが左クリックされたか
-	bool IsClickMouseLeft(void) const;
-
-	// マウスが右クリックされたか
-	bool IsClickMouseRight(void) const;
-
-	// マウスが左クリックされたか(押しっぱなしはNG)
-	bool IsTrgMouseLeft(void) const;
-
-	// マウスが右クリックされたか(押しっぱなしはNG)
-	bool IsTrgMouseRight(void) const;
-
-	// コントローラの入力情報を取得する
-	JOYPAD_IN_STATE GetJPadInputState(JOYPAD_NO no);
-
-	// ボタンが押された
-	bool IsPadBtnNew(JOYPAD_NO no, JOYPAD_BTN btn) const;
-	bool IsPadBtnTrgDown(JOYPAD_NO no, JOYPAD_BTN btn) const;
-	bool IsPadBtnTrgUp(JOYPAD_NO no, JOYPAD_BTN btn) const;
-
-	// アナログキーの入力値から方向を取得
-	VECTOR GetDirectionXZAKey(int aKeyX, int aKeyY);
+	ActiveDevice GetActiveDevice() const { return activeDevice_; }
 
 private:
 
 	// キー情報
-	struct Info
+	struct KeyState
 	{
-		int key;			// キーID
-		bool keyOld;		// 1フレーム前の押下状態
-		bool keyNew;		// 現フレームの押下状態
-		bool keyTrgDown;	// 現フレームでボタンが押されたか
-		bool keyTrgUp;		// 現フレームでボタンが離されたか
+		bool now = false;	// 現フレーム
+		bool old = false;	// 1フレーム前
+		bool down = false;	// 現フレームでボタンが押されたか
+		bool up = false;	// 現フレームでボタンが離されたか
 	};
-
-	// マウス
-	struct MouseInfo
-	{
-		int key;			// キーID
-		bool keyOld;		// 1フレーム前の押下状態
-		bool keyNew;		// 現フレームの押下状態
-		bool keyTrgDown;	// 現フレームでボタンが押されたか
-		bool keyTrgUp;		// 現フレームでボタンが離されたか
-	};
-
-	// コントローラ情報
-	DINPUT_JOYSTATE joyDInState_;
-
-	// コントローラ情報(XBOX)
-	XINPUT_STATE joyXInState_;
-
-	// キー情報
-	std::map<int, InputManager::Info> keyInfos_;
-	InputManager::Info infoEmpty_;
-
-	// マウス情報
-	std::map<int, InputManager::MouseInfo> mouseInfos_;
-	InputManager::MouseInfo mouseInfoEmpty_;
-
-	// マウスカーソルの位置
-	Vector2 mousePos_;
-	
-	// マウスボタンの入力状態
-	int mouseInput_;
 
 	// パッド情報
-	JOYPAD_IN_STATE padInfos_[5];
+	struct PadState
+	{
+		KeyState dir[(int)INPUT_INFO::PAD_DIR::MAX]; // 十字キー
+		KeyState btn[(int)INPUT_INFO::PAD_BTN::MAX]; // ボタン
+		KeyState stick[(int)INPUT_INFO::PAD_STICK::MAX];
 
-	// 配列の中からキー情報を取得する
-	const InputManager::Info& Find(int key) const;
+		KeyState lt;
+		KeyState rt;
 
-	// 配列の中からマウス情報を取得する
-	const InputManager::MouseInfo& FindMouse(int key) const;
+		int lx = 0;
+		int ly = 0;
 
-	// 接続されたコントローラの種別を取得する
-	JOYPAD_TYPE GetJPadType(JOYPAD_NO no);
+		int rx = 0;
+		int ry = 0;
 
-	// コントローラの入力情報を取得する
-	DINPUT_JOYSTATE GetJPadDInputState(JOYPAD_NO no);
+		int ltValue = 0;
+		int rtValue = 0;
+	};
 
-	// コントローラ(XBOX)の入力情報を取得する
-	XINPUT_STATE GetJPadXInputState(JOYPAD_NO no);
+public:
 
-	// コントローラの入力情報を更新する
-	void SetJPadInState(JOYPAD_NO jpNo);
+	void Init(void);		// 初期化
+	void Update(void);		// 更新
 
+	// マウス
+	Vector2 GetMousePos(void) const;
+	bool IsMouse(INPUT_INFO::MouseBtn btn) const;			// 押しっぱなし
+	bool IsMouseDown(INPUT_INFO::MouseBtn btn) const;		// 押した瞬間
+	bool IsMouseUp(INPUT_INFO::MouseBtn btn) const;			// 離した瞬間
+
+	// パッド移動
+	bool IsPadDir(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_DIR dir) const;
+	bool IsPadDirDown(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_DIR dir) const;
+	bool IsPadDirUp(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_DIR dir) const;
+
+	bool IsPadLT(INPUT_INFO::JOYPAD_NO pad) const;
+	bool IsPadRT(INPUT_INFO::JOYPAD_NO pad) const;
+	float GetPadLTValue(INPUT_INFO::JOYPAD_NO pad) const;
+	float GetPadRTValue(INPUT_INFO::JOYPAD_NO pad) const;
+
+	// アナログキーの入力値から方向を取得
+	VECTOR GetDirectionXZAKey(INPUT_INFO::JOYPAD_NO pad) const;
+	VECTOR GetRightStickDirection(INPUT_INFO::JOYPAD_NO pad) const;
+
+	// キー割り当て
+	void SetActionKey(INPUT_INFO::ACTION action, const std::vector<int>& keys);
+	void SetActionMouse(INPUT_INFO::ACTION action, INPUT_INFO::MouseBtn btn);
+
+	void SetActionPadBtn(INPUT_INFO::ACTION action, INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_BTN btn);
+	void SetActionPadDir(INPUT_INFO::ACTION action, INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_DIR dir);
+	void SetActionPadTrigger(INPUT_INFO::ACTION action, INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_TRIGGER trigger);
+
+	// キーコンフィグ
+	void ClearActionBind(INPUT_INFO::ACTION action);
+	void ClearBindByType(INPUT_INFO::ACTION action, BindType type, INPUT_INFO::JOYPAD_NO pad = INPUT_INFO::JOYPAD_NO::PAD1);
+	void ClearKeyMouse(INPUT_INFO::ACTION action);
+	void ClearPad(INPUT_INFO::ACTION action);
+
+	int CountPadBtn(const ActionBind& bind, INPUT_INFO::JOYPAD_NO pad) const;
+	int CountPadDir(const ActionBind& bind, INPUT_INFO::JOYPAD_NO pad) const;
+	int CountPadTrigger(const ActionBind& bind, INPUT_INFO::JOYPAD_NO pad) const;
+
+	bool DetectKey(int& outkey);
+	bool DetectMouse(INPUT_INFO::MouseBtn& outBtn);
+	bool DetectPadBtn(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_BTN& outBtn);
+	bool DetectPadDir(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_DIR& outDir);
+	bool DetectPadTrigger(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_TRIGGER& out);
+	bool DetectPadStick(INPUT_INFO::JOYPAD_NO pad, INPUT_INFO::PAD_STICK& out);
+	
+	void SetActionBinds(const std::map<INPUT_INFO::ACTION, ActionBind>& binds);
+
+private:
+	ActiveDevice activeDevice_ = ActiveDevice::KEY_MOUSE;
+
+	std::map<int, KeyState> keyStates_;
+	std::map<INPUT_INFO::ACTION, ActionBind> actionBinds_;
+
+	KeyState mouseStates_[(int)INPUT_INFO::MouseBtn::MAX];
+	Vector2 mousePos_;
+
+	PadState padStates_[5];
+
+	void UpdateKeyboard();
+	void UpdateMouse();
+	void UpdatePad(INPUT_INFO::JOYPAD_NO pad);
+	static void UpdateKeyState(bool isPressed, KeyState& st);
+	bool IsInputAlreadyUsed(const BindInput& input, INPUT_INFO::ACTION ignoreAction) const;
+	void RemoveDuplicateOtherActions(INPUT_INFO::ACTION action, const BindInput& input);
+
+	inline int ToDxPad(INPUT_INFO::JOYPAD_NO pad) { return DX_INPUT_PAD1 + (int)pad; }
+
+	static constexpr float ANALOG_MAX = 32767.0f;
+	static constexpr float DEAD_ZONE = 0.35f;
 };

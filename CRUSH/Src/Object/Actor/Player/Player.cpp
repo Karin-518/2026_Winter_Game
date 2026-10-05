@@ -106,25 +106,10 @@ void Player::Move(void)
 	const float MOVE_POW = 5.0f;
 	VECTOR dir = Math::VECTOR_ZERO;
 
-	// ゲームパッドが接続数で処理を分ける
-	if (GetJoypadNum() == 0)
-	{
-		// WASDで移動する
-		if (InputManager::GetInstance()->IsNew(KEY_INPUT_W)) { dir = { 0.0f, 0.0f, 1.0f }; }
-		if (InputManager::GetInstance()->IsNew(KEY_INPUT_A)) { dir = { -1.0f, 0.0f, 0.0f }; }
-		if (InputManager::GetInstance()->IsNew(KEY_INPUT_S)) { dir = { 0.0f, 0.0f, -1.0f }; }
-		if (InputManager::GetInstance()->IsNew(KEY_INPUT_D)) { dir = { 1.0f, 0.0f, 0.0f }; }
-	}
-	else
-	{
-		// 接続されているゲームパッド１の情報を取得
-		InputManager::JOYPAD_IN_STATE padState =
-			InputManager::GetInstance()->GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
-
-		// アナログキーの入力値から方向を取得
-		dir = InputManager::GetInstance()->GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
-
-	}
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_UP)) { dir = VAdd(dir, { 0.0f, 0.0f, 1.0f }); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_LEFT)) { dir = VAdd(dir, { -1.0f, 0.0f, 0.0f }); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_DOWN)) { dir = VAdd(dir, { 0.0f, 0.0f, -1.0f }); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_RIGHT)) { dir = VAdd(dir, { 1.0f, 0.0f, 0.0f }); }
 
 	if (!Math::EqualsVZero(dir))
 	{

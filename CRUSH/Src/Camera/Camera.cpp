@@ -184,26 +184,21 @@ void Camera::MoveXYZDirection(void)
 {
 	// 矢印キーでカメラの角度を変える
 	float rotPow = 1.0f * DX_PI_F / 180.0f;
-	if (InputManager::GetInstance()->IsNew(KEY_INPUT_DOWN))	{ angle_.x += rotPow; }
-	if (InputManager::GetInstance()->IsNew(KEY_INPUT_UP))	{ angle_.x -= rotPow; }
-	if (InputManager::GetInstance()->IsNew(KEY_INPUT_RIGHT)) { angle_.y += rotPow; }
-	if (InputManager::GetInstance()->IsNew(KEY_INPUT_LEFT))	{ angle_.y -= rotPow; }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::CAMERA_DOWN)) { angle_.x += rotPow; }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::CAMERA_UP)) { angle_.x -= rotPow; }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::CAMERA_RIGHT)) { angle_.y += rotPow; }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::CAMERA_LEFT))	{ angle_.y -= rotPow; }
 }
 
 void Camera::MoveXYZDirectionPad(void)
 {
-	// 接続されているゲームパッド１の情報を取得
-	InputManager::JOYPAD_IN_STATE padState = 
-		InputManager::GetInstance()->GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
-
 	VECTOR dir = Math::VECTOR_ZERO;
-
 
 	const float ROT_POW_DEG = 2.0f;
 	const float rotPow = ROT_POW_DEG * DX_PI_F / 180.0f;
 
 	// 右スティックの傾き
-	dir = InputManager::GetInstance()->GetDirectionXZAKey(padState.AKeyRX, padState.AKeyRY);
+	//dir = InputManager::GetInstance()->GetDirectionXZAKey(padState.AKeyRX, padState.AKeyRY);
 
 	// 右スティック左右の傾き
 	angle_.y += dir.x * rotPow;
