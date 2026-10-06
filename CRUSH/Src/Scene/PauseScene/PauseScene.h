@@ -18,4 +18,7 @@ public:
 private:
 
 	int handle_;
+
+	RECT continueRect_{ 250, 200, 500, 260 };
+	RECT exitRect_{ 250, 290, 500, 350 };
 };

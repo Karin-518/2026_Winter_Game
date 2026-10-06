@@ -1,7 +1,7 @@
 #pragma once
 #include <DxLib.h>
 
-namespace Collision
+namespace Collision3D
 {
     // ‹…‘Ì“¯m‚ÌÕ“Ë”»’è
     bool HitSpheres(const VECTOR& a, float ar, const VECTOR& b, float br);
@@ -10,4 +10,11 @@ namespace Collision
     bool HitSphereCapsule(
         const VECTOR& sphPos, float sphRadius,
         const VECTOR& capA, const VECTOR& capB, float capRadius);
+}
+
+namespace Collision2D
+{
+    // ‹éŒ`‚Æ“_‚ÌÕ“Ë”»’è
+    bool HitPointRect(
+        int x, int y, const RECT& rect);
 }
