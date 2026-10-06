@@ -1,12 +1,12 @@
 #pragma once
 #include "../SceneBase.h"
 
-class TitleScene : public SceneBase
+class PauseScene : public SceneBase
 {
 public:
-	
-	TitleScene(void);				// コンストラクタ
-	~TitleScene(void) override;		// デストラクタ
+
+	PauseScene(void);				// コンストラクタ
+	~PauseScene(void) override;		// デストラクタ
 
 	void Init(void)		override;	// 初期化
 	void Load(void)		override;	// 読み込み

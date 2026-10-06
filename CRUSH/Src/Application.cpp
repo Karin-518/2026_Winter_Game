@@ -10,6 +10,7 @@
 Application* Application::instance_ = nullptr;
 
 const std::string Application::PATH_MODEL = "Data/Model/";
+const std::string Application::PATH_IMAGE = "Data/Image/";
 
 Application::Application(void)
 {
@@ -26,7 +27,7 @@ void Application::Init(void)
 {
 
 	// アプリケーションの初期設定
-	SetWindowText("OriginalGame");
+	SetWindowText("CRUSH");
 
 	// ウィンドウ関連
 	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32);
@@ -66,11 +67,8 @@ void Application::Init(void)
 void Application::Run(void)
 {
 	// ゲームループ
-	while (ProcessMessage() == 0)
+	while (ProcessMessage() == 0 && !isEnd_)
 	{
-		// エスケープキーが押されたらゲーム終了
-		if (CheckHitKey(KEY_INPUT_ESCAPE) == 1) return;
-
 		// フレームレート更新
 		// 1/60秒経過していないなら再ループさせる
 		if (!fps_->UpdateFrameRate()) continue;
@@ -120,4 +118,9 @@ bool Application::IsInitFail(void) const
 bool Application::IsReleaseFail(void) const
 {
 	return isReleaseFail_;
+}
+
+void Application::SetEnd(bool isEnd)
+{
+	isEnd_ = isEnd;
 }

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Scene\PauseScene\PauseScene.cpp" />
     <ClCompile Include="Src\Object\Actor\Player\State\MoveState\PlayerMoveState.cpp" />
     <ClCompile Include="Src\Object\Actor\Player\State\IdleState\PlayerIdleState.cpp" />
     <ClCompile Include="Src\Audio\AudioManager.cpp" />
@@ -54,6 +55,7 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Scene\PauseScene\PauseScene.h" />
     <ClInclude Include="Src\Object\Actor\Player\State\MoveState\PlayerMoveState.h" />
     <ClInclude Include="Src\Object\Actor\Player\State\IdleState\PlayerIdleState.h" />
     <ClInclude Include="Src\Audio\AudioManager.h" />
