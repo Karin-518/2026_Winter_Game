@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Actor\Player\State\MoveState\PlayerMoveState.cpp" />
+    <ClCompile Include="Src\Object\Actor\Player\State\IdleState\PlayerIdleState.cpp" />
     <ClCompile Include="Src\Audio\AudioManager.cpp" />
     <ClCompile Include="Src\Audio\SoundTable.cpp" />
     <ClCompile Include="Src\Common\Collision\Collision.cpp" />
@@ -50,10 +52,10 @@
     <ClCompile Include="Src\Object\Actor\Stage\Stage.cpp" />
     <ClCompile Include="Src\Scene\SceneBase.cpp" />
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
-    <ClCompile Include="Src\Object\Common\State\StateBase.cpp" />
-    <ClCompile Include="Src\Object\Common\State\StateContext.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Actor\Player\State\MoveState\PlayerMoveState.h" />
+    <ClInclude Include="Src\Object\Actor\Player\State\IdleState\PlayerIdleState.h" />
     <ClInclude Include="Src\Audio\AudioManager.h" />
     <ClInclude Include="Src\Audio\SoundInfo.h" />
     <ClInclude Include="Src\Audio\SoundTable.h" />
@@ -71,6 +73,7 @@
     <ClInclude Include="Src\Object\Actor\Enemy\Enemis\EnemyPool.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\Enemy.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\Enemis\EnemyBase.h" />
+    <ClInclude Include="Src\Object\Actor\Player\State\PlayerState.h" />
     <ClInclude Include="Src\Scene\GameScene\GameScene.h" />
     <ClInclude Include="Src\Scene\Loading\Loading.h" />
     <ClInclude Include="Src\Common\Transform\MatrixUtility.h" />
