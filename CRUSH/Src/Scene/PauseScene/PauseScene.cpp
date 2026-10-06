@@ -47,6 +47,7 @@ void PauseScene::Update(void)
 	{
 		if (Collision2D::HitPointRect(mouseX, mouseY, continueRect_))
 		{
+			InputManager::GetInstance()->SetMouseLock(true);
 			SceneManager::GetInstance()->PopScene();
 			return;
 		}
