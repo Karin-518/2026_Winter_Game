@@ -4,6 +4,33 @@
 
 #include "Camera.h"
 
+namespace
+{
+	// カメラの初期座標
+	constexpr VECTOR DERFAULT_POS = { 0.0f, 250.0f, -500.0f };
+
+	// カメラの初期角度
+	constexpr VECTOR DERFAULT_ANGLES = { 0.0f, 0.0f, 0.0f };
+
+	// 追従対象からカメラへの相対座標
+	constexpr VECTOR FOLLOW_CAMERA_LOCAL_POS = { 0.0f, 200.0f, -250.0f };
+
+	// 追従対象から注視点への相対座標
+	constexpr VECTOR FOLLOW_TARGET_LOCAL_POS = { 0.0f, 0.0f, 500.0f };
+
+	// カメラのクリップ範囲
+	constexpr float VIEW_NEAR = 20.0f;
+	constexpr float VIEW_FAR = 5000.0f;
+
+	// マウスの感度
+	constexpr float MOUSE_SENSITIVITY_DEG = 0.1f;
+
+	// ゲームパッドの感度
+	constexpr float PAD_ROT_SPEED_DEG = 2.0f;
+
+	// カメラのピッチ角度の制限
+	constexpr float PITCH_LIMIT_DEG = 20.0f;
+}
 
 Camera::Camera(void)
 {
