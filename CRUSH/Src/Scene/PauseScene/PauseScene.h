@@ -1,12 +1,12 @@
 #pragma once
 #include "../SceneBase.h"
 
-class TitleScene : public SceneBase
+class PauseScene : public SceneBase
 {
 public:
-	
-	TitleScene(void);				// コンストラクタ
-	~TitleScene(void) override;		// デストラクタ
+
+	PauseScene(void);				// コンストラクタ
+	~PauseScene(void) override;		// デストラクタ
 
 	void Init(void)		override;	// 初期化
 	void Load(void)		override;	// 読み込み
@@ -18,4 +18,7 @@ public:
 private:
 
 	int handle_;
+
+	RECT continueRect_{ 250, 200, 500, 260 };
+	RECT exitRect_{ 250, 290, 500, 350 };
 };

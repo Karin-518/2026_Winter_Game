@@ -3,7 +3,7 @@
 #include "Collision.h"
 #include "../Math/Math.h"
 
-namespace Collision
+namespace Collision3D
 {
     bool HitSpheres(const VECTOR& a, float ar, const VECTOR& b, float br)
     {
@@ -22,5 +22,14 @@ namespace Collision
 
         VECTOR closest = VAdd(capA, VScale(dir, t));
         return HitSpheres(closest, capRadius, sphPos, sphRadius);
+    }
+}
+
+namespace Collision2D
+{
+    bool HitPointRect(int x, int y, const RECT& rect)
+    {
+        return rect.left <= x && x < rect.right &&
+            rect.top <= y && y < rect.bottom;
     }
 }

@@ -1,11 +1,10 @@
-#include "TitleScene.h"
-
 #include <DxLib.h>
-
 #include "../../Input/InputManager.h"
 #include "../../Audio/AudioManager.h"
 #include "../SceneManager.h"
 #include "../GameScene/GameScene.h"
+
+#include "TitleScene.h"
 
 TitleScene::TitleScene(void)
 {
@@ -39,6 +38,7 @@ void TitleScene::Update(void)
 	{
 		// ƒQ[ƒ€ƒV[ƒ“‚Ö
 		SceneManager::GetInstance()->ChangeScene(std::make_shared<GameScene>());
+		return;
 	}
 }
 

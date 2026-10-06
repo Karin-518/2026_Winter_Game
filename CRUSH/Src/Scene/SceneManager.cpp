@@ -4,7 +4,6 @@
 
 #include "Loading/Loading.h"
 #include "TitleScene/TitleScene.h"
-#include "GameScene/GameScene.h"
 
 SceneManager* SceneManager::instance_ = nullptr;
 
