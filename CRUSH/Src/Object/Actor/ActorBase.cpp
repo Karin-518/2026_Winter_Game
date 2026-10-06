@@ -66,9 +66,6 @@ void ActorBase::Update(void)
 	// 回転行列をモデルに反映
 	MV1SetRotationMatrix(modelId_, mat);
 
-	// プレイヤーの移動処理
-	Move();
-
 	// 重力(加速度を速度に加算していく)
 	jumpPow_ -= 0.8f;
 
@@ -116,10 +113,6 @@ void ActorBase::CollisionStage(const VECTOR& pos)
 	// 衝突判定に指定座標に押し戻す
 	pos_ = pos;
 	jumpPow_ = 0.0f;
-}
-
-void ActorBase::Move(void)
-{
 }
 
 void ActorBase::DelayRotate(void)

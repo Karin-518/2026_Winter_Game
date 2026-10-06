@@ -4,7 +4,6 @@
 
 class AnimationController
 {
-
 public:
 
 	// アニメーションデータ

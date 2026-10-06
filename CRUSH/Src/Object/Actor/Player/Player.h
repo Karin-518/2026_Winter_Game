@@ -1,8 +1,7 @@
 #pragma once
-#include <vector>
-#include <DxLib.h>
-
 #include "../ActorBase.h"
+#include "../../Common/State/StateContext.h"
+#include "State/PlayerState.h"
 
 class Camera;
 
@@ -33,6 +32,12 @@ public:
 	// 解放
 	void Release(void) override;
 
+	// アニメーションの取得
+	AnimationController* GetAnimationController(void) const { return animationController_; }
+
+	// 
+	void MoveByInput(float speed);
+
 private:
 
 	// リソースロード
@@ -47,12 +52,11 @@ private:
 	// 初期化後の個別処理
 	void InitPost(void) override;
 
-	// 移動処理
-	void Move(void) override;
-
 private:
 
 	// カメラ
 	Camera* camera_;
 	
+	// ステートを管理
+	StateContext<Player, PLAYER_STATE> state_;
 };

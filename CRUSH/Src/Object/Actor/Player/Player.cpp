@@ -1,9 +1,12 @@
+#include <memory>
 #include "../../../Application.h"
 #include "../../../Input/InputManager.h"
 #include "../../../Common/Math/Math.h"
 #include "../../../Common/Transform/MatrixUtility.h"
-#include "../../Common/AnimationController/AnimationController.h"
 #include "../../../Camera/Camera.h"
+#include "../../Common/AnimationController/AnimationController.h"
+#include "State/IdleState/PlayerIdleState.h"
+#include "State/MoveState/PlayerMoveState.h"
 
 #include "Player.h"
 
@@ -24,20 +27,54 @@ namespace
 	// アニメーションの速度
 	constexpr float ANIMATION_SPEED = 0.5f;
 
-	// 移動速度
-	const float MOVE_POW = 5.0f;
-
 	// 入力値の補間地（小さいほど慣性が強い）
 	const float SMOOTH = 0.25f;
 }
 
 Player::Player(Camera* camera)
+	:
+	state_(*this)
 {
 	camera_ = camera;
 }
 
 Player::~Player(void)
 {
+}
+
+void Player::MoveByInput(float speed)
+{
+	// カメラ角度を取得
+	VECTOR cameraAngles = camera_->GetAngle();
+
+	// 移動量
+	VECTOR dir = Math::VECTOR_ZERO;
+
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_UP)) { dir = VAdd(dir, Math::DIR_F); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_LEFT)) { dir = VAdd(dir, Math::DIR_L); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_DOWN)) { dir = VAdd(dir, Math::DIR_B); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_RIGHT)) { dir = VAdd(dir, Math::DIR_R); }
+
+	if (!Math::EqualsVZero(dir))
+	{
+		dir.x = preInputDir_.x + (dir.x - preInputDir_.x) * SMOOTH;
+		dir.z = preInputDir_.z + (dir.z - preInputDir_.z) * SMOOTH;
+		preInputDir_ = dir;
+
+		// 正規化
+		dir = VNorm(dir);
+
+		// XYZの回転行列
+		// XZ平面移動にする場合は、XZの回転を考慮しないようにする
+		MATRIX mat = MGetIdent();
+		mat = MMult(mat, MGetRotY(cameraAngles.y));
+
+		// 回転行列を使用して、ベクトルを回転させる
+		moveDir_ = VTransform(dir, mat);
+
+		// 方向×スピードで移動量を作って、座標に足して移動
+		pos_ = VAdd(pos_, VScale(moveDir_, speed));
+	}
 }
 
 void Player::InitLoad(void)
@@ -85,21 +122,21 @@ void Player::InitAnimation(void)
 		static_cast<int>(ANIM_TYPE::IDLE), ANIMATION_SPEED, Application::PATH_MODEL + "Player/Idle.mv1");
 	animationController_->Add(
 		static_cast<int>(ANIM_TYPE::WALK), ANIMATION_SPEED, Application::PATH_MODEL + "Player/Walk.mv1");
-
-	// 初期アニメーションの再生
-	animationController_->Play(static_cast<int>(ANIM_TYPE::IDLE));
 }
 
 void Player::InitPost(void)
 {
+	state_.Register(PLAYER_STATE::IDLE, std::make_unique<PlayerIdleState>());
+	state_.Register(PLAYER_STATE::MOVE, std::make_unique<PlayerMoveState>());
+	state_.Start(PLAYER_STATE::IDLE);
 }
 
 void Player::Update(void)
 {
-	ActorBase::Update();
+	// ステートの更新
+	state_.Update();
 
-	// アニメーションの更新
-	animationController_->Update();
+	ActorBase::Update();
 }
 
 void Player::Draw(void)
@@ -114,53 +151,17 @@ void Player::Draw(void)
 		Math::Rad2Deg(angle_.y),
 		Math::Rad2Deg(angle_.z)
 	);
+
+	DrawFormatString(
+		0, 100, 0xffffff,
+		"ステート　 ：%d",
+		(int)state_.GetStateId()
+	);
+
 #endif //_DEBUG
 }
 
 void Player::Release(void)
 {
 	ActorBase::Release();
-}
-
-void Player::Move(void)
-{
-	// カメラ角度を取得
-	VECTOR cameraAngles = camera_->GetAngle();
-
-	// 移動量
-	VECTOR dir = Math::VECTOR_ZERO;
-
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_UP)) { dir = VAdd(dir, Math::DIR_F); }
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_LEFT)) { dir = VAdd(dir, Math::DIR_L); }
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_DOWN)) { dir = VAdd(dir, Math::DIR_B); }
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_RIGHT)) { dir = VAdd(dir, Math::DIR_R); }
-
-	if (!Math::EqualsVZero(dir))
-	{
-		dir.x = preInputDir_.x + (dir.x - preInputDir_.x) * SMOOTH;
-		dir.z = preInputDir_.z + (dir.z - preInputDir_.z) * SMOOTH;
-		preInputDir_ = dir;
-
-		// 正規化
-		dir = VNorm(dir);
-
-		// XYZの回転行列
-		// XZ平面移動にする場合は、XZの回転を考慮しないようにする
-		MATRIX mat = MGetIdent();
-		mat = MMult(mat, MGetRotY(cameraAngles.y));
-
-		// 回転行列を使用して、ベクトルを回転させる
-		moveDir_ = VTransform(dir, mat);
-
-		// 方向×スピードで移動量を作って、座標に足して移動
-		pos_ = VAdd(pos_, VScale(moveDir_, MOVE_POW));
-
-		// 歩くアニメーションの再生
-		animationController_->Play(static_cast<int>(ANIM_TYPE::WALK));
-	}
-	else
-	{
-		// 待機アニメーションの再生
-		animationController_->Play(static_cast<int>(ANIM_TYPE::IDLE));
-	}
 }
