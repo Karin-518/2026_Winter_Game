@@ -5,7 +5,7 @@
 #include "../../../Application.h"
 #include "../../../Common/Math/Math.h"
 #include "../../../Common/Transform/MatrixUtility.h"
-#include "../../Common/AnimationController.h"
+#include "../../Common/AnimationController/AnimationController.h"
 
 #include "../Player/Player.h"
 
