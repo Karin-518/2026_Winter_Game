@@ -72,6 +72,9 @@ private:
 	
 	// 注視点
 	VECTOR targetPos_;
+
+	// 初回追従用のフラグ
+	bool isFollowInitialized_;
 	
 	// 方向回転によるXYZの移動（マウス）
 	void MoveXYZDirection(void);

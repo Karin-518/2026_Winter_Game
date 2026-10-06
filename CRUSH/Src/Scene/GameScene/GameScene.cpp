@@ -117,10 +117,6 @@ void GameScene::Update(void)
 		return;
 	}
 
-
-	// カメラの更新
-	camera_->Update();
-
 	// ステージ更新
 	stage_->Update();
 
@@ -139,7 +135,11 @@ void GameScene::Update(void)
 		}
 	}
 
+	// 敵の更新
 	enemyMng_->Update();
+
+	// カメラの更新
+	camera_->Update();
 }
 
 void GameScene::Draw(void)

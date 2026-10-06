@@ -13,10 +13,10 @@ namespace
 	constexpr VECTOR DERFAULT_ANGLES = { 0.0f, 0.0f, 0.0f };
 
 	// 追従対象からカメラへの相対座標
-	constexpr VECTOR FOLLOW_CAMERA_LOCAL_POS = { 0.0f, 200.0f, -250.0f };
+	constexpr VECTOR FOLLOW_CAMERA_LOCAL_POS = { 0.0f, 160.0f, -350.0f };
 
 	// 追従対象から注視点への相対座標
-	constexpr VECTOR FOLLOW_TARGET_LOCAL_POS = { 0.0f, 0.0f, 500.0f };
+	constexpr VECTOR FOLLOW_TARGET_LOCAL_POS = { 0.0f, 150.0f, 100.0f };
 
 	// カメラのクリップ範囲
 	constexpr float VIEW_NEAR = 20.0f;
@@ -29,7 +29,10 @@ namespace
 	constexpr float PAD_ROT_SPEED_DEG = 2.0f;
 
 	// カメラのピッチ角度の制限
-	constexpr float PITCH_LIMIT_DEG = 20.0f;
+	constexpr float PITCH_LIMIT_DEG = 12.0f;
+
+	// 補間率
+	constexpr float FOLLOW_SMOOTH = 0.3f;
 }
 
 Camera::Camera(void)
@@ -47,10 +50,54 @@ void Camera::Init(void)
 
 	// カメラの初期角度
 	angle_ = DERFAULT_ANGLES;
+
+	isFollowInitialized_ = false;
 }
 
 void Camera::Update(void)
 {
+	// 方向回転によるXYZの移動
+	if (InputManager::GetInstance()->GetActiveDevice() == InputManager::ActiveDevice::KEY_MOUSE)
+	{
+		// キーボード・マウス
+		MoveXYZDirection();
+	}
+	else
+	{
+		// ゲームパッド
+		MoveXYZDirectionPad();
+	}
+
+	if (mode_ != MODE::FOLLOW || follow_ == nullptr) return;
+
+	MATRIX mat = MGetIdent();
+	mat = MMult(mat, MGetRotX(angle_.x));
+	mat = MMult(mat, MGetRotY(angle_.y));
+
+	MATRIX matY = MGetIdent();
+	matY = MMult(matY, MGetRotY(angle_.y));
+
+	const VECTOR followPos = follow_->GetPos();
+
+	// 追従位置と注視点を計算して宣言
+	const VECTOR desiredPos =
+		VAdd(followPos, VTransform(FOLLOW_CAMERA_LOCAL_POS, mat));
+
+	const VECTOR desiredTargetPos =
+		VAdd(followPos, VTransform(FOLLOW_TARGET_LOCAL_POS, matY));
+
+	if (!isFollowInitialized_)
+	{
+		pos_ = desiredPos;
+		targetPos_ = desiredTargetPos;
+		isFollowInitialized_ = true;
+		return;
+	}
+
+	pos_ = VAdd(pos_, VScale(VSub(desiredPos, pos_), FOLLOW_SMOOTH));
+	targetPos_ = VAdd(
+		targetPos_,
+		VScale(VSub(desiredTargetPos, targetPos_), FOLLOW_SMOOTH));
 }
 
 void Camera::SetBeforeDraw(void)
@@ -87,17 +134,6 @@ void Camera::SetBeforeDrawFixedPoint(void)
 
 void Camera::SetBeforeDrawFree(void)
 {
-	// 方向回転によるXYZの移動
-	if (InputManager::GetInstance()->GetActiveDevice() == InputManager::ActiveDevice::KEY_MOUSE)
-	{
-		// キーボード・マウス
-		MoveXYZDirection();
-	}
-	else
-	{
-		// ゲームパッド
-		MoveXYZDirectionPad();
-	}
 
 	// カメラの設定
 	SetCameraPositionAndAngle(
@@ -128,38 +164,6 @@ void Camera::DrawDebug(void)
 
 void Camera::SetBeforeDrawFollow(void)
 {
-	// 方向回転によるXYZの移動
-	if (InputManager::GetInstance()->GetActiveDevice() == InputManager::ActiveDevice::KEY_MOUSE)
-	{
-		// キーボード・マウス
-		MoveXYZDirection();
-	}
-	else
-	{
-		// ゲームパッド
-		MoveXYZDirectionPad();
-	}
-
-	// カメラの回転行列を作成（ピッチ+ヨー）
-	MATRIX mat = MGetIdent();
-	mat = MMult(mat, MGetRotX(angle_.x));
-	mat = MMult(mat, MGetRotY(angle_.y));
-
-	// 注視点用の回転行列を作成（ヨーのみ）
-	MATRIX matY = MGetIdent();
-	matY = MMult(matY, MGetRotY(angle_.y));
-
-	// 注視点の移動
-	VECTOR followPos = follow_->GetPos();
-	VECTOR targetLocalRotPos = VTransform(FOLLOW_TARGET_LOCAL_POS, matY);
-	targetPos_ = VAdd(followPos, targetLocalRotPos);
-
-	// カメラの移動
-	VECTOR cameraLocalRotPos = VTransform(FOLLOW_CAMERA_LOCAL_POS, mat);
-
-	// 相対座標からワールド座標に直して、カメラ座標とする
-	pos_ = VAdd(followPos, cameraLocalRotPos);
-
 	// カメラの設定(位置と注視点による制御)
 	SetCameraPositionAndTargetAndUpVec(
 		pos_,
