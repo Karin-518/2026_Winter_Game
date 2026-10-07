@@ -35,8 +35,16 @@ public:
 	// アニメーションの取得
 	AnimationController* GetAnimationController(void) const { return animationController_; }
 
-	// 
+	// 移動用の入力処理
 	void MoveByInput(float speed);
+
+private:
+
+	// カメラ
+	Camera* camera_;
+
+	// ステートを管理
+	StateContext<Player, PLAYER_STATE> state_;
 
 private:
 
@@ -51,12 +59,4 @@ private:
 
 	// 初期化後の個別処理
 	void InitPost(void) override;
-
-private:
-
-	// カメラ
-	Camera* camera_;
-	
-	// ステートを管理
-	StateContext<Player, PLAYER_STATE> state_;
 };

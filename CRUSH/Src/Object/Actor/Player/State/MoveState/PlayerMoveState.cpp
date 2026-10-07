@@ -5,8 +5,11 @@
 
 namespace
 {
-	// 移動速度
-	const float MOVE_POW = 5.0f;
+	// 歩き移動速度
+	const float WALK_POW = 5.0f;
+
+	// 走り移動速度
+	const float SPRINT_POW = 10.0f;
 }
 
 void PlayerMoveState::Enter(Player& owner)
@@ -25,8 +28,16 @@ PLAYER_STATE PlayerMoveState::Update(Player& owner)
 	{
 		return PLAYER_STATE::IDLE;
 	}
-
-	owner.MoveByInput(MOVE_POW);
+	
+	// 走る入力があれば、移動速度を上げる
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::SPRINT))
+	{
+		owner.MoveByInput(SPRINT_POW);
+	}
+	else
+	{
+		owner.MoveByInput(WALK_POW);
+	}
 
 	// 何もなければ、切り替えない
 	return PLAYER_STATE::NONE;
