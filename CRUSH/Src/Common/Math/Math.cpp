@@ -193,4 +193,8 @@ namespace Math
         dot = std::clamp(dot, -1.0, 1.0);
         return acos(dot) * (180.0 / DX_PI);
     }
+    float EaseOutCubic(float t)
+    {
+        return 1.0f - powf(1.0f - t, 3.0f);
+    }
 }

@@ -64,7 +64,6 @@ namespace Math
 	int DirNearAroundDeg(float from, float to);
 
 	// ---- 補間 ----
-	//
 	// 線形補間
 	int Lerp(int start, int end, float t);
 	float Lerp(float start, float end, float t);
@@ -82,13 +81,11 @@ namespace Math
 	COLOR_F Lerp(const COLOR_F& start, const COLOR_F& end, float t);
 
 	// ---- 曲線 ----
-	//
 	// ベジェ曲線
 	Vector2 Bezier(const Vector2& p1, const Vector2& p2, const Vector2& p3, float t);
 	VECTOR Bezier(const VECTOR& p1, const VECTOR& p2, const VECTOR& p3, float t);
 
 	// ---- ベクトル ----
-	// 
 	// ベクトルの長さ
 	double Magnitude(const Vector2& v);
 	double Magnitude(const VECTOR& v);
@@ -112,4 +109,7 @@ namespace Math
 
 	// 2つのベクトルの間の角度
 	double AngleDeg(const VECTOR& from, const VECTOR& to);
+
+	// イージング
+	float EaseOutCubic(float t);
 }

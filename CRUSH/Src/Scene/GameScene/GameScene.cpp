@@ -64,6 +64,7 @@ void GameScene::Load(void)
 
 	// カメラモード変更
 	camera_->SetFollow(player);
+	camera_->SetLookTarget(enemy);
 	camera_->ChangeMode(Camera::MODE::FOLLOW);
 
 	// ステージの読み込み
