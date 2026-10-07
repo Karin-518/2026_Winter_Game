@@ -29,7 +29,7 @@ namespace
 	constexpr float PAD_ROT_SPEED_DEG = 2.0f;
 
 	// カメラのピッチ角度の制限
-	constexpr float PITCH_LIMIT_DEG = 12.0f;
+	constexpr float PITCH_LIMIT_DEG = 15.0f;
 
 	// 補間率
 	constexpr float FOLLOW_SMOOTH = 0.3f;
