@@ -25,16 +25,16 @@ namespace
 	constexpr float VIEW_NEAR = 20.0f;
 	constexpr float VIEW_FAR = 5000.0f;
 
-	// マウスの感度（マウスの移動1ドットあたりの回転角度（度））
+	// マウスの感度
 	constexpr float MOUSE_SENSITIVITY_DEG = 0.1f;
 
-	// ゲームパッドの感度（スティックを倒し切ったときの1フレームの回転角度（度））
+	// ゲームパッドの感度
 	constexpr float PAD_ROT_SPEED_DEG = 2.0f;
 
 	// カメラのピッチ角度の制限
 	constexpr float PITCH_LIMIT_DEG = 15.0f;
 
-	// 補間率（1フレームで、目標との差の30%だけ近づく）
+	// 補間率
 	constexpr float FOLLOW_SMOOTH = 0.3f;
 
 	// リセットにかけるフレーム数
@@ -90,7 +90,6 @@ void Camera::Update(void)
 	else
 	{
 		UpdateInput();
-
 	}
 
 	CalcFollowGoal();
