@@ -27,6 +27,12 @@ namespace
 }
 
 GameScene::GameScene(void)
+	:
+	camera_(nullptr),
+	stage_(nullptr),
+	enemyMng_(nullptr),
+	enemyFac_(nullptr),
+	enemyPool_(nullptr)
 {
 }
 

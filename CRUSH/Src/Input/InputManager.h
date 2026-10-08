@@ -21,7 +21,7 @@ private:
 	// インスタンス
 	static InputManager* instance_;
 	
-	InputManager(void) {};		// デフォルトコンストラクタをprivateにして、
+	InputManager(void);			// デフォルトコンストラクタをprivateにして、
 	~InputManager(void);		// 外部から生成できない様にする
 
 	// コピー・ムーブ操作を禁止

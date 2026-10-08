@@ -28,14 +28,14 @@ namespace
 	constexpr float ANIMATION_SPEED = 0.5f;
 
 	// 入力値の補間地（小さいほど慣性が強い）
-	const float SMOOTH = 0.25f;
+	constexpr float INPUT_SMOOTH = 0.25f;
 }
 
 Player::Player(Camera* camera)
 	:
+	camera_(camera),
 	state_(*this)
 {
-	camera_ = camera;
 }
 
 Player::~Player(void)
@@ -57,8 +57,8 @@ void Player::MoveByInput(float speed)
 
 	if (!Math::EqualsVZero(dir))
 	{
-		dir.x = preInputDir_.x + (dir.x - preInputDir_.x) * SMOOTH;
-		dir.z = preInputDir_.z + (dir.z - preInputDir_.z) * SMOOTH;
+		dir.x = preInputDir_.x + (dir.x - preInputDir_.x) * INPUT_SMOOTH;
+		dir.z = preInputDir_.z + (dir.z - preInputDir_.z) * INPUT_SMOOTH;
 		preInputDir_ = dir;
 
 		// 正規化

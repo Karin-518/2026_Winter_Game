@@ -15,9 +15,9 @@ namespace INPUT_INFO
 		MOVE_LEFT,		// 左移動
 		MOVE_RIGHT,		// 右移動
 		ATTACK,			// 攻撃
-		AVOID,			// 回避
+		DEDGE,			// 回避
 		SPRINT,			// ダッシュ
-		ROCK,			// ロックオン	
+		LOCK_ON,		// ロックオン	
 		CAMERA_RESET,	// カメラリセット
 		ITEM,			// アイテム使用
 		CAMERA_UP,		// カメラ上
@@ -58,9 +58,9 @@ namespace INPUT_INFO
 		case INPUT_INFO::ACTION::MOVE_LEFT:
 		case INPUT_INFO::ACTION::MOVE_RIGHT:
 		case INPUT_INFO::ACTION::ATTACK:
-		case INPUT_INFO::ACTION::AVOID:
+		case INPUT_INFO::ACTION::DEDGE:
 		case INPUT_INFO::ACTION::SPRINT:
-		case INPUT_INFO::ACTION::ROCK:
+		case INPUT_INFO::ACTION::LOCK_ON:
 		case INPUT_INFO::ACTION::CAMERA_RESET:
 		case INPUT_INFO::ACTION::ITEM:
 		case INPUT_INFO::ACTION::CAMERA_UP:
@@ -132,9 +132,9 @@ namespace INPUT_INFO
 		{ACTION::MOVE_LEFT,		"左移動"},
 		{ACTION::MOVE_RIGHT,	"右移動"},
 		{ACTION::ATTACK,		"攻撃"},
-		{ACTION::AVOID,			"回避"},
+		{ACTION::DEDGE,			"回避"},
 		{ACTION::SPRINT,		"ダッシュ"},
-		{ACTION::ROCK,			"ロックオン"},
+		{ACTION::LOCK_ON,		"ロックオン"},
 		{ACTION::CAMERA_RESET,	"カメラリセット"},
 		{ACTION::ITEM,			"アイテム使用"},
 		{ACTION::CAMERA_UP,		"カメラ上"},
