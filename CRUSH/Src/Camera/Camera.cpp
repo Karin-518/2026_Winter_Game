@@ -35,10 +35,10 @@ namespace
 	constexpr float PITCH_LIMIT_DEG = 15.0f;
 
 	// 補間率
-	constexpr float FOLLOW_SMOOTH = 0.3f;
+	constexpr float FOLLOW_SMOOTH = 0.5f;
 
 	// リセットにかけるフレーム数
-	constexpr int RESET_FRAME = 30;
+	constexpr int RESET_FRAME = 20;
 }
 
 Camera::Camera(void)
