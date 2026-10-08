@@ -9,8 +9,11 @@ namespace
 	// カメラの初期座標
 	constexpr VECTOR DEFAULT_POS = { 0.0f, 250.0f, -500.0f };
 
+	// リセット後のピッチ角度（度）。0で水平
+	constexpr float RESET_PITCH_DEG = 5.0f;
+
 	// カメラの初期角度
-	constexpr VECTOR DEFAULT_ANGLES = { 5.0f * Math::DEG2RAD, 0.0f, 0.0f };
+	constexpr VECTOR DEFAULT_ANGLES = { RESET_PITCH_DEG * Math::DEG2RAD, 0.0f, 0.0f };
 
 	// 追従対象からカメラへの相対座標
 	constexpr VECTOR FOLLOW_CAMERA_LOCAL_POS = { 0.0f, 160.0f, -350.0f };
@@ -34,11 +37,8 @@ namespace
 	// 補間率（1フレームで、目標との差の30%だけ近づく）
 	constexpr float FOLLOW_SMOOTH = 0.3f;
 
-	// リセットに×フレーム数
-	constexpr int RESET_FRAME = 30.0f;
-
-	// リセット後のピッチ角度（度）。0で水平
-	constexpr float RESET_PITCH_DEG = 5.0f;
+	// リセットにかけるフレーム数
+	constexpr int RESET_FRAME = 30;
 }
 
 Camera::Camera(void)
@@ -319,7 +319,7 @@ void Camera::StartReset(void)
 	// 追従対象か向き先がなければ何もしない
 	if (follow_ == nullptr || lookTarget_ == nullptr) return;
 
-	// 追従対象（向き先のベクトル）
+	// 追従対象から向き先へのベクトル
 	VECTOR dir = VSub(lookTarget_->GetPos(), follow_->GetPos());
 
 	// 左右の角度だけ扱うため、上下の成分を0にする

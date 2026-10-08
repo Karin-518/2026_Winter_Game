@@ -181,6 +181,10 @@ void GameScene::Release(void)
 	// 配列をクリア
 	allActor_.clear();
 
+	// カメラの解放
+	camera_->Release();
+	delete camera_;
+
 	// 敵の解放
 	enemyMng_->Release();
 	delete enemyMng_;
