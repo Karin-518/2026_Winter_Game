@@ -17,7 +17,7 @@ public:
 	void Release(void);
 
 	// ステージモデルのハンドルID
-	int GetModelId(void);
+	int GetModelId(void) const;
 
 private:
 
@@ -26,6 +26,5 @@ private:
 
 	// ステージモデルの位置
 	VECTOR pos_;
-
 };
 

@@ -5,7 +5,6 @@ class ActorBase;
 
 class Camera
 {
-
 public:
 	
 	// ƒJƒƒ‰ƒ‚[ƒh

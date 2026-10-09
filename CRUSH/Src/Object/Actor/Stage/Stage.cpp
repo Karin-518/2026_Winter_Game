@@ -22,6 +22,7 @@ void Stage::Init(void)
 
 	// マテリアルの数を取得
 	int num = MV1GetMaterialNum(modelId_);
+
 	for (int i = 1; i < num; i++)
 	{
 		// 0は地面なので、1から設定する
@@ -58,7 +59,7 @@ void Stage::Release(void)
 	MV1DeleteModel(modelId_);
 }
 
-int Stage::GetModelId(void)
+int Stage::GetModelId(void) const
 {
 	return modelId_;
 }

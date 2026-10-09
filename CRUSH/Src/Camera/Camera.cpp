@@ -32,7 +32,7 @@ namespace
 	constexpr float PAD_ROT_SPEED_DEG = 2.0f;
 
 	// カメラのピッチ角度の制限
-	constexpr float PITCH_LIMIT_DEG = 15.0f;
+	constexpr float PITCH_LIMIT_DEG = 30.0f;
 
 	// 補間率
 	constexpr float FOLLOW_SMOOTH = 0.5f;
@@ -197,8 +197,6 @@ void Camera::ChangeMode(MODE mode)
 		break;
 
 	case Camera::MODE::FREE:
-		break;
-
 	case Camera::MODE::FOLLOW:
 		// 追従中はマウスを固定して、移動量でカメラを回す
 		InputManager::GetInstance()->SetMouseLock(true);
