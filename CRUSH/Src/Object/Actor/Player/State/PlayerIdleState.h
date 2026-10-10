@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../../Common/State/StateBase.h"
-#include "../PlayerState.h"
+#include "../../../Common/State/StateBase.h"
+#include "PlayerState.h"
 
 class Player;
 

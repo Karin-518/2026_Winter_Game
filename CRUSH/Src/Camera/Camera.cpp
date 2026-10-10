@@ -1,6 +1,8 @@
+#include <algorithm>
 #include "../Common/Math/Math.h"
 #include "../Input/InputManager.h"
 #include "../Object/Actor/ActorBase.h"
+#include "../Object/Collider/Model/ColliderModel.h"
 
 #include "Camera.h"
 
@@ -31,14 +33,26 @@ namespace
 	// ゲームパッドの感度
 	constexpr float PAD_ROT_SPEED_DEG = 2.0f;
 
-	// カメラのピッチ角度の制限
-	constexpr float PITCH_LIMIT_DEG = 30.0f;
+	// 見下ろす側の制限
+	constexpr float PITCH_DOWN_LIMIT_DEG = 30.0f;
 
-	// 補間率
-	constexpr float FOLLOW_SMOOTH = 0.5f;
+	// 見上げる側の制限
+	constexpr float PITCH_UP_LIMIT_DEG = 60.0f;
+
+	// 回る中心が追従相手を追いかける補間率
+	constexpr float FOLLOW_SMOOTH = 0.2f;
 
 	// リセットにかけるフレーム数
 	constexpr int RESET_FRAME = 20;
+
+	// 壁を調べる線分の始点
+	constexpr VECTOR WALL_CHECK_OFFSET = { 0.0f, 200.0f, 0.0f };
+
+	// 壁に当たったとき、壁から離す距離
+	constexpr float WALL_BACK_DIS = 30.0f;
+
+	// 壁や地面に寄っても、頭からこれ以上は近づかない距離
+	constexpr float MIN_CAMERA_DIS = 30.0f;
 }
 
 Camera::Camera(void)
@@ -48,8 +62,7 @@ Camera::Camera(void)
 	mode_(MODE::NONE),
 	pos_(Math::VECTOR_ZERO),
 	targetPos_(Math::VECTOR_ZERO),
-	goalPos_(Math::VECTOR_ZERO),
-	goalTargetPos_(Math::VECTOR_ZERO),
+	pivotPos_(Math::VECTOR_ZERO),
 	angle_(Math::VECTOR_ZERO),
 	isFollowInitialized_(false),
 	isResetting_(false),
@@ -92,15 +105,18 @@ void Camera::Update(void)
 		UpdateInput();
 	}
 
-	CalcFollowGoal();
+	// 回る中心だけを、追従相手へ少し遅れて追いかけさせる
+	UpdatePivot();
 
-	if (!isFollowInitialized_)
-	{
-		SnapToGoal();
-		return;
-	}
+	// カメラ位置は補間しない
+	CalcFollowPos();
 
-	SmoothToGoal();
+	const VECTOR lookDir = VSub(targetPos_, pos_);
+
+	// 壁や地面があれば手前に寄せる
+	AvoidWall();
+
+	targetPos_ = VAdd(pos_, lookDir);
 }
 
 void Camera::SetBeforeDraw(void)
@@ -178,6 +194,8 @@ void Camera::SetBeforeDrawFollow(void)
 
 void Camera::Release(void)
 {
+	hitStages_.clear();
+
 	if (InputManager::GetInstance() != nullptr)
 	{
 		InputManager::GetInstance()->SetMouseLock(false);
@@ -214,6 +232,14 @@ void Camera::SetLookTarget(ActorBase* target)
 	lookTarget_ = target;
 }
 
+void Camera::AddHitStage(const ColliderModel* stage)
+{
+	// nullptr は登録しない
+	if (stage == nullptr) return;
+
+	hitStages_.push_back(stage);
+}
+
 void Camera::MoveXYZDirection(void)
 {
 	// 矢印キーでカメラの角度を変える
@@ -248,10 +274,14 @@ void Camera::MoveXYZDirectionPad(void)
 
 void Camera::ClampPitch(void)
 {
-	const float limit = PITCH_LIMIT_DEG * DX_PI_F / 180.0f;
+	const float downLimit = Math::Deg2Rad(PITCH_DOWN_LIMIT_DEG);
+	const float upLimit = -Math::Deg2Rad(PITCH_UP_LIMIT_DEG);
 
-	if (angle_.x > limit) { angle_.x = limit; }
-	if (angle_.x < -limit) { angle_.x = -limit; }
+	// 見下ろしすぎない
+	if (angle_.x > downLimit) { angle_.x = downLimit; }
+
+	// 見上げすぎない
+	if (angle_.x < upLimit) { angle_.x = upLimit; }
 }
 
 void Camera::UpdateInput(void)
@@ -276,7 +306,16 @@ void Camera::UpdateInput(void)
 
 }
 
-void Camera::CalcFollowGoal(void)
+void Camera::UpdatePivot(void)
+{
+	const VECTOR followPos = follow_->GetPos();
+
+	// 初回だけ補間せずに合わせる。2回目からは差の一部だけ近づける
+	pivotPos_ = isFollowInitialized_ ? Math::Lerp(pivotPos_, followPos, FOLLOW_SMOOTH) : followPos;
+	isFollowInitialized_ = true;
+}
+
+void Camera::CalcFollowPos(void)
 {
 	// mat: カメラ位置用（上下と左右の角度で回す）
 	MATRIX mat = MGetIdent();
@@ -288,27 +327,38 @@ void Camera::CalcFollowGoal(void)
 	MATRIX matY = MGetIdent();
 	matY = MMult(matY, MGetRotY(angle_.y));
 
-	const VECTOR followPos = follow_->GetPos();
-
-	// カメラの目標位置と、目標の注視点を計算
-	goalPos_ = VAdd(followPos, VTransform(FOLLOW_CAMERA_LOCAL_POS, mat));
-	goalTargetPos_ =
-		VAdd(followPos, VTransform(FOLLOW_TARGET_LOCAL_POS, matY));
+	// 回る中心を基準に、カメラ位置と注視点を計算
+	pos_ = VAdd(pivotPos_, VTransform(FOLLOW_CAMERA_LOCAL_POS, mat));
+	targetPos_ = VAdd(pivotPos_, VTransform(FOLLOW_TARGET_LOCAL_POS, matY));
 }
 
-void Camera::SnapToGoal(void)
+void Camera::AvoidWall(void)
 {
-	// 初回だけ補間せずに合わせる
-	pos_ = goalPos_;
-	targetPos_ = goalTargetPos_;
-	isFollowInitialized_ = true;
+	// 追従相手の頭あたりから、カメラまでの線分で調べる
+	const VECTOR start = VAdd(follow_->GetPos(), WALL_CHECK_OFFSET);
+
+	for (const ColliderModel* stage : hitStages_)
+	{
+		pos_ = AvoidWallByStage(*stage, start, pos_);
+	}
 }
 
-void Camera::SmoothToGoal(void)
+VECTOR Camera::AvoidWallByStage(const ColliderModel& stage, const VECTOR& start, const VECTOR& goal) const
 {
-	// 毎フレーム目標との差の一部だけ近づける
-	pos_ = Math::Lerp(pos_, goalPos_, FOLLOW_SMOOTH);
-	targetPos_ = Math::Lerp(targetPos_, goalTargetPos_, FOLLOW_SMOOTH);
+	const MV1_COLL_RESULT_POLY hit = stage.GetNearestHitPolyLine(start, goal);
+
+	// 壁がない
+	if (!hit.HitFlag) return goal;
+
+	// 始点(頭)から壁までの距離
+	const float hitDist = VSize(VSub(hit.HitPosition, start));
+
+	// 壁の手前に置く。ただし頭から MIN_CAMERA_DIS より近くには来ない
+	const float camDist = (std::max)(hitDist - WALL_BACK_DIS, MIN_CAMERA_DIS);
+
+	// 始点からカメラの方向へ camDist だけ離れた位置
+	const VECTOR dir = VNorm(VSub(goal, start));
+	return VAdd(start, VScale(dir, camDist));
 }
 
 void Camera::StartReset(void)

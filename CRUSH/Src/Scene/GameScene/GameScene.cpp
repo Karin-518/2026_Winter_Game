@@ -14,18 +14,6 @@
 
 #include "GameScene.h"
 
-namespace
-{
-	// 線分のオフセット
-	constexpr float LINE_OFFSET = 10.0f;
-
-	// ポリゴンの検索回数
-	constexpr int POLYGON_SEARCH_COUNT = 10;
-
-	// 法線の移動量
-	constexpr float NORMAL_MOVE_AMOUNT = 1.0f;
-}
-
 GameScene::GameScene(void)
 	:
 	camera_(nullptr),
@@ -112,6 +100,9 @@ void GameScene::LoadEnd(void)
 		// 読み込み
 		actor->LoadEnd();
 	}
+
+	// ステージの当たり判定ができた後に登録する
+	RegisterStageCollider();
 }
 
 void GameScene::Update(void)
@@ -132,14 +123,6 @@ void GameScene::Update(void)
 	{
 		// 更新処理
 		actor->Update();
-
-		// 当たり判定を取るか？
-		if (actor)
-		{
-			// 当たり判定
-			FieldCollision(actor);
-			WallCollision(actor);
-		}
 	}
 
 	// 敵の更新
@@ -198,92 +181,17 @@ void GameScene::Release(void)
 	delete enemyFac_;
 }
 
-// ステージの床とプレイヤーの衝突
-void GameScene::FieldCollision(ActorBase* actor)
+void GameScene::RegisterStageCollider(void)
 {
-	// 座標を所得
-	VECTOR actorPos = actor->GetPos();
+	const ColliderModel* stageCollider = stage_->GetCollider();
 
-	// 線分の上座標
-	VECTOR startPos = actorPos;
-	startPos.y = actorPos.y + LINE_OFFSET;
-
-	// 線分の下座標
-	VECTOR endPos = actorPos;
-	endPos.y = actorPos.y - LINE_OFFSET;
-
-	// ステージのモデルを取得
-	int modelId = stage_->GetModelId();
-
-	// 線分とモデルの衝突判定
-	MV1_COLL_RESULT_POLY res =
-		MV1CollCheck_Line(modelId, -1, startPos, endPos);
-
-	// ステージに当たっているか？
-	if (res.HitFlag)
+	// アクターに登録
+	for (auto actor : allActor_)
 	{
-		// 当たった場所に戻す
-		actor->CollisionStage(res.HitPosition);
+		actor->AddGroundModel(stageCollider);
+		actor->AddWallModel(stageCollider);
 	}
-}
 
-void GameScene::WallCollision(ActorBase* actor)
-{
-	// 座標を取得
-	VECTOR pos = actor->GetPos();
-
-	// カプセルの座標
-	VECTOR capStartPos = VAdd(pos, actor->GetStartCapsulePos());
-	VECTOR capEndPos = VAdd(pos, actor->GetEndCapsulePos());
-
-	// カプセルとの当たり判定
-	auto hits = MV1CollCheck_Capsule
-	(
-		stage_->GetModelId(),			// ステージのモデルID
-		-1,								// ステージ全てのポリゴンを指定
-		capStartPos,					// カプセルの上
-		capEndPos,						// カプセルの下
-		actor->GetCapsuleRadius()		// カプセルの半径
-	);
-
-	// 衝突したポリゴン全ての検索
-	for (int i = 0; i < hits.HitNum; i++)
-	{
-		// ポリゴンを1枚に分割
-		auto hit = hits.Dim[i];
-
-		// ポリゴン検索を制限(全てを検索すると重いため)
-		for (int tryCnt = 0; tryCnt < POLYGON_SEARCH_COUNT; tryCnt++)
-		{
-			// 最初の衝突判定で検出した衝突ポリゴン1枚と衝突判定を取る
-			int pHit = HitCheck_Capsule_Triangle
-			(
-				capStartPos,					// カプセルの上
-				capEndPos,						// カプセルの下
-				actor->GetCapsuleRadius(),		// カプセルの半径
-				hit.Position[0],				// ポリゴン1
-				hit.Position[1],				// ポリゴン2
-				hit.Position[2]					// ポリゴン3
-			);
-
-			// カプセルとポリゴンが当たっていた
-			if (pHit)
-			{
-				// 当たっていたので座標をポリゴンの法線方向に移動させる
-				pos = VAdd(pos, VScale(hit.Normal, NORMAL_MOVE_AMOUNT));
-
-				// 球体の座標も移動させる
-				capStartPos = VAdd(capStartPos, VScale(hit.Normal, NORMAL_MOVE_AMOUNT));
-				capEndPos = VAdd(capEndPos, VScale(hit.Normal, NORMAL_MOVE_AMOUNT));
-
-				// 複数当たっている可能性があるので再検索
-				continue;
-			}
-		}
-	}
-	// 検出したポリゴン情報の後始末
-	MV1CollResultPolyDimTerminate(hits);
-
-	// 計算した場所にアクターを戻す
-	actor->CollisionStage(pos);
+	// カメラに登録(カメラは地面だけ)
+	camera_->AddHitStage(stageCollider);
 }

@@ -1,7 +1,9 @@
 #pragma once
+#include <vector>
 #include <DxLib.h>
 
 class ActorBase;
+class ColliderModel;
 
 class Camera
 {
@@ -58,6 +60,9 @@ public:
 	// リセットの向き先を設定
 	void SetLookTarget(ActorBase* target);
 
+	// ぶつかる相手(ステージ)を登録
+	void AddHitStage(const ColliderModel* stage);
+
 private:
 
 	// 追従相手
@@ -65,6 +70,9 @@ private:
 
 	// リセットの向き先
 	ActorBase* lookTarget_;
+
+	// ぶつかる相手
+	std::vector<const ColliderModel*> hitStages_;
 
 	// カメラモード
 	MODE mode_;
@@ -75,11 +83,8 @@ private:
 	// 注視点
 	VECTOR targetPos_;
 
-	// カメラ位置の目標
-	VECTOR goalPos_;
-
-	// 注視点の目標
-	VECTOR goalTargetPos_;
+	// カメラが回る中心
+	VECTOR pivotPos_;
 
 	// カメラの角度
 	VECTOR angle_;
@@ -119,14 +124,20 @@ private:
 	// デバイスの振り分けと角度の更新
 	void UpdateInput(void);
 
-	// 追従対象の位置と角度から目標位置・注視点を計算
-	void CalcFollowGoal(void);
+	// 回る中心を、追従相手へ近づける
+	void UpdatePivot(void);
 
-	// 初回のみ補完せず目標へ合わせる
-	void SnapToGoal(void);
+	// 回る中心と角度から、カメラ位置と注視点を計算する
+	void CalcFollowPos(void);
 
-	// 目標へ近づける
-	void SmoothToGoal(void);
+	// 追従相手とカメラの間に壁があれば、カメラを壁の手前に寄せる
+	void AvoidWall(void);
+
+	// ステージ1つ分の壁よけ。壁がなければ goal をそのまま返す
+	VECTOR AvoidWallByStage(
+		const ColliderModel& stage, 
+		const VECTOR& start, 
+		const VECTOR& goal) const;
 
 	// リセット開始
 	void StartReset(void);

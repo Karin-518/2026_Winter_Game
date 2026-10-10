@@ -39,9 +39,6 @@ private:
 	// 全てのアクター
 	std::vector<ActorBase*> allActor_;
 
-	// 衝突判定(床)
-	void FieldCollision(ActorBase* actor);
-
-	// 衝突判定(壁)
-	void WallCollision(ActorBase* actor);
+	// ステージの当たり判定を、アクターとカメラに登録する
+	void RegisterStageCollider(void);
 };

@@ -1,11 +1,14 @@
+#include "../../../Resource/ResourceManager.h"
+#include "../../Collider/Model/ColliderModel.h"
+
 #include "Stage.h"
 
-#include "../../../Application.h"
-
 Stage::Stage(void)
+	:
+	modelId_(-1),
+	pos_({}),
+	collider_(nullptr)
 {
-	modelId_ = -1;
-	pos_ = { 0.0f, 0.0f, 0.0f };
 }
 
 Stage::~Stage(void)
@@ -31,12 +34,18 @@ void Stage::Init(void)
 
 	// 衝突判定情報の構築
 	MV1SetupCollInfo(modelId_, -1);
+
+	// 当たり判定の生成
+	if (collider_ == nullptr)
+	{
+		collider_ = new ColliderModel(ColliderBase::TAG::STAGE, modelId_);
+	}
 }
 
 void Stage::Load(void)
 {
 	// ステージモデルの読み込み
-	modelId_ = MV1LoadModel((Application::PATH_MODEL + "Stage/Stage.mv1").c_str());
+	modelId_ = ResourceManager::GetInstance()->Load(ResourceManager::SRC::STAGE).GetHandleId();
 }
 
 void Stage::LoadEnd(void)
@@ -56,10 +65,8 @@ void Stage::Draw(void)
 
 void Stage::Release(void)
 {
-	MV1DeleteModel(modelId_);
-}
+	delete collider_;
+	collider_ = nullptr;
 
-int Stage::GetModelId(void) const
-{
-	return modelId_;
+	modelId_ = -1;
 }

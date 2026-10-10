@@ -1,11 +1,11 @@
-﻿#include "Application.h"
-
-#include <DxLib.h>
-
+﻿#include <DxLib.h>
 #include "Common/System/FpsControl.h"
 #include "Input/InputManager.h"
 #include "Scene/SceneManager.h"
 #include "Audio/AudioManager.h"
+#include "Resource/ResourceManager.h"
+
+#include "Application.h"
 
 Application* Application::instance_ = nullptr;
 
@@ -13,10 +13,12 @@ const std::string Application::PATH_MODEL = "Data/Model/";
 const std::string Application::PATH_IMAGE = "Data/Image/";
 
 Application::Application(void)
+	:
+	isInitFail_(false),
+	isReleaseFail_(false),
+	fps_(nullptr),
+	isEnd_(false)
 {
-	isInitFail_ = false;
-	isReleaseFail_ = false;
-	fps_ = nullptr;
 }
 
 Application::~Application(void)
@@ -53,6 +55,10 @@ void Application::Init(void)
 	// サウンド
 	AudioManager::CreateInstance();
 	AudioManager::GetInstance()->Init();
+
+	// リソース管理
+	ResourceManager::CreateInstance();
+	ResourceManager::GetInstance()->Init();
 
 	// シーン管理初期化
 	SceneManager::CreateInstance();
@@ -95,6 +101,9 @@ void Application::Delete(void)
 	// シーン管理解放・削除
 	SceneManager::GetInstance()->Delete();
 	SceneManager::DeleteInstance();
+
+	// リソース管理削除
+	ResourceManager::DeleteInstance();
 
 	// サウンド削除
 	AudioManager::GetInstance()->DeleteAll();

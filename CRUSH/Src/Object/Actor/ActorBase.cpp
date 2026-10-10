@@ -1,30 +1,34 @@
 #include "../../Application.h"
 #include "../../Common/Math/Math.h"
-#include "../../Common/Transform/MatrixUtility.h"
+#include "../../Common/Math/MatrixUtility.h"
 #include "../Common/AnimationController/AnimationController.h"
+#include "../Collider/Line/ColliderLine.h"
+#include "../Collider/Capsule/ColliderCapsule.h"
+#include "../Collider/Model/ColliderModel.h"
+
 #include "ActorBase.h"
 
+namespace
+{
+	// 重力
+	constexpr float GRAVITY = 0.8f;
+}
+
 ActorBase::ActorBase(void)
+	:
+	animationController_(nullptr),
+	animType_(0),
+	modelId_(-1),
+	pos_({}),
+	angle_({}),
+	localAngle_({}),
+	scale_({}),
+	groundLine_(nullptr),
+	bodyCapsule_(nullptr),
+	preInputDir_({}),
+	moveDir_({}),
+	jumpPow_(0.0f)
 { 
-	animationController_ = nullptr;
-
-	animType_ = 0;
-
-	modelId_ = -1;
-	pos_ = { 0.0f,0.0f,0.0f };
-	angle_ = { 0.0f,0.0f,0.0f };
-	localAngle_ = { 0.0f,0.0f,0.0f };
-	scale_ = { 0.0f,0.0f,0.0f };
-
-	startCapsulePos_ = { 0.0f,0.0f,0.0f };
-	endCapsulePos_ = { 0.0f,0.0f,0.0f };
-	capsuleRadius_ = 0.0f;
-
-	preInputDir_ = { 0.0f,0.0f,0.0f };
-
-	moveDir_ = { 0.0f,0.0f,0.0f };
-	jumpPow_ = 0.0f;
-	isCollision_ = false;
 }
 
 ActorBase::~ActorBase(void)
@@ -35,6 +39,13 @@ void ActorBase::Init(void)
 {
 	// Transform初期化
 	InitTransform();
+
+	// 当たり判定の作成
+	if (groundLine_ == nullptr &&
+		bodyCapsule_ == nullptr)
+	{
+		InitCollider();
+	}
 
 	// アニメーションの初期化
 	InitAnimation();
@@ -67,10 +78,15 @@ void ActorBase::Update(void)
 	MV1SetRotationMatrix(modelId_, mat);
 
 	// 重力(加速度を速度に加算していく)
-	jumpPow_ -= 0.8f;
+	jumpPow_ -= GRAVITY;
 
 	// プレイヤーの座標に移動量(速度、ジャンプ力)を加算する
 	pos_.y += jumpPow_;
+
+	// ステージとの当たり判定(壁 → 地面の順)
+	// モデルに座標を渡す前に行うので、押し戻した位置がそのフレームで反映される
+	CollisionWall();
+	CollisionGround();
 
 	// モデルに座標を設定する
 	MV1SetPosition(modelId_, pos_);
@@ -83,36 +99,47 @@ void ActorBase::Draw(void)
 {
 	MV1DrawModel(modelId_);
 
-	DrawSphere3D(
-		VAdd(pos_,startCapsulePos_),
-		capsuleRadius_,
-		16,
-		0x00ff00,
-		0x00ff00,
-		false
-	);
+#ifdef _DEBUG
 
-	DrawSphere3D(
-		VAdd(pos_, endCapsulePos_),
-		capsuleRadius_,
-		16,
-		0x00ff00,
-		0x00ff00,
-		false
-	);
+	// 当たり判定のデバッグ表示
+	if (bodyCapsule_ != nullptr)
+	{
+		bodyCapsule_->Draw();
+	}
+
+	if (groundLine_ != nullptr)
+	{
+		groundLine_->Draw();
+	}
+
+#endif // _DEBUG
 }
 
 void ActorBase::Release(void)
 {
-	MV1DeleteModel(modelId_);
+	modelId_ = -1;
+
+	animationController_->Release();
 	delete animationController_;
+	animationController_ = nullptr;
+
+	ReleaseCollider();
 }
 
-void ActorBase::CollisionStage(const VECTOR& pos)
+void ActorBase::AddGroundModel(const ColliderModel* model)
 {
-	// 衝突判定に指定座標に押し戻す
-	pos_ = pos;
-	jumpPow_ = 0.0f;
+	// nullptr は登録しない
+	if (model == nullptr) return;
+
+	groundModels_.push_back(model);
+}
+
+void ActorBase::AddWallModel(const ColliderModel* model)
+{
+	// nullptr は登録しない
+	if (model == nullptr) return;
+
+	wallModels_.push_back(model);
 }
 
 void ActorBase::DelayRotate(void)
@@ -122,4 +149,40 @@ void ActorBase::DelayRotate(void)
 
 	// 常に最短経路で補間
 	angle_.y = Math::LerpAngle(angle_.y, goal, 0.2f);
+}
+
+void ActorBase::CollisionWall(void)
+{
+	if (bodyCapsule_ == nullptr) return;
+
+	for (const ColliderModel* stage : wallModels_)
+	{
+		bodyCapsule_->PushBackFromModel(*stage, pos_);
+	}
+}
+
+void ActorBase::CollisionGround(void)
+{
+	if (groundLine_ == nullptr) return;
+
+	bool isGround = false;
+	for (const ColliderModel* stage : groundModels_)
+	{
+		isGround = groundLine_->SnapToGround(*stage, pos_) || isGround;
+	}
+
+	// 地面に立っていれば落下を止める
+	if (isGround) jumpPow_ = 0.0f;
+}
+
+void ActorBase::ReleaseCollider(void)
+{
+	delete groundLine_;
+	groundLine_ = nullptr;
+
+	delete bodyCapsule_;
+	bodyCapsule_ = nullptr;
+
+	groundModels_.clear();
+	wallModels_.clear();
 }

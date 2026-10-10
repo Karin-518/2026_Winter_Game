@@ -1,6 +1,6 @@
-#include "../../../../../Input/InputManager.h"
-#include "../../../../Common/AnimationController/AnimationController.h"
-#include "../../Player.h"
+#include "../../../../Input/InputManager.h"
+#include "../../../Common/AnimationController/AnimationController.h"
+#include "../Player.h"
 #include "PlayerMoveState.h"
 
 namespace

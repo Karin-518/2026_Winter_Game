@@ -1,7 +1,12 @@
 #pragma once
 #include <string>
+#include <vector>
 #include <DxLib.h>
+
 class AnimationController;
+class ColliderLine;
+class ColliderCapsule;
+class ColliderModel;
 
 class ActorBase
 {
@@ -20,15 +25,11 @@ public:
 	// 座標を取得
 	const VECTOR& GetPos(void) const { return pos_; }
 
-	// カプセルの当たり判定を取得
-	const VECTOR& GetStartCapsulePos(void) const { return startCapsulePos_; }
-	const VECTOR& GetEndCapsulePos(void) const { return endCapsulePos_; }
-	const float& GetCapsuleRadius(void) const { return capsuleRadius_; }
+	// 地面判定の相手を登録
+	void AddGroundModel(const ColliderModel* model);
 
-	const bool& GetisCollision(void) const { return isCollision_; }
-
-	// ステージと衝突
-	void CollisionStage(const VECTOR& pos);
+	// 壁判定の相手を登録
+	void AddWallModel(const ColliderModel* model);
 
 protected:
 
@@ -45,13 +46,17 @@ protected:
 	VECTOR localAngle_;
 	VECTOR scale_;
 
-	// カプセルの当たり判定座標
-	VECTOR startCapsulePos_;
-	VECTOR endCapsulePos_;
-	float capsuleRadius_;
+	// 足元の線分(地面判定用)
+	ColliderLine* groundLine_;
 
-	// 当たり判定を取るか
-	bool isCollision_;
+	// 体のカプセル(壁判定用)
+	ColliderCapsule* bodyCapsule_;
+
+	// 地面判定の相手
+	std::vector<const ColliderModel*> groundModels_;
+
+	// 壁判定の相手
+	std::vector<const ColliderModel*> wallModels_;
 
 	// パッド入力値の補間
 	VECTOR preInputDir_;
@@ -68,6 +73,9 @@ protected:
 	// 大きさ、回転、座標の初期化
 	virtual void InitTransform(void) = 0;
 
+	// 当たり判定の作成(派生クラスで形と大きさを決める)
+	virtual void InitCollider(void) = 0;
+
 	// アニメーションの初期化
 	virtual void InitAnimation(void) = 0;
 
@@ -76,5 +84,16 @@ protected:
 
 	// 遅延回転処理
 	void DelayRotate(void);
+
+private:
+
+	// 壁から押し出す
+	void CollisionWall(void);
+
+	// 地面に合わせる
+	void CollisionGround(void);
+
+	// 当たり判定の解放
+	void ReleaseCollider(void);
 
 };

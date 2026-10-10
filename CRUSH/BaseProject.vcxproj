@@ -19,16 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Common\Draw\Draw.cpp" />
+    <ClCompile Include="Src\Object\Collider\Capsule\ColliderCapsule.cpp" />
+    <ClCompile Include="Src\Object\Collider\ColliderBase.cpp" />
+    <ClCompile Include="Src\Object\Collider\Line\ColliderLine.cpp" />
+    <ClCompile Include="Src\Object\Collider\Model\ColliderModel.cpp" />
+    <ClCompile Include="Src\Resource\Resource.cpp" />
+    <ClCompile Include="Src\Resource\ResourceManager.cpp" />
     <ClCompile Include="Src\Scene\PauseScene\PauseScene.cpp" />
-    <ClCompile Include="Src\Object\Actor\Player\State\MoveState\PlayerMoveState.cpp" />
-    <ClCompile Include="Src\Object\Actor\Player\State\IdleState\PlayerIdleState.cpp" />
+    <ClCompile Include="Src\Object\Actor\Player\State\PlayerMoveState.cpp" />
+    <ClCompile Include="Src\Object\Actor\Player\State\PlayerIdleState.cpp" />
     <ClCompile Include="Src\Audio\AudioManager.cpp" />
     <ClCompile Include="Src\Audio\SoundTable.cpp" />
     <ClCompile Include="Src\Common\Collision\Collision.cpp" />
-    <ClCompile Include="Src\Common\Draw\Draw.cpp" />
     <ClCompile Include="Src\Common\Math\Math.cpp" />
     <ClCompile Include="Src\Common\System\FpsControl.cpp" />
-    <ClCompile Include="Src\Common\Transform\Transform.cpp" />
     <ClCompile Include="Src\Object\Actor\ActorBase.cpp" />
     <ClCompile Include="Src\Object\Actor\Enemy\Enemis\Enemy1\Enemy1.cpp" />
     <ClCompile Include="Src\Object\Actor\Enemy\Enemis\Enemy2\Enemy2.cpp" />
@@ -40,10 +45,9 @@
     <ClCompile Include="Src\Object\Actor\Enemy\Enemy.cpp" />
     <ClCompile Include="Src\Scene\GameScene\GameScene.cpp" />
     <ClCompile Include="Src\Scene\Loading\Loading.cpp" />
-    <ClCompile Include="Src\Common\Transform\MatrixUtility.cpp" />
+    <ClCompile Include="Src\Common\Math\MatrixUtility.cpp" />
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Common\System\Fader.cpp" />
-    <ClCompile Include="Src\Common\Transform\Quaternion.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Camera\Camera.cpp" />
     <ClCompile Include="Src\Input\InputManager.cpp" />
@@ -55,17 +59,22 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Common\Draw\Draw.h" />
+    <ClInclude Include="Src\Object\Collider\Capsule\ColliderCapsule.h" />
+    <ClInclude Include="Src\Object\Collider\ColliderBase.h" />
+    <ClInclude Include="Src\Object\Collider\Line\ColliderLine.h" />
+    <ClInclude Include="Src\Object\Collider\Model\ColliderModel.h" />
+    <ClInclude Include="Src\Resource\Resource.h" />
+    <ClInclude Include="Src\Resource\ResourceManager.h" />
     <ClInclude Include="Src\Scene\PauseScene\PauseScene.h" />
-    <ClInclude Include="Src\Object\Actor\Player\State\MoveState\PlayerMoveState.h" />
-    <ClInclude Include="Src\Object\Actor\Player\State\IdleState\PlayerIdleState.h" />
+    <ClInclude Include="Src\Object\Actor\Player\State\PlayerMoveState.h" />
+    <ClInclude Include="Src\Object\Actor\Player\State\PlayerIdleState.h" />
     <ClInclude Include="Src\Audio\AudioManager.h" />
     <ClInclude Include="Src\Audio\SoundInfo.h" />
     <ClInclude Include="Src\Audio\SoundTable.h" />
     <ClInclude Include="Src\Common\Collision\Collision.h" />
-    <ClInclude Include="Src\Common\Draw\Draw.h" />
     <ClInclude Include="Src\Common\Math\Math.h" />
     <ClInclude Include="Src\Common\System\FpsControl.h" />
-    <ClInclude Include="Src\Common\Transform\Transform.h" />
     <ClInclude Include="Src\Input\InputInfo.h" />
     <ClInclude Include="Src\Object\Actor\ActorBase.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\Enemis\Enemy1\Enemy1.h" />
@@ -78,10 +87,9 @@
     <ClInclude Include="Src\Object\Actor\Player\State\PlayerState.h" />
     <ClInclude Include="Src\Scene\GameScene\GameScene.h" />
     <ClInclude Include="Src\Scene\Loading\Loading.h" />
-    <ClInclude Include="Src\Common\Transform\MatrixUtility.h" />
+    <ClInclude Include="Src\Common\Math\MatrixUtility.h" />
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Common\System\Fader.h" />
-    <ClInclude Include="Src\Common\Transform\Quaternion.h" />
     <ClInclude Include="Src\Common\Math\Vector2.h" />
     <ClInclude Include="Src\main.h" />
     <ClInclude Include="Src\Camera\Camera.h" />

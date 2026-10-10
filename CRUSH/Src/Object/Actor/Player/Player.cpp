@@ -2,11 +2,14 @@
 #include "../../../Application.h"
 #include "../../../Input/InputManager.h"
 #include "../../../Common/Math/Math.h"
-#include "../../../Common/Transform/MatrixUtility.h"
+#include "../../../Common/Math/MatrixUtility.h"
 #include "../../../Camera/Camera.h"
+#include "../../../Resource/ResourceManager.h"
 #include "../../Common/AnimationController/AnimationController.h"
-#include "State/IdleState/PlayerIdleState.h"
-#include "State/MoveState/PlayerMoveState.h"
+#include "../../Collider/Line/ColliderLine.h"
+#include "../../Collider/Capsule/ColliderCapsule.h"
+#include "State/PlayerIdleState.h"
+#include "State/PlayerMoveState.h"
 
 #include "Player.h"
 
@@ -14,6 +17,12 @@ namespace
 {
 	// 初期ローカル角度
 	constexpr float DEFAULT_LOCAL_ANGLE_DEG_Y = 180.0f;
+
+	// 足元の線分の始点
+	constexpr VECTOR LINE_START_POS = { 0.0f, 10.0f, 0.0f };
+
+	// 足元の線分の終点
+	constexpr VECTOR LINE_END_POS = { 0.0f, -10.0f, 0.0f };
 
 	// 当たり判定のカプセルの開始位置
 	constexpr VECTOR START_CAPSULE_POS = { 0.0f, 110.0f, 0.0f };
@@ -55,36 +64,40 @@ void Player::MoveByInput(float speed)
 	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_DOWN)) { dir = VAdd(dir, Math::DIR_B); }
 	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_RIGHT)) { dir = VAdd(dir, Math::DIR_R); }
 
-	if (!Math::EqualsVZero(dir))
-	{
-		dir.x = preInputDir_.x + (dir.x - preInputDir_.x) * INPUT_SMOOTH;
-		dir.z = preInputDir_.z + (dir.z - preInputDir_.z) * INPUT_SMOOTH;
-		preInputDir_ = dir;
+	if (Math::EqualsVZero(dir)) return;
 
-		// 正規化
-		dir = VNorm(dir);
+	dir.x = preInputDir_.x + (dir.x - preInputDir_.x) * INPUT_SMOOTH;
+	dir.z = preInputDir_.z + (dir.z - preInputDir_.z) * INPUT_SMOOTH;
+	preInputDir_ = dir;
 
-		// XYZの回転行列
-		// XZ平面移動にする場合は、XZの回転を考慮しないようにする
-		MATRIX mat = MGetIdent();
-		mat = MMult(mat, MGetRotY(cameraAngles.y));
+	// 正規化
+	dir = VNorm(dir);
 
-		// 回転行列を使用して、ベクトルを回転させる
-		moveDir_ = VTransform(dir, mat);
+	// XYZの回転行列
+	// XZ平面移動にする場合は、XZの回転を考慮しないようにする
+	MATRIX mat = MGetIdent();
+	mat = MMult(mat, MGetRotY(cameraAngles.y));
 
-		// 方向×スピードで移動量を作って、座標に足して移動
-		pos_ = VAdd(pos_, VScale(moveDir_, speed));
-	}
+	// 回転行列を使用して、ベクトルを回転させる
+	moveDir_ = VTransform(dir, mat);
+
+	// 方向×スピードで移動量を作って、座標に足して移動
+	pos_ = VAdd(pos_, VScale(moveDir_, speed));
 }
 
 void Player::InitLoad(void)
 {
-	// モデルの読み込み
-	modelId_ = MV1LoadModel((Application::PATH_MODEL + "Player/Player.mv1").c_str());
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER);
 }
 
 void Player::InitTransform(void)
 {
+	if (modelId_ == -1)
+	{
+		modelId_ = ResourceManager::GetInstance()->LoadModelDuplicate(
+												ResourceManager::SRC::PLAYER);
+	}
+
 	// モデルの角度
 	angle_ = Math::VECTOR_ZERO;
 	localAngle_ = { 0.0f, Math::Deg2Rad(DEFAULT_LOCAL_ANGLE_DEG_Y), 0.0f };
@@ -101,15 +114,18 @@ void Player::InitTransform(void)
 
 	// モデルの位置設定
 	pos_ = Math::VECTOR_ZERO;
-	MV1SetPosition(modelId_, pos_);
+	MV1SetPosition(modelId_, pos_);;
+}
 
-	// 当たり判定を作成
-	startCapsulePos_ = START_CAPSULE_POS;
-	endCapsulePos_ = END_CAPSULE_POS;
-	capsuleRadius_ = CAPSULE_RADIUS;
-	
-	// 当たり判定を取るか
-	isCollision_ = true;
+void Player::InitCollider(void)
+{
+	// 足元の線分(地面判定)
+	groundLine_ = new ColliderLine(
+		ColliderBase::TAG::PLAYER, &pos_, LINE_START_POS, LINE_END_POS);
+
+	// 体のカプセル(壁判定)
+	bodyCapsule_ = new ColliderCapsule(
+		ColliderBase::TAG::PLAYER, &pos_, START_CAPSULE_POS, END_CAPSULE_POS, CAPSULE_RADIUS);
 }
 
 void Player::InitAnimation(void)

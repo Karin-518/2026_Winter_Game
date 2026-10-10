@@ -1,17 +1,39 @@
-#include "Enemy.h"
-
 #include <cmath>
-
 #include "../../../Application.h"
 #include "../../../Common/Math/Math.h"
-#include "../../../Common/Transform/MatrixUtility.h"
+#include "../../../Common/Math/MatrixUtility.h"
+#include "../../../Resource/ResourceManager.h"
 #include "../../Common/AnimationController/AnimationController.h"
-
+#include "../../Collider/Line/ColliderLine.h"
+#include "../../Collider/Capsule/ColliderCapsule.h"
 #include "../Player/Player.h"
 
-Enemy::Enemy(Player* player)
+#include "Enemy.h"
+
+namespace
 {
-	player_ = player;
+	// 足元の線分の始点
+	constexpr VECTOR LINE_START_POS = { 0.0f, 10.0f, 0.0f };
+
+	// 足元の線分の終点
+	constexpr VECTOR LINE_END_POS = { 0.0f, -10.0f, 0.0f };
+
+	// 当たり判定のカプセルの開始位置
+	constexpr VECTOR START_CAPSULE_POS = { 0.0f, 110.0f, 0.0f };
+
+	// 当たり判定のカプセルの終了位置
+	constexpr VECTOR END_CAPSULE_POS = { 0.0f, 30.0f, 0.0f };
+
+	// 当たり判定のカプセルの半径
+	constexpr float CAPSULE_RADIUS = 20.0f;
+}
+
+Enemy::Enemy(Player* player)
+	:
+	player_(player),
+	isNoticeView_(false),
+	isNoticeHearing_(false)
+{
 }
 
 Enemy::~Enemy(void)
@@ -52,12 +74,17 @@ void Enemy::Draw(void)
 
 void Enemy::InitLoad(void)
 {
-	// モデルの読み込み
-	modelId_ = MV1LoadModel((Application::PATH_MODEL + "Player/Player.mv1").c_str());
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER);
 }
 
 void Enemy::InitTransform(void)
 {
+	if (modelId_ == -1)
+	{
+		modelId_ = ResourceManager::GetInstance()->LoadModelDuplicate(
+											ResourceManager::SRC::PLAYER);
+	}
+
 	// モデルの角度
 	angle_ = { 0.0f, Math::Deg2Rad(45.0f), 0.0f };
 	localAngle_ = { 0.0f, Math::Deg2Rad(180.0f), 0.0f };
@@ -74,14 +101,17 @@ void Enemy::InitTransform(void)
 	// モデルの位置設定
 	pos_ = { 200.0f, 0.0f, 150.0f };
 	MV1SetPosition(modelId_, pos_);
+}
 
-	// 当たり判定を作成
-	startCapsulePos_ = { 0.0f,110,0.0f };
-	endCapsulePos_ = { 0.0f,30.0f,0.0f };
-	capsuleRadius_ = 20.0f;
+void Enemy::InitCollider(void)
+{
+	// 足元の線分(地面判定)
+	groundLine_ = new ColliderLine(
+		ColliderBase::TAG::ENEMY, &pos_, LINE_START_POS, LINE_END_POS);
 
-	// 当たり判定を取るか
-	isCollision_ = true;
+	// 体のカプセル(壁判定)
+	bodyCapsule_ = new ColliderCapsule(
+		ColliderBase::TAG::ENEMY, &pos_, START_CAPSULE_POS, END_CAPSULE_POS, CAPSULE_RADIUS);
 }
 
 void Enemy::InitAnimation(void)

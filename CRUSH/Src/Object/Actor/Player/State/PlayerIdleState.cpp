@@ -1,6 +1,6 @@
-#include "../../../../../Input/InputManager.h"
-#include "../../../../Common/AnimationController/AnimationController.h"
-#include "../../Player.h"
+#include "../../../../Input/InputManager.h"
+#include "../../../Common/AnimationController/AnimationController.h"
+#include "../Player.h"
 #include "PlayerIdleState.h"
 
 void PlayerIdleState::Enter(Player& owner)

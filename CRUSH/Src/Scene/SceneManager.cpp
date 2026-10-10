@@ -1,9 +1,9 @@
-#include "SceneManager.h"
-
 #include <DxLib.h>
-
 #include "Loading/Loading.h"
 #include "TitleScene/TitleScene.h"
+#include "../Resource/ResourceManager.h"
+
+#include "SceneManager.h"
 
 SceneManager* SceneManager::instance_ = nullptr;
 
@@ -124,6 +124,9 @@ void SceneManager::ChangeScene(std::shared_ptr<SceneBase>scene)
 		//末尾のものを新しい物に入れ替える
 		scenes_.back()->Release();
 		scenes_.back() = scene;
+
+		// 前のシーンで読み込んだ画像・モデルをまとめて解放
+		ResourceManager::GetInstance()->Release();
 	}
 
 	// 読み込み(非同期)
@@ -153,9 +156,12 @@ void SceneManager::PopScene(void)
 void SceneManager::JumpScene(std::shared_ptr<SceneBase> scene)
 {
 	// 全て解放
-		// 全て解放
 	for (auto& scene : scenes_) { scene->Release(); }
+
 	scenes_.clear();
+
+	// 前のシーンで読み込んだ画像・モデルをまとめて解放
+	ResourceManager::GetInstance()->Release();
 
 	// 新しく積む
 	scenes_.push_back(scene);

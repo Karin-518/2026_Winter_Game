@@ -46,6 +46,9 @@ private:
 	// 大きさ、回転、座標の初期化
 	void InitTransform(void) override;
 
+	// 当たり判定の作成
+	void InitCollider(void) override;
+
 	// アニメーションの初期化
 	void InitAnimation(void) override;
 
