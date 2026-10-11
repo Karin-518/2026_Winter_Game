@@ -1,6 +1,7 @@
 #pragma once
 #include "../ActorBase.h"
 #include "../../Common/State/StateContext.h"
+#include "../../Common/Health/Health.h"
 #include "State/PlayerState.h"
 
 class Camera;
@@ -38,10 +39,19 @@ public:
 	// 移動用の入力処理
 	void MoveByInput(float speed);
 
+	// ヘルスの取得
+	Health& GetHealth(void) { return health_; }
+
+	// 攻撃が当たりそうなときに呼ばれる
+	void OnHit(int damage);
+
 private:
 
 	// カメラ
 	Camera* camera_;
+
+	// ヘルス
+	Health health_;
 
 	// ステートを管理
 	StateContext<Player, PLAYER_STATE> state_;
@@ -62,4 +72,7 @@ private:
 
 	// 初期化後の個別処理
 	void InitPost(void) override;
+
+	// HPが0になったときに呼ぶ
+	void OnDead(void);
 };

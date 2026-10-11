@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Common\Health\Health.cpp" />
     <ClCompile Include="Src\Common\Draw\Draw.cpp" />
     <ClCompile Include="Src\Object\Collider\Capsule\ColliderCapsule.cpp" />
     <ClCompile Include="Src\Object\Collider\ColliderBase.cpp" />
@@ -59,6 +60,7 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Common\Health\Health.h" />
     <ClInclude Include="Src\Common\Draw\Draw.h" />
     <ClInclude Include="Src\Object\Collider\Capsule\ColliderCapsule.h" />
     <ClInclude Include="Src\Object\Collider\ColliderBase.h" />

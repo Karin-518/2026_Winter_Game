@@ -38,11 +38,15 @@ namespace
 
 	// 入力値の補間地（小さいほど慣性が強い）
 	constexpr float INPUT_SMOOTH = 0.25f;
+
+	// プレイヤーの最大HP
+	constexpr int MAX_HP = 100;
 }
 
 Player::Player(Camera* camera)
 	:
 	camera_(camera),
+	health_(),
 	state_(*this)
 {
 }
@@ -83,6 +87,14 @@ void Player::MoveByInput(float speed)
 
 	// 方向×スピードで移動量を作って、座標に足して移動
 	pos_ = VAdd(pos_, VScale(moveDir_, speed));
+}
+
+void Player::OnHit(int damage)
+{
+	// ダメージをつけなかったら何もしない
+	if (!health_.Damage(damage)) return;
+
+
 }
 
 void Player::InitLoad(void)
@@ -145,10 +157,23 @@ void Player::InitPost(void)
 	state_.Register(PLAYER_STATE::IDLE, std::make_unique<PlayerIdleState>());
 	state_.Register(PLAYER_STATE::MOVE, std::make_unique<PlayerMoveState>());
 	state_.Start(PLAYER_STATE::IDLE);
+
+	// HP を満タンにして、0 になったときの通知先を登録する
+	health_.Init(MAX_HP);
+	health_.SetOnDead([this]() { OnDead(); });
+}
+
+void Player::OnDead(void)
+{
+	// 死亡は外部から切り替えを依頼
+	state_.RequestState(PLAYER_STATE::DEAD);
 }
 
 void Player::Update(void)
 {
+	// 無敵の残りを減らす
+	health_.Update();
+
 	// ステートの更新
 	state_.Update();
 
