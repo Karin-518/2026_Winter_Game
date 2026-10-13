@@ -1,8 +1,23 @@
-﻿#include <DxLib.h>
+﻿#include <cstdlib>
+#include <DxLib.h>
 #include "../Application.h"
 #include "InputManager.h"
 
 InputManager* InputManager::instance_ = nullptr;
+
+namespace
+{
+	// 真ん中からこれ以上離れたら、真ん中へ戻す（ピクセル）
+	constexpr int RECENTER_RANGE = 200;
+
+	constexpr float ANALOG_MAX = 32767.0f;
+
+	constexpr float DEAD_ZONE = 0.35f;
+
+	// マウスを固定する位置（画面の真ん中）
+	constexpr int MOUSE_CENTER_X = Application::SCREEN_SIZE_X / 2;
+	constexpr int MOUSE_CENTER_Y = Application::SCREEN_SIZE_Y / 2;
+}
 
 InputManager::InputManager(void)
 	:
@@ -153,25 +168,7 @@ void InputManager::UpdateMouse(void)
 	if (isMouseLock_)
 	{
 		// マウスの画面固定モード
-		// 画面中央からのずれが移動量
-		int screenWidth, screenHeight, colorBit;
-		GetScreenState(&screenWidth, &screenHeight, &colorBit);
-		const int centerX = screenWidth / 2;
-		const int centerY = screenHeight / 2;
-
-		mouseMove_ = 
-		{
-			static_cast<float>(x - centerX), 
-			static_cast<float>(y - centerY) 
-		};	
-
-		SetMousePoint(centerX, centerY);
-
-		mousePos_ =
-		{
-			static_cast<float>(centerX),
-			static_cast<float>(centerY)
-		};
+		UpdateMouseLock(x, y);
 	}
 	else
 	{
@@ -230,6 +227,20 @@ void InputManager::UpdateMouse(void)
 			break;
 		}
 	}
+}
+
+void InputManager::UpdateMouseLock(int x, int y)
+{
+	// 移動量は、前のフレームとの差
+	mouseMove_ = { static_cast<float>(x) - mousePos_.x, static_cast<float>(y) - mousePos_.y };
+	mousePos_ = { static_cast<float>(x), static_cast<float>(y) };
+
+	// 真ん中の近くにいる間は、戻さない
+	if (abs(x - MOUSE_CENTER_X) < RECENTER_RANGE && abs(y - MOUSE_CENTER_Y) < RECENTER_RANGE) return;
+
+	// 端に近づいたら真ん中へ戻す。次のフレームの差が正しくなるよう、位置も真ん中にする
+	SetMousePoint(MOUSE_CENTER_X, MOUSE_CENTER_Y);
+	mousePos_ = { static_cast<float>(MOUSE_CENTER_X), static_cast<float>(MOUSE_CENTER_Y) };
 }
 
 void InputManager::UpdatePad(INPUT_INFO::JOYPAD_NO pad)
@@ -690,16 +701,12 @@ void InputManager::SetMouseLock(bool isLock)
 	if (isMouseLock_)
 	{
 		// カーソルを非表示にして画面中央へ設定
-		int screenWidth, screenHeight, colorBit;
-
-		GetScreenState(&screenWidth, &screenHeight, &colorBit);
-
-		SetMousePoint(screenWidth / 2, screenHeight / 2);
+		SetMousePoint(MOUSE_CENTER_X, MOUSE_CENTER_Y);
 
 		mousePos_ = 
 		{ 
-			static_cast<float>(screenWidth / 2), 
-			static_cast<float>(screenHeight / 2) 
+			static_cast<float>(MOUSE_CENTER_X),
+			static_cast<float>(MOUSE_CENTER_Y)
 		};
 
 		SetMouseDispFlag(FALSE);

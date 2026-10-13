@@ -34,6 +34,9 @@ public:
 	// UŒ‚‚ª“–‚½‚è‚»‚¤‚È‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
 	void OnHit(int damage) override;
 
+	// “|‚ê‚½‚©
+	bool IsDead(void) const { return health_.IsDead(); }
+
 private:
 
 	// ƒvƒŒƒCƒ„[

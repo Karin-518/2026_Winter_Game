@@ -1,5 +1,4 @@
 #pragma once
-
 #include <list>
 #include <memory>
 
@@ -8,7 +7,6 @@ class Loading;
 
 class SceneManager
 {
-
 public:
 
 	// シーン管理用
@@ -75,6 +73,16 @@ public:
 
 private:
 
+	// 予約の種類
+	enum class REQUEST
+	{
+		NONE,
+		CHANGE,
+		PUSH,
+		POP,
+		JUMP,
+	};
+
 	// 各種シーン
 	std::list<std::shared_ptr<SceneBase>> scenes_;
 
@@ -83,4 +91,25 @@ private:
 
 	// ゲーム終了
 	bool isGameEnd_;
+
+	// 予約の種類
+	REQUEST request_;
+
+	// 予約されたシーン（POP のときは使わない）
+	std::shared_ptr<SceneBase> nextScene_;
+
+	// 予約を受け付ける（すでに予約があれば無視する）
+	void Request(REQUEST request, std::shared_ptr<SceneBase> scene);
+
+	// 予約があれば実行する
+	void ApplyRequest(void);
+
+	// 実際の切り替え処理
+	void ApplyChange(std::shared_ptr<SceneBase> scene);
+	void ApplyPush(std::shared_ptr<SceneBase> scene);
+	void ApplyPop(void);
+	void ApplyJump(std::shared_ptr<SceneBase> scene);
+
+	// 一番上のシーンを非同期で読み込む
+	void LoadBackScene(void);
 };

@@ -1,87 +1,100 @@
-#include "FpsControl.h"
-
 #include <DxLib.h>
-
 #include "../../Application.h"
 
-// コンストラクタ
-FpsControl::FpsControl()
-	: currentTime(0)
-	, prevFrameTime(0)
-	, frameCnt(0)
-	, updateFrameRateTime(0)
-	, frameRate(0.0f)
+#include "FpsControl.h"
+
+namespace
+{
+	// 1秒（マイクロ秒）
+	constexpr long long ONE_SECOND_US = 1000000;
+
+	// 1フレームの時間（マイクロ秒）。60FPS なら 16666
+	constexpr long long FRAME_TIME_US = ONE_SECOND_US / 60;
+
+	// 残りがこれより長ければ Sleep で休む。短ければ寝すぎないよう、そのまま待つ
+	constexpr long long SLEEP_MARGIN_US = 2000;
+
+	// これ以上遅れたら取り戻さず、今から数え直す（ロード直後などで一気に進まないように）
+	constexpr long long MAX_DELAY_FRAME = 5;
+}
+
+FpsControl::FpsControl(void)
+	:
+	currentTime_(0),
+	prevFrameTime_(0),
+	updateFrameRateTime_(0),
+	frameCnt_(0),
+	frameRate_(0.0f)
 {
 }
 
-// デストラクタ
-FpsControl::~FpsControl()
+FpsControl::~FpsControl(void)
 {
 }
 
-// 初期化
 void FpsControl::Init(void)
 {
-	currentTime = 0;
-	prevFrameTime = 0;
-	frameCnt = 0;
-	updateFrameRateTime = 0;
-	frameRate = 0.0f;
+	currentTime_ = GetNowHiPerformanceCount();
+	prevFrameTime_ = currentTime_;
+	updateFrameRateTime_ = currentTime_;
+	frameCnt_ = 0;
+	frameRate_ = 0.0f;
 }
 
-// フレームレート更新
 bool FpsControl::UpdateFrameRate(void)
 {
-	Sleep(1);	// システムに処理を返す
-
 	// 現在の時刻を取得
-	currentTime = GetNowCount();
+	currentTime_ = GetNowHiPerformanceCount();
 
-	// 現在の時刻が、前回のフレーム実行時より
-	// 1/60秒経過していたら処理を実行する
-	if (currentTime - prevFrameTime >= FRAME_RATE)
+	// 前のフレームから経った時間
+	const long long elapsed = currentTime_ - prevFrameTime_;
+
+	// 1フレーム分経っていたら、処理を実行する
+	if (elapsed >= FRAME_TIME_US)
 	{
-		// フレーム実行時の時間を更新
-		prevFrameTime = currentTime;
-
-		// フレーム数をカウント
-		frameCnt++;
-
-		// 1/60経過した
+		AdvanceFrameTime(elapsed);
+		frameCnt_++;
 		return true;
 	}
+
+	// まだ時間に余裕があるときだけ、システムに処理を返す
+	if (FRAME_TIME_US - elapsed > SLEEP_MARGIN_US) { Sleep(1); }
 
 	return false;
 }
 
-// フレームレート計算
-void FpsControl::CalcFrameRate()
+void FpsControl::AdvanceFrameTime(long long elapsed)
 {
-	// 前回のフレームレート更新からの経過時間を求める
-	int difTime = currentTime - updateFrameRateTime;
-
-	// 前回のフレームレートを更新から
-	// 1秒以上経過していたらフレームレートを更新する
-	if (difTime > 1000)
+	// 大きく遅れたときは、取り戻そうとせず今から数え直す
+	if (elapsed > FRAME_TIME_US * MAX_DELAY_FRAME)
 	{
-		// フレーム回数をミリ秒に合わせる
-		// 小数まで出したのでfloatにキャスト
-		float castFrameCnt = (float)(frameCnt * 1000);
-
-		// フレームレートを求める
-		// 理想通りなら 60000 / 1000 で 60 となる
-		frameRate = castFrameCnt / difTime;
-
-		// フレームカウントをクリア
-		frameCnt = 0;
-
-		// フレームレート更新時間を更新
-		updateFrameRateTime = currentTime;
+		prevFrameTime_ = currentTime_;
+		return;
 	}
+
+	// 「実際に始めた時間」ではなく「始める予定だった時間」から次を数える
+	// こうすると、少し遅れたフレームがあっても、次のフレームで取り戻せる
+	prevFrameTime_ += FRAME_TIME_US;
 }
 
-// フレームレートを表示(デバッグ用)
-void FpsControl::DrawFrameRate()
+void FpsControl::CalcFrameRate(void)
+{
+	// 前回のフレームレート更新からの経過時間
+	const long long difTime = currentTime_ - updateFrameRateTime_;
+
+	// 1秒以上経っていなければ、まだ更新しない
+	if (difTime <= ONE_SECOND_US) return;
+
+	// 理想通りなら 60 になる
+	frameRate_ = static_cast<float>(
+		static_cast<double>(frameCnt_) * ONE_SECOND_US / static_cast<double>(difTime));
+
+	// カウントをリセット
+	frameCnt_ = 0;
+	updateFrameRateTime_ = currentTime_;
+}
+
+void FpsControl::DrawFrameRate(void)
 {
 	// スクリーンの右端に来るように設定
 	DrawFormatString(
@@ -89,6 +102,6 @@ void FpsControl::DrawFrameRate()
 		0,
 		0xFF0000,
 		"FPS[%.2f]",
-		frameRate
+		frameRate_
 	);
 }

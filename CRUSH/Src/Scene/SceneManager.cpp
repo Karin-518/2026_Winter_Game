@@ -8,10 +8,13 @@
 SceneManager* SceneManager::instance_ = nullptr;
 
 SceneManager::SceneManager(void)
+	:
+	scenes_(),
+	load_(nullptr),
+	isGameEnd_(false),
+	request_(REQUEST::NONE),
+	nextScene_(nullptr)
 {
-	scenes_.clear();
-	load_ = nullptr;
-	isGameEnd_ = false;
 }
 
 SceneManager::~SceneManager(void)
@@ -56,6 +59,8 @@ void SceneManager::Init3D(void)
 // 更新
 void SceneManager::Update(void)
 {
+	ApplyRequest();
+
 	// シーンがなければ終了
 	if (scenes_.empty()) { return; }
 
@@ -66,18 +71,17 @@ void SceneManager::Update(void)
 		load_->Update();
 
 		// ロードの更新が終了していたら
-		if (load_->IsLoading() == false)
+		if (!load_->IsLoading())
 		{
 			// ロード後の初期化
 			scenes_.back()->LoadEnd();
 		}
+
+		return;
 	}
-	// 通常の更新処理
-	else
-	{
-		// 現在のシーンの更新
-		scenes_.back()->Update();
-	}
+
+	// 現在のシーンの更新
+	scenes_.back()->Update();
 }
 
 void SceneManager::Draw(void)
@@ -87,16 +91,14 @@ void SceneManager::Draw(void)
 	{
 		// ロードの描画
 		load_->Draw();
+		return;
 	}
-	// 通常の更新
-	else
+
+	// 積まれているもの全てを描画する
+	for (auto& scene : scenes_)
 	{
-		// 積まれているもの全てを描画する
-		for (auto& scene : scenes_)
-		{
-			// シーンの描画
-			scene->Draw();
-		}
+		// シーンの描画
+		scene->Draw();
 	}
 }
 
@@ -106,64 +108,131 @@ void SceneManager::Delete(void)
 	for (auto& scene : scenes_) { scene->Release(); }
 	scenes_.clear();
 
+	// 実行されなかった予約を捨てる
+	request_ = REQUEST::NONE;
+	nextScene_ = nullptr;
+
 	// ロード画面の削除
 	load_->Release();
 	delete load_;
+	load_ = nullptr;
 }
 
-void SceneManager::ChangeScene(std::shared_ptr<SceneBase>scene)
+void SceneManager::ChangeScene(std::shared_ptr<SceneBase> scene)
 {
-	// シーンが空か？
-	if (scenes_.empty())
-	{
-		//空なので新しく入れる
-		scenes_.push_back(scene);
-	}
-	else
-	{
-		//末尾のものを新しい物に入れ替える
-		scenes_.back()->Release();
-		scenes_.back() = scene;
-
-		// 前のシーンで読み込んだ画像・モデルをまとめて解放
-		ResourceManager::GetInstance()->Release();
-	}
-
-	// 読み込み(非同期)
-	load_->StartAsyncLoad();
-	scenes_.back()->Load();
-	load_->EndAsyncLoad();
+	Request(REQUEST::CHANGE, scene);
 }
 
 void SceneManager::PushScene(std::shared_ptr<SceneBase> scene)
 {
-	//新しく積むのでもともと入っている奴はまだ削除されない
-	scenes_.push_back(scene);
-	scenes_.back()->Load();
-	scenes_.back()->Init();
+	Request(REQUEST::PUSH, scene);
 }
 
 void SceneManager::PopScene(void)
 {
-	//積んであるものを消して、もともとあったものを末尾にする
-	if (scenes_.size() > 0)
-	{
-		scenes_.back()->Release();
-		scenes_.pop_back();
-	}
+	Request(REQUEST::POP, nullptr);
 }
 
 void SceneManager::JumpScene(std::shared_ptr<SceneBase> scene)
 {
-	// 全て解放
-	for (auto& scene : scenes_) { scene->Release(); }
+	Request(REQUEST::JUMP, scene);
+}
 
+void SceneManager::Request(REQUEST request, std::shared_ptr<SceneBase> scene)
+{
+	// 同じフレームに2つ目の予約が来たら、最初の予約を優先する
+	if (request_ != REQUEST::NONE) return;
+
+	request_ = request;
+	nextScene_ = scene;
+}
+
+void SceneManager::ApplyRequest(void)
+{
+	if (request_ == REQUEST::NONE) return;
+
+	// 実行中に新しい予約が入っても消さないよう、先に取り出して空にする
+	REQUEST request = request_;
+	std::shared_ptr<SceneBase> scene = nextScene_;
+	request_ = REQUEST::NONE;
+	nextScene_ = nullptr;
+
+	switch (request)
+	{
+	case REQUEST::CHANGE:
+		ApplyChange(scene);
+		break;
+	case REQUEST::PUSH:
+		ApplyPush(scene);
+		break;
+	case REQUEST::POP:
+		ApplyPop();
+		break;
+	case REQUEST::JUMP:
+		ApplyJump(scene);
+		break;
+	default:
+		break;
+	}
+}
+
+void SceneManager::ApplyChange(std::shared_ptr<SceneBase> scene)
+{
+	// 最初のシーンなら、そのまま積む
+	if (scenes_.empty())
+	{
+		scenes_.push_back(scene);
+		LoadBackScene();
+		return;
+	}
+
+	// 一番上のシーンを、新しいシーンに入れ替える
+	scenes_.back()->Release();
+	scenes_.back() = scene;
+
+	// 前のシーンで読み込んだ画像・モデルをまとめて解放
+	ResourceManager::GetInstance()->Release();
+
+	LoadBackScene();
+}
+
+void SceneManager::ApplyPush(std::shared_ptr<SceneBase> scene)
+{
+	// 下のシーンは残したまま積む
+	scenes_.push_back(scene);
+
+	// 同期で読み込んで、すぐ初期化する
+	scenes_.back()->Load();
+	scenes_.back()->LoadEnd();
+}
+
+void SceneManager::ApplyPop(void)
+{
+	if (scenes_.empty()) return;
+
+	// 一番上を消して、下のシーンに戻る
+	scenes_.back()->Release();
+	scenes_.pop_back();
+}
+
+void SceneManager::ApplyJump(std::shared_ptr<SceneBase> scene)
+{
+	// 積んであるシーンを全て解放
+	for (auto& s : scenes_) { s->Release(); }
 	scenes_.clear();
 
 	// 前のシーンで読み込んだ画像・モデルをまとめて解放
 	ResourceManager::GetInstance()->Release();
 
-	// 新しく積む
+	// 新しいシーンだけにして読み込む
 	scenes_.push_back(scene);
+	LoadBackScene();
 }
 
+void SceneManager::LoadBackScene(void)
+{
+	// 読み込み。終わったら Update で LoadEnd が呼ばれる
+	load_->StartAsyncLoad();
+	scenes_.back()->Load();
+	load_->EndAsyncLoad();
+}

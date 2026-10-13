@@ -1,12 +1,10 @@
 #pragma once
-
-#include <vector>
-
 #include "../SceneBase.h"
 
 class Camera;
 class Stage;
-class ActorBase;
+class Player;
+class Boss;
 
 class GameScene : public SceneBase
 {
@@ -22,15 +20,22 @@ public:
 	void Release(void)	override;	// 解放
 
 private:
+
 	// カメラ
 	Camera* camera_;
 
 	// ステージ
 	Stage* stage_;
 
-	// 全てのアクター
-	std::vector<ActorBase*> allActor_;
+	// プレイヤー
+	Player* player_;
+
+	// ボス
+	Boss* boss_;
 
 	// ステージの当たり判定を、アクターとカメラに登録する
 	void RegisterStageCollider(void);
+
+	// バトルが終わったかどうか確認
+	bool CheckBattleEnd(void);
 };

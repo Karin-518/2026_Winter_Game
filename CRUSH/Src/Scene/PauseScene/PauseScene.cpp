@@ -61,7 +61,6 @@ void PauseScene::Update(void)
 
 void PauseScene::Draw(void)
 {
-#ifdef _DEBUG
 	DrawBox(0, 0, 1024, 640, 0x000000, true);
 	DrawString(0, 0, "ポーズ画面", 0xffffff);
 
@@ -76,8 +75,6 @@ void PauseScene::Draw(void)
 		GetColor(255, 255, 255), FALSE);
 	DrawString(exitRect_.left + 20, exitRect_.top + 15,
 		"ゲーム終了", GetColor(255, 255, 255));
-
-#endif //_DEBUG
 }
 
 void PauseScene::Release(void)

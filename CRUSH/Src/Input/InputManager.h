@@ -189,13 +189,11 @@ private:
 
 	void UpdateKeyboard(void);
 	void UpdateMouse(void);
+	void UpdateMouseLock(int x, int y);
 	void UpdatePad(INPUT_INFO::JOYPAD_NO pad);
 	static void UpdateKeyState(bool isPressed, KeyState& st);
 	bool IsInputAlreadyUsed(const BindInput& input, INPUT_INFO::ACTION ignoreAction) const;
 	void RemoveDuplicateOtherActions(INPUT_INFO::ACTION action, const BindInput& input);
 
 	inline int ToDxPad(INPUT_INFO::JOYPAD_NO pad) { return DX_INPUT_PAD1 + (int)pad; }
-
-	static constexpr float ANALOG_MAX = 32767.0f;
-	static constexpr float DEAD_ZONE = 0.35f;
 };
