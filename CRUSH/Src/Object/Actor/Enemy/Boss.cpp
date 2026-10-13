@@ -129,11 +129,11 @@ void Boss::InitCollider(void)
 {
 	// 足元の線分(地面判定)
 	groundLine_ = new ColliderLine(
-		ColliderBase::TAG::PLAYER, &pos_, LINE_START_POS, LINE_END_POS);
+		ColliderBase::TAG::ENEMY, &pos_, LINE_START_POS, LINE_END_POS);
 
 	// 体のカプセル(壁判定)
 	bodyCapsule_ = new ColliderCapsule(
-		ColliderBase::TAG::PLAYER, &pos_, START_CAPSULE_POS, END_CAPSULE_POS, CAPSULE_RADIUS);
+		ColliderBase::TAG::ENEMY, &pos_, START_CAPSULE_POS, END_CAPSULE_POS, CAPSULE_RADIUS);
 }
 
 void Boss::InitAnimation(void)
