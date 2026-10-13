@@ -28,7 +28,7 @@ void Health::Update(void)
 bool Health::Damage(int damage)
 {
 	// 倒れている・無敵ならダメージを受けない
-	if (hp_ <= 0 || IsInvincible()) return false;
+	if (IsDead() || IsInvincible()) return false;
 
 	// HPを減らす
 	hp_ -= damage;

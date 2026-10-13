@@ -42,6 +42,9 @@ namespace
 
 	// プレイヤーの最大HP
 	constexpr int MAX_HP = 100;
+
+	// 無敵時間のフレーム
+	constexpr int HIT_INVINCIBLE_FRAME = 30;
 }
 
 Player::Player(Camera* camera)
@@ -92,10 +95,15 @@ void Player::MoveByInput(float speed)
 
 void Player::OnHit(int damage)
 {
-	// ダメージをつけなかったら何もしない
+	// ダメージが通らなかったら何もしない
 	if (!health_.Damage(damage)) return;
 
+	// 倒れたら、のけぞらない
+	if (health_.IsDead()) return;
 
+	// 被弾後の無敵とのけぞり
+	health_.SetInvincible(HIT_INVINCIBLE_FRAME);
+	//state_.RequestState(PLAYER_STATE::HIT);
 }
 
 void Player::InitLoad(void)

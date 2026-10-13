@@ -34,6 +34,9 @@ public:
 	void SetOnDead(std::function<void(void)> func) { onDead_ = func; }
 	void SetOnHalf(std::function<void(void)> func) { onHalf_ = func; }
 
+	// Ž€–S‚µ‚½‚©Šm”F
+	bool IsDead(void) const { return hp_ <= 0; }
+
 private:
 
 	int hp_;							// ¡‚ÌHP
