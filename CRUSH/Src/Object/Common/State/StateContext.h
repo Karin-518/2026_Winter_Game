@@ -2,6 +2,7 @@
 #include <map>
 #include <memory>
 #include <utility>
+#include <cassert>
 #include "StateBase.h"
 
 template <typename TOwner, typename TStateId>
@@ -79,6 +80,9 @@ private:
 	{
 		// IDが登録されていなければ、何もしない
 		auto it = states_.find(id);
+		// 登録し忘れたステートIDなら、デバッグ時に止める 
+		assert(it != states_.end() && "未登録のステートIDです");
+
 		if (it == states_.end()) return;
 
 		//現在のステートから抜ける

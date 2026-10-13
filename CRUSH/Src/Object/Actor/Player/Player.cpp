@@ -10,6 +10,7 @@
 #include "../../Collider/Capsule/ColliderCapsule.h"
 #include "State/PlayerIdleState.h"
 #include "State/PlayerMoveState.h"
+#include "State/PlayerDeadState.h"
 
 #include "Player.h"
 
@@ -156,6 +157,7 @@ void Player::InitPost(void)
 {
 	state_.Register(PLAYER_STATE::IDLE, std::make_unique<PlayerIdleState>());
 	state_.Register(PLAYER_STATE::MOVE, std::make_unique<PlayerMoveState>());
+	state_.Register(PLAYER_STATE::DEAD, std::make_unique<PlayerDeadState>());
 	state_.Start(PLAYER_STATE::IDLE);
 
 	// HP ‚ğ–ƒ^ƒ“‚É‚µ‚ÄA0 ‚É‚È‚Á‚½‚Æ‚«‚Ì’Ê’mæ‚ğ“o˜^‚·‚é

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Actor\Player\State\PlayerDeadState.cpp" />
     <ClCompile Include="Src\Object\Actor\Enemy\Boss.cpp" />
     <ClCompile Include="Src\Object\Common\Health\Health.cpp" />
     <ClCompile Include="Src\Common\Draw\Draw.cpp" />
@@ -53,6 +54,7 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Actor\Player\State\PlayerDeadState.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\Boss.h" />
     <ClInclude Include="Src\Object\Common\Health\Health.h" />
     <ClInclude Include="Src\Common\Draw\Draw.h" />
