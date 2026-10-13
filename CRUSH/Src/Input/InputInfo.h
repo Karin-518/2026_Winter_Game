@@ -15,7 +15,7 @@ namespace INPUT_INFO
 		MOVE_LEFT,		// 左移動
 		MOVE_RIGHT,		// 右移動
 		ATTACK,			// 攻撃
-		DEDGE,			// 回避
+		DODGE,			// 回避
 		SPRINT,			// ダッシュ
 		LOCK_ON,		// ロックオン	
 		CAMERA_RESET,	// カメラリセット
@@ -58,7 +58,7 @@ namespace INPUT_INFO
 		case INPUT_INFO::ACTION::MOVE_LEFT:
 		case INPUT_INFO::ACTION::MOVE_RIGHT:
 		case INPUT_INFO::ACTION::ATTACK:
-		case INPUT_INFO::ACTION::DEDGE:
+		case INPUT_INFO::ACTION::DODGE:
 		case INPUT_INFO::ACTION::SPRINT:
 		case INPUT_INFO::ACTION::LOCK_ON:
 		case INPUT_INFO::ACTION::CAMERA_RESET:
@@ -132,7 +132,7 @@ namespace INPUT_INFO
 		{ACTION::MOVE_LEFT,		"左移動"},
 		{ACTION::MOVE_RIGHT,	"右移動"},
 		{ACTION::ATTACK,		"攻撃"},
-		{ACTION::DEDGE,			"回避"},
+		{ACTION::DODGE,			"回避"},
 		{ACTION::SPRINT,		"ダッシュ"},
 		{ACTION::LOCK_ON,		"ロックオン"},
 		{ACTION::CAMERA_RESET,	"カメラリセット"},
