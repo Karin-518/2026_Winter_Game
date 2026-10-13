@@ -7,9 +7,6 @@
 class Camera;
 class Stage;
 class ActorBase;
-class EnemyManager;
-class EnemyFactory;
-class EnemyPool;
 
 class GameScene : public SceneBase
 {
@@ -30,11 +27,6 @@ private:
 
 	// ステージ
 	Stage* stage_;
-
-	// 敵管理
-	EnemyManager* enemyMng_;
-	EnemyFactory* enemyFac_;
-	EnemyPool* enemyPool_;
 
 	// 全てのアクター
 	std::vector<ActorBase*> allActor_;

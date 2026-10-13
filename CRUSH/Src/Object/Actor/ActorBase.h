@@ -31,6 +31,9 @@ public:
 	// 壁判定の相手を登録
 	void AddWallModel(const ColliderModel* model);
 
+	// 攻撃が当たりそうなときに呼ばれる
+	virtual void OnHit(int damage) {}
+
 protected:
 
 	// アニメーション制御

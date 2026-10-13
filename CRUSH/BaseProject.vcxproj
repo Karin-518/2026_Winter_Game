@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Actor\Enemy\Boss.cpp" />
     <ClCompile Include="Src\Object\Common\Health\Health.cpp" />
     <ClCompile Include="Src\Common\Draw\Draw.cpp" />
     <ClCompile Include="Src\Object\Collider\Capsule\ColliderCapsule.cpp" />
@@ -36,14 +37,6 @@
     <ClCompile Include="Src\Common\Math\Math.cpp" />
     <ClCompile Include="Src\Common\System\FpsControl.cpp" />
     <ClCompile Include="Src\Object\Actor\ActorBase.cpp" />
-    <ClCompile Include="Src\Object\Actor\Enemy\Enemis\Enemy1\Enemy1.cpp" />
-    <ClCompile Include="Src\Object\Actor\Enemy\Enemis\Enemy2\Enemy2.cpp" />
-    <ClCompile Include="Src\Object\Actor\Enemy\Enemis\EnemyBase.cpp" />
-    <ClCompile Include="Src\Object\Actor\Enemy\Enemis\EnemyFactory.cpp" />
-    <ClCompile Include="Src\Object\Actor\Enemy\Enemis\EnemyFactory.h" />
-    <ClCompile Include="Src\Object\Actor\Enemy\Enemis\EnemyManager.cpp" />
-    <ClCompile Include="Src\Object\Actor\Enemy\Enemis\EnemyPool.cpp" />
-    <ClCompile Include="Src\Object\Actor\Enemy\Enemy.cpp" />
     <ClCompile Include="Src\Scene\GameScene\GameScene.cpp" />
     <ClCompile Include="Src\Scene\Loading\Loading.cpp" />
     <ClCompile Include="Src\Common\Math\MatrixUtility.cpp" />
@@ -60,6 +53,7 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Actor\Enemy\Boss.h" />
     <ClInclude Include="Src\Object\Common\Health\Health.h" />
     <ClInclude Include="Src\Common\Draw\Draw.h" />
     <ClInclude Include="Src\Object\Collider\Capsule\ColliderCapsule.h" />
@@ -79,13 +73,6 @@
     <ClInclude Include="Src\Common\System\FpsControl.h" />
     <ClInclude Include="Src\Input\InputInfo.h" />
     <ClInclude Include="Src\Object\Actor\ActorBase.h" />
-    <ClInclude Include="Src\Object\Actor\Enemy\Enemis\Enemy1\Enemy1.h" />
-    <ClInclude Include="Src\Object\Actor\Enemy\Enemis\Enemy2\Enemy2.h" />
-    <ClInclude Include="Src\Object\Actor\Enemy\Enemis\EnemyInfo.h" />
-    <ClInclude Include="Src\Object\Actor\Enemy\Enemis\EnemyManager.h" />
-    <ClInclude Include="Src\Object\Actor\Enemy\Enemis\EnemyPool.h" />
-    <ClInclude Include="Src\Object\Actor\Enemy\Enemy.h" />
-    <ClInclude Include="Src\Object\Actor\Enemy\Enemis\EnemyBase.h" />
     <ClInclude Include="Src\Object\Actor\Player\State\PlayerState.h" />
     <ClInclude Include="Src\Scene\GameScene\GameScene.h" />
     <ClInclude Include="Src\Scene\Loading\Loading.h" />

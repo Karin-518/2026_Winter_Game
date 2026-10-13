@@ -193,11 +193,9 @@ void Player::Draw(void)
 		Math::Rad2Deg(angle_.z)
 	);
 
-	DrawFormatString(
-		0, 100, 0xffffff,
-		"ステート　 ：%d",
-		(int)state_.GetStateId()
-	);
+	// デバッグ表示
+	DrawFormatString(0, 90, 0xffffff, "HP：%d / %d", health_.GetHp(), health_.GetMaxHp());
+	DrawFormatString(0, 110, 0xffffff, "無敵：%s", health_.IsInvincible() ? "あり" : "なし");
 
 #endif //_DEBUG
 }

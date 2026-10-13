@@ -25,6 +25,9 @@ void ResourceManager::Init(void)
 	// プレイヤーモデル
 	Register(SRC::PLAYER, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Player.mv1");
 
+	// ボスモデル
+	Register(SRC::BOSS, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Player.mv1");
+
 	// ステージモデル
 	Register(SRC::STAGE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Stage/Stage.mv1");
 }

@@ -10,6 +10,7 @@ public:
 	enum class SRC
 	{
 		PLAYER,
+		BOSS,
 		STAGE,
 	};
 

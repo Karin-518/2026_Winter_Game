@@ -43,7 +43,7 @@ public:
 	Health& GetHealth(void) { return health_; }
 
 	// UŒ‚‚ª“–‚½‚è‚»‚¤‚È‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
-	void OnHit(int damage);
+	void OnHit(int damage) override;
 
 private:
 

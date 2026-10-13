@@ -8,10 +8,19 @@
 #include "../../Collider/Capsule/ColliderCapsule.h"
 #include "../Player/Player.h"
 
-#include "Enemy.h"
+#include "Boss.h"
 
 namespace
 {
+	// 視野の広さ
+	constexpr float VIEW_RANGE = 600.0f;
+
+	// 視野角
+	constexpr float VIEW_ANGLE = 30.0f;
+
+	// 聴覚の広さ
+	constexpr float HEARING_RANGE = 400.0f;
+
 	// 足元の線分の始点
 	constexpr VECTOR LINE_START_POS = { 0.0f, 10.0f, 0.0f };
 
@@ -26,21 +35,22 @@ namespace
 
 	// 当たり判定のカプセルの半径
 	constexpr float CAPSULE_RADIUS = 20.0f;
+
+	// ボスの最大HP
+	constexpr int MAX_HP = 500;
 }
 
-Enemy::Enemy(Player* player)
+Boss::Boss(Player* player)
 	:
-	player_(player),
-	isNoticeView_(false),
-	isNoticeHearing_(false)
+	player_(player)
 {
 }
 
-Enemy::~Enemy(void)
+Boss::~Boss(void)
 {
 }
 
-void Enemy::Update(void)
+void Boss::Update(void)
 {
 	ActorBase::Update();
 
@@ -48,7 +58,7 @@ void Enemy::Update(void)
 	Search();
 }
 
-void Enemy::Draw(void)
+void Boss::Draw(void)
 {
 	if (isNoticeView_)
 	{
@@ -70,19 +80,31 @@ void Enemy::Draw(void)
 
 	// 視野描画
 	DrawViewRange();
+
+
+#ifdef _DEBUG
+	// デバッグ表示
+	DrawFormatString(0, 130, 0xffffff, "ボスHP：%d / %d", health_.GetHp(), health_.GetMaxHp());
+
+#endif //_DEBUG
 }
 
-void Enemy::InitLoad(void)
+void Boss::OnHit(int damage)
 {
-	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER);
+	health_.Damage(damage);
 }
 
-void Enemy::InitTransform(void)
+void Boss::InitLoad(void)
+{
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::BOSS);
+}
+
+void Boss::InitTransform(void)
 {
 	if (modelId_ == -1)
 	{
 		modelId_ = ResourceManager::GetInstance()->LoadModelDuplicate(
-											ResourceManager::SRC::PLAYER);
+			ResourceManager::SRC::BOSS);
 	}
 
 	// モデルの角度
@@ -103,18 +125,18 @@ void Enemy::InitTransform(void)
 	MV1SetPosition(modelId_, pos_);
 }
 
-void Enemy::InitCollider(void)
+void Boss::InitCollider(void)
 {
 	// 足元の線分(地面判定)
 	groundLine_ = new ColliderLine(
-		ColliderBase::TAG::ENEMY, &pos_, LINE_START_POS, LINE_END_POS);
+		ColliderBase::TAG::PLAYER, &pos_, LINE_START_POS, LINE_END_POS);
 
 	// 体のカプセル(壁判定)
 	bodyCapsule_ = new ColliderCapsule(
-		ColliderBase::TAG::ENEMY, &pos_, START_CAPSULE_POS, END_CAPSULE_POS, CAPSULE_RADIUS);
+		ColliderBase::TAG::PLAYER, &pos_, START_CAPSULE_POS, END_CAPSULE_POS, CAPSULE_RADIUS);
 }
 
-void Enemy::InitAnimation(void)
+void Boss::InitAnimation(void)
 {
 	// モデルアニメーション制御の初期化
 	animationController_ = new AnimationController(modelId_);
@@ -129,13 +151,17 @@ void Enemy::InitAnimation(void)
 	animationController_->Play(static_cast<int>(ANIM_TYPE::WALK));
 }
 
-void Enemy::InitPost(void)
+void Boss::InitPost(void)
 {
 	isNoticeView_ = false;
 	isNoticeHearing_ = false;
+
+	// HP を満タンにして、0 になったときの通知先を登録する
+	health_.Init(MAX_HP);
+	health_.SetOnDead([this]() { OnDead(); });
 }
 
-void Enemy::DrawViewRange(void)
+void Boss::DrawViewRange(void)
 {
 	float viewRad = Math::Deg2Rad(VIEW_ANGLE);
 
@@ -181,7 +207,7 @@ void Enemy::DrawViewRange(void)
 		HEARING_RANGE, 10, 0xffff7f, 0xffff7f, true);
 }
 
-void Enemy::Search(void)
+void Boss::Search(void)
 {
 	// 検知フラグリセット
 	isNoticeView_ = false;
@@ -216,4 +242,8 @@ void Enemy::Search(void)
 	{
 		isNoticeHearing_ = true;
 	}
+}
+
+void Boss::OnDead(void)
+{
 }
