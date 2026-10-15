@@ -70,6 +70,8 @@ void Resource::Load(void)
 
 void Resource::Release(void)
 {
+	if (!IsLoaded()) return;
+
 	switch (type_)
 	{
 	case Resource::TYPE::IMG:
@@ -92,6 +94,8 @@ void Resource::Release(void)
 	default:
 		break;
 	}
+
+	handleId_ = INVALID_HANDLE;
 }
 
 int Resource::DuplicateModel(void)

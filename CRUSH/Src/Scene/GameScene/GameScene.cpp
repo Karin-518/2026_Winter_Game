@@ -8,6 +8,8 @@
 #include "../SceneManager.h"
 #include "../PauseScene/PauseScene.h"
 #include "../TitleScene/TitleScene.h"
+#include "../GameOver/GameOver.h"
+#include "../GameClear/GameClear.h"
 
 #include "GameScene.h"
 
@@ -82,6 +84,21 @@ void GameScene::LoadEnd(void)
 
 void GameScene::Update(void)
 {
+#ifdef _DEBUG
+	if (CheckHitKey(KEY_INPUT_C))
+	{
+		SceneManager::GetInstance()->ChangeScene(std::make_shared<GameClear>());
+		return;
+	}
+
+	if (CheckHitKey(KEY_INPUT_O))
+	{
+		SceneManager::GetInstance()->ChangeScene(std::make_shared<GameOver>());
+		return;
+	}
+
+#endif //_DEBUG
+
 	if (InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::PAUSE))
 	{
 		// ポーズシーンへ
