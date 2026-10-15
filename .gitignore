@@ -1,45 +1,66 @@
-# Prerequisites
-*.d
+# =========================================
+# Third-party assets (redistribution not allowed)
+# =========================================
+CRUSH/Data/
+*.dxa
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# =========================================
+# Build outputs
+# =========================================
+x64/
+x86/
+[Dd]ebug/
+[Rr]elease/
 
 # Executables
 *.exe
 *.out
 *.app
 
-# debug information files
+# Object files
+*.d
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled headers
+*.gch
+*.pch
+*.ipch
+
+# Linker and debug files
+*.ilk
+*.pdb
+*.idb
+*.iobj
+*.ipdb
 *.dwo
-*.pso
-CRUSH/.vs/
-CRUSH/x64/
-CRUSH/Log.txt
+*.tlog
+
+# Libraries (DxLib is not included in this repository)
+*.so
+*.dylib
+*.dll
+*.lai
+*.la
+*.a
+*.lib
+
+# Fortran module files
+*.mod
+*.smod
+
+# =========================================
+# Visual Studio user settings and cache
+# =========================================
+.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+
+# =========================================
+# DxLib log file
+# =========================================
+Log.txt
