@@ -8,8 +8,9 @@
 #include "PauseScene.h"
 
 PauseScene::PauseScene(void)
+	:
+	handle_(-1)
 {
-	handle_ = -1;
 }
 
 PauseScene::~PauseScene(void)
@@ -62,7 +63,7 @@ void PauseScene::Update(void)
 void PauseScene::Draw(void)
 {
 	DrawBox(0, 0, 1024, 640, 0x000000, true);
-	DrawString(0, 0, "ポーズ画面", 0xffffff);
+	DrawString(10, 10, "ポーズ画面", 0xffffff);
 
 	DrawBox(continueRect_.left, continueRect_.top,
 		continueRect_.right, continueRect_.bottom,
