@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <DxLib.h>
+#include "../../Resource/ResourceManager.h"
 
 class AnimationController;
 class ColliderLine;
@@ -87,6 +88,15 @@ protected:
 
 	// 遅延回転処理
 	void DelayRotate(void);
+
+	// リソースからアニメーションを登録する
+	void AddAnimation(int type, ResourceManager::SRC src, float speed);
+
+	template <typename T>
+	void AddAnimation(T type, ResourceManager::SRC src, float speed)
+	{
+		AddAnimation(static_cast<int>(type), src, speed);
+	}
 
 private:
 

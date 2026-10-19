@@ -109,6 +109,10 @@ void Player::OnHit(int damage)
 void Player::InitLoad(void)
 {
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER);
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_IDLE);
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_WALK);
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_RUN);
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_ATTACK_1);
 }
 
 void Player::InitTransform(void)
@@ -154,11 +158,10 @@ void Player::InitAnimation(void)
 	// モデルアニメーション制御の初期化
 	animationController_ = new AnimationController(modelId_);
 
-	// アニメーションの追加
-	animationController_->Add(
-		static_cast<int>(ANIM_TYPE::IDLE), ANIMATION_SPEED, Application::PATH_MODEL + "Player/Idle.mv1");
-	animationController_->Add(
-		static_cast<int>(ANIM_TYPE::WALK), ANIMATION_SPEED, Application::PATH_MODEL + "Player/Walk.mv1");
+	AddAnimation(ANIM_TYPE::IDLE, ResourceManager::SRC::PLAYER_ANIM_IDLE, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::WALK, ResourceManager::SRC::PLAYER_ANIM_WALK, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::RUN, ResourceManager::SRC::PLAYER_ANIM_RUN, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::ATTACK_1, ResourceManager::SRC::PLAYER_ANIM_ATTACK_1, ANIMATION_SPEED);
 }
 
 void Player::InitPost(void)

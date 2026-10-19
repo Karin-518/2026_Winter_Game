@@ -6,10 +6,10 @@
 namespace
 {
 	// 歩き移動速度
-	const float WALK_POW = 5.0f;
+	const float WALK_POW = 6.0f;
 
 	// 走り移動速度
-	const float SPRINT_POW = 10.0f;
+	const float SPRINT_POW = 12.0f;
 }
 
 void PlayerMoveState::Enter(Player& owner)
@@ -32,10 +32,14 @@ PLAYER_STATE PlayerMoveState::Update(Player& owner)
 	// 走る入力があれば、移動速度を上げる
 	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::SPRINT))
 	{
+		// 走るアニメーションの再生
+		owner.GetAnimationController()->Play(static_cast<int>(Player::ANIM_TYPE::RUN));
 		owner.MoveByInput(SPRINT_POW);
 	}
 	else
 	{
+		// 歩くアニメーションの再生
+		owner.GetAnimationController()->Play(static_cast<int>(Player::ANIM_TYPE::WALK));
 		owner.MoveByInput(WALK_POW);
 	}
 

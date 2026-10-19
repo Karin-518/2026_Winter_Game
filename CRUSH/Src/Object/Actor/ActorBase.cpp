@@ -151,6 +151,12 @@ void ActorBase::DelayRotate(void)
 	angle_.y = Math::LerpAngle(angle_.y, goal, 0.2f);
 }
 
+void ActorBase::AddAnimation(int type, ResourceManager::SRC src, float speed)
+{
+	int handle = ResourceManager::GetInstance()->Load(src).GetHandleId();
+	animationController_->Add(type, speed, handle);
+}
+
 void ActorBase::CollisionWall(void)
 {
 	if (bodyCapsule_ == nullptr) return;

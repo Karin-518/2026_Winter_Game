@@ -1,24 +1,37 @@
+#include <cmath>
 #include <DxLib.h>
 #include "AnimationController.h"
 
 AnimationController::AnimationController(int modelId)
+	:
+	modelId_(modelId),
+	animations_(),
+	playType_(-1),
+	playAnim_(),
+	isLoop_(true),
+	prevAnim_(),
+	isPrevLoop_(true),
+	blendRate_(1.0f),
+	blendStep_(0.0f),
+	blendEase_(Math::EASE_TYPE::LINEAR),
+	speedRate_(1.0f),
+	tempSpeedRate_(1.0f),
+	tempSpeedFrame_(0),
+	isLooped_(false),
+	loopCount_(0)
 {
-	modelId_ = modelId;
-	playType_ = -1;
-	animCount_ = 0;
 }
 
 AnimationController::~AnimationController(void)
 {
 }
 
-void AnimationController::Add(int type, float speed, const std::string path)
+void AnimationController::Add(int type, float speed, int animSrcHandle, int animIndex)
 {
 	Animation animation;
-	animation.model = MV1LoadModel(path.c_str());
-	animation.animIndex = -1;
-
-	Add(type, speed, animation);
+	animation.model = animSrcHandle;
+	animation.animIndex = animIndex;
+	Register(type, speed, animation);
 }
 
 void AnimationController::AddInFbx(int type, float speed, int animIndex)
@@ -26,135 +39,239 @@ void AnimationController::AddInFbx(int type, float speed, int animIndex)
 	Animation animation;
 	animation.model = -1;
 	animation.animIndex = animIndex;
+	Register(type, speed, animation);
+}
 
-	Add(type, speed, animation);
+void AnimationController::SetSpeedCurve(int type, float startRate, float endRate, Math::EASE_TYPE ease)
+{
+	auto it = animations_.find(type);
+	if (it == animations_.end()) return;
+
+	it->second.curveStartRate = startRate;
+	it->second.curveEndRate = endRate;
+	it->second.curveEase = ease;
+}
+
+void AnimationController::Register(int type, float speed, Animation animation)
+{
+	animation.speed = speed;
+
+	// 登録済みなら上書きしない
+	if (animations_.count(type) != 0) return;
+
+	animations_.emplace(type, animation);
 }
 
 void AnimationController::Play(int type, bool isLoop)
 {
+	PlayParam param;
+	param.isLoop = isLoop;
+	Play(type, param);
+}
 
-	if (playType_ == type)
+void AnimationController::Play(int type, const PlayParam& param)
+{
+	// 同じアニメーションなら継続
+	if (playType_ == type && !param.isForce) return;
+
+	// 未登録なら何もしない
+	auto it = animations_.find(type);
+	if (it == animations_.end()) return;
+
+	// ブレンド途中の旧アニメーションがあれば外し、現在のものを旧へ
+	DetachPrev();
+	prevAnim_ = playAnim_;
+	isPrevLoop_ = isLoop_;
+
+	// 新しいアニメーションをアタッチ
+	playType_ = type;
+	playAnim_ = it->second;
+	playAnim_.attachNo = Attach(playAnim_);
+	if (playAnim_.attachNo == -1)
 	{
-		// 同じアニメーションだったら再生を継続する
+		playType_ = -1;
 		return;
 	}
-
-	if (playType_ != -1)
-	{
-		// モデルからアニメーションを外す
-		MV1DetachAnim(modelId_, playAnim_.attachNo);
-	}
-
-	// アニメーション種別を変更
-	playType_ = type;
-	playAnim_ = animations_[type];
-
-	// 初期化
-	playAnim_.step = 0.0f;
-
-	// モデルにアニメーションを付ける
-	if (playAnim_.model == -1)
-	{
-		// モデルと同じファイルからアニメーションをアタッチする
-		playAnim_.attachNo = MV1AttachAnim(modelId_, playAnim_.animIndex);
-	}
-	else
-	{
-		// 別のモデルファイルからアニメーションをアタッチする
-		// DxModelViewerを確認すること(大体0か1)
-		int animIdx = 0;
-		playAnim_.attachNo = MV1AttachAnim(modelId_, animIdx, playAnim_.model);
-	}
-
-	// アニメーション総時間の取得
 	playAnim_.totalTime = MV1GetAttachAnimTotalTime(modelId_, playAnim_.attachNo);
 
-	// アニメーションループ
-	isLoop_ = isLoop;
+	// 再生位置の初期化
+	playAnim_.step = param.startStep;
+	MV1SetAttachAnimTime(modelId_, playAnim_.attachNo, playAnim_.step);
+	preStep_ = playAnim_.step;
+	isLooped_ = false;
+	loopCount_ = 0;
+	isLoop_ = param.isLoop;
 
+	StartBlend(param.blendFrame, param.blendEase);
 }
 
 void AnimationController::Update(void)
 {
-	// 再生
-	playAnim_.step += playAnim_.speed;
+	if (playType_ == -1) return;
 
-	// アニメーションが終了したら
-	if (playAnim_.step > playAnim_.totalTime)
-	{
-		if (isLoop_)
-		{
-			// ループ再生
-			playAnim_.step = 0.0f;
-		}
-		else
-		{
-			// ループしない
-			playAnim_.step = playAnim_.totalTime;
-		}
-	}
+	float globalRate = CalcGlobalRate();
 
-	// アニメーション設定
-	MV1SetAttachAnimTime(modelId_, playAnim_.attachNo, playAnim_.step);
+	// 再生中のアニメーション
+	preStep_ = playAnim_.step;
+	isLooped_ = StepAnim(playAnim_, isLoop_, globalRate * CalcCurveRate());
+	if (isLooped_) loopCount_++;
 
+	// 旧アニメーションも動かし続ける
+	StepAnim(prevAnim_, isPrevLoop_, globalRate);
+
+	// ブレンド
+	UpdateBlend(globalRate);
+
+	UpdatetempSpeed();
 }
 
 void AnimationController::Release(void)
 {
+	// 本体モデルからアタッチだけ外す
+	DetachPrev();
+	if (playAnim_.attachNo != -1) MV1DetachAnim(modelId_, playAnim_.attachNo);
 
-	// 外部FBXのモデル(アニメーション)解放
-	for (const std::pair<int, Animation>& pair : animations_)
-	{
-		if (pair.second.model != -1)
-		{
-			MV1DeleteModel(pair.second.model);
-		}
-	}
-	
-	// 可変長配列をクリアする
+	playAnim_ = Animation();
+	playType_ = -1;
 	animations_.clear();
-	
 }
 
-int AnimationController::GetPlayType(void) const
+int AnimationController::Attach(const Animation& anim)
 {
-	return playType_;
+	// 本体モデルと同じファイル内のアニメーション
+	if (anim.model == -1) return MV1AttachAnim(modelId_, anim.animIndex);
+
+	// 別のモデルファイルのアニメーション
+	return MV1AttachAnim(modelId_, anim.animIndex, anim.model);
+}
+
+bool AnimationController::StepAnim(Animation& anim, bool isLoop, float rate)
+{
+	if (anim.attachNo == -1) return false;
+
+	anim.step += anim.speed * rate;
+
+	bool isOver = anim.step > anim.totalTime;
+	bool isWrap = isOver && isLoop && anim.totalTime > 0.0f;
+
+	// ループは端数を残す
+	if (isWrap) anim.step = fmodf(anim.step, anim.totalTime);
+	if (isOver && !isWrap) anim.step = anim.totalTime;
+
+	MV1SetAttachAnimTime(modelId_, anim.attachNo, anim.step);
+	return isWrap;
+}
+
+void AnimationController::StartBlend(float blendFrame, Math::EASE_TYPE ease)
+{
+	blendEase_ = ease;
+
+	// 初回再生 or ブレンドなし指定
+	if (prevAnim_.attachNo == -1 || blendFrame <= 0.0f)
+	{
+		DetachPrev();
+		blendRate_ = 1.0f;
+		ApplyBlendRate();
+		return;
+	}
+
+	blendRate_ = 0.0f;
+	blendStep_ = 1.0f / blendFrame;
+	ApplyBlendRate();
+}
+
+void AnimationController::UpdateBlend(float rate)
+{
+	if (prevAnim_.attachNo == -1) return;
+
+	blendRate_ += blendStep_ * rate;
+	if (blendRate_ >= 1.0f)
+	{
+		blendRate_ = 1.0f;
+		DetachPrev();
+	}
+
+	ApplyBlendRate();
+}
+
+void AnimationController::ApplyBlendRate(void)
+{
+	// 進捗をイージングで変換してから反映
+	float rate = Math::Ease(blendEase_, blendRate_);
+
+	MV1SetAttachAnimBlendRate(modelId_, playAnim_.attachNo, rate);
+	if (prevAnim_.attachNo == -1) return;
+	MV1SetAttachAnimBlendRate(modelId_, prevAnim_.attachNo, 1.0f);
+}
+
+void AnimationController::SetSpeedRate(float rate)
+{
+	speedRate_ = rate;
+}
+
+void AnimationController::ChangeSpeedForFrame(float rate, int frame)
+{
+	tempSpeedRate_ = rate;
+	tempSpeedFrame_ = frame;
 }
 
 bool AnimationController::IsEnd(void) const
 {
+	if (isLoop_) return false;
+	if (playType_ == -1) return false;
 
-	bool ret = false;
-
-	if (isLoop_)
-	{
-		// ループ設定されているなら、
-		// 無条件で終了しないを返す
-		return ret;
-	}
-
-	if (playAnim_.step >= playAnim_.totalTime)
-	{
-		// 再生時間を過ぎたらtrue
-		return true;
-	}
-
-	return ret;
-
+	return playAnim_.step >= playAnim_.totalTime;
 }
 
-const AnimationController::Animation& AnimationController::GetPlayAnim(void) const
+float AnimationController::GetRate(void) const
 {
-	return playAnim_;
+	// 0 で割らないようにする
+	if (playAnim_.totalTime <= 0.0f) return 0.0f;
+	return playAnim_.step / playAnim_.totalTime;
 }
 
-void AnimationController::Add(int type, float speed, Animation& animation)
+bool AnimationController::IsPassed(float time) const
 {
-	animation.speed = speed;
+	if (playType_ == -1) return false;
 
-	if (animations_.count(type) == 0)
-	{
-		// 追加
-		animations_.emplace(type, animation);
-	}
+	// 通常
+	// 前回位置 < time <= 今回位置
+	if (!isLooped_) return preStep_ < time && time <= playAnim_.step;
+
+	// ループ
+	// 前回位置～終端か、先頭～今回位置のどちらかに入っていれば通過
+	return time > preStep_ || time < playAnim_.step;
+}
+
+bool AnimationController::IsInRange(float startTime, float endTime) const
+{
+	if (playType_ == -1) return false;
+	return startTime <= playAnim_.step && playAnim_.step <= endTime;
+}
+
+void AnimationController::DetachPrev(void)
+{
+	if (prevAnim_.attachNo == -1) return;
+
+	MV1DetachAnim(modelId_, prevAnim_.attachNo);
+	prevAnim_.attachNo = -1;
+}
+
+void AnimationController::UpdatetempSpeed(void)
+{
+	if (tempSpeedFrame_ <= 0) return;
+
+	tempSpeedFrame_--;
+	if (tempSpeedFrame_ == 0) tempSpeedRate_ = 1.0f;
+}
+
+float AnimationController::CalcGlobalRate(void) const
+{
+	return speedRate_ * tempSpeedRate_;
+}
+
+float AnimationController::CalcCurveRate(void) const
+{
+	float t = Math::Ease(playAnim_.curveEase, GetRate());
+	return Math::Lerp(playAnim_.curveStartRate, playAnim_.curveEndRate, t);
 }

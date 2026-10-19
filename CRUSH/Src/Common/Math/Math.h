@@ -7,8 +7,7 @@
 
 namespace Math
 {
-	// ---- 定数 ----
-	// 
+	// ---- 定数 ---- 
 	// ラジアン(rad)・度(deg)変換用
 	constexpr float RAD2DEG = (180.0f / DX_PI_F);
 	constexpr float DEG2RAD = (DX_PI_F / 180.0f);
@@ -31,7 +30,6 @@ namespace Math
 	constexpr VECTOR DIR_D = { 0.0f, -1.0f, 0.0f };
 
 	// ---- 基本関数 ----
-	// 
 	// 四捨五入
 	int Round(float v);
 
@@ -39,7 +37,6 @@ namespace Math
 	std::vector<std::string> Split(const std::string& line, char delimiter);
 
 	// ---- 角度変換 ----
-	// 
 	// ラジアン(rad)から度(deg)
 	double Rad2Deg(double rad);
 	float Rad2Deg(float rad);
@@ -94,7 +91,8 @@ namespace Math
 	float SqrMagnitude(const Vector2& v);
 	float SqrMagnitudeF(const VECTOR& v);
 	double SqrMagnitude(const VECTOR& v);
-	double SqrMagnitude(const VECTOR& v1, const VECTOR& v2);
+	double SqrDistance(const Vector2& a, const Vector2& b);
+	double SqrDistance(const VECTOR& v1, const VECTOR& v2);
 
 	double Distance(const Vector2& v1, const Vector2& v2);
 	double Distance(const VECTOR& v1, const VECTOR& v2);
@@ -110,6 +108,22 @@ namespace Math
 	// 2つのベクトルの間の角度
 	double AngleDeg(const VECTOR& from, const VECTOR& to);
 
-	// イージング
+	// ---- イージング ----
+		// イージングの種類                            
+	enum class EASE_TYPE
+	{
+		LINEAR,			// 一定
+		IN_QUAD,		// ゆっくり → 速い
+		OUT_QUAD,		// 速い → ゆっくり
+		IN_OUT_QUAD,	// ゆっくり → 速い → ゆっくり
+		IN_CUBIC,		// IN_QUAD より強め
+		OUT_CUBIC,		// OUT_QUAD より強め
+		IN_OUT_CUBIC,	// IN_OUT_QUAD より強め
+	};
+
+	// 進捗 t(0?1) をイージング曲線で変換
+	float Ease(EASE_TYPE type, float t);
+
+	// イーズアウト(Cubic)
 	float EaseOutCubic(float t);
 }

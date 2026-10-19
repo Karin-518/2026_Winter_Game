@@ -15,6 +15,8 @@ public:
 	{
 		IDLE,
 		WALK,
+		RUN,
+		ATTACK_1,
 		MAX,
 	};
 

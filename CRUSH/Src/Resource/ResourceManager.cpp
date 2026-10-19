@@ -23,10 +23,15 @@ ResourceManager::~ResourceManager(void)
 void ResourceManager::Init(void)
 {
 	// プレイヤーモデル
-	Register(SRC::PLAYER, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Player.mv1");
+	Register(SRC::PLAYER, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Warrior.mv1");
+	// プレイヤーのアニメーション
+	Register(SRC::PLAYER_ANIM_IDLE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Idle.mv1");
+	Register(SRC::PLAYER_ANIM_WALK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Walk.mv1");
+	Register(SRC::PLAYER_ANIM_RUN, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Run.mv1");
+	Register(SRC::PLAYER_ANIM_ATTACK_1, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Attack1.mv1");
 
 	// ボスモデル
-	Register(SRC::BOSS, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Player.mv1");
+	Register(SRC::BOSS, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Dragon.mv1");
 
 	// ステージモデル
 	Register(SRC::STAGE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Stage/Stage.mv1");

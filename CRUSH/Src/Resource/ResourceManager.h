@@ -10,6 +10,10 @@ public:
 	enum class SRC
 	{
 		PLAYER,
+		PLAYER_ANIM_IDLE,
+		PLAYER_ANIM_WALK,
+		PLAYER_ANIM_RUN,
+		PLAYER_ANIM_ATTACK_1,
 		BOSS,
 		STAGE,
 	};

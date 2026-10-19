@@ -140,15 +140,6 @@ void Boss::InitAnimation(void)
 {
 	// モデルアニメーション制御の初期化
 	animationController_ = new AnimationController(modelId_);
-
-	// アニメーションの追加
-	animationController_->Add(
-		static_cast<int>(ANIM_TYPE::IDLE), 0.5f, Application::PATH_MODEL + "Player/Idle.mv1");
-	animationController_->Add(
-		static_cast<int>(ANIM_TYPE::WALK), 0.5f, Application::PATH_MODEL + "Player/Walk.mv1");
-
-	// 初期アニメーションの再生
-	animationController_->Play(static_cast<int>(ANIM_TYPE::WALK));
 }
 
 void Boss::InitPost(void)

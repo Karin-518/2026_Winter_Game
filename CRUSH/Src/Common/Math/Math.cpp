@@ -136,19 +136,29 @@ namespace Math
     float  SqrMagnitudeF(const VECTOR& v) { return v.x * v.x + v.y * v.y + v.z * v.z; }
     double SqrMagnitude(const VECTOR& v) { return v.x * v.x + v.y * v.y + v.z * v.z; }
 
-    double SqrMagnitude(const VECTOR& a, const VECTOR& b)
+    double SqrDistance(const Vector2& a, const Vector2& b)
     {
-        return pow(b.x - a.x, 2) + pow(b.y - a.y, 2) + pow(b.z - a.z, 2);
+        double dx = b.x - a.x;
+        double dy = b.y - a.y;
+        return dx * dx + dy * dy;
+    }
+
+    double SqrDistance(const VECTOR& a, const VECTOR& b)
+    {
+        double dx = b.x - a.x;
+        double dy = b.y - a.y;
+        double dz = b.z - a.z;
+        return dx * dx + dy * dy + dz * dz;
     }
 
     double Distance(const Vector2& a, const Vector2& b)
     {
-        return sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
+         return sqrt(SqrDistance(a, b));
     }
 
     double Distance(const VECTOR& a, const VECTOR& b)
     {
-        return sqrt(SqrMagnitude(a, b));
+        return sqrt(SqrDistance(a, b));
     }
 
     bool Equals(const VECTOR& a, const VECTOR& b)
@@ -158,17 +168,7 @@ namespace Math
 
     bool EqualsVZero(const VECTOR& v1)
     {
-        const VECTOR& v2 = VECTOR_ZERO;
-        if (v1.x == v2.x && v1.y == v2.y && v1.z == v2.z)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    bool EqualsZero(const VECTOR& v)
-    {
-        return Equals(v, VECTOR_ZERO);
+        return Equals(v1, VECTOR_ZERO);
     }
 
     VECTOR Normalize(const Vector2& v)
@@ -180,7 +180,7 @@ namespace Math
 
     VECTOR Normalize(const VECTOR& v)
     {
-        if (EqualsZero(v)) return v;
+        if (EqualsVZero(v)) return v;
         return VNorm(v);
     }
 
@@ -193,8 +193,40 @@ namespace Math
         dot = std::clamp(dot, -1.0, 1.0);
         return acos(dot) * (180.0 / DX_PI);
     }
+
+    float Ease(EASE_TYPE type, float t)
+    {
+        if (t < 0.0f) t = 0.0f;
+        if (t > 1.0f) t = 1.0f;
+        float inv = 1.0f - t;
+
+        switch (type)
+        {
+        case EASE_TYPE::IN_QUAD:
+            return t * t;
+
+        case EASE_TYPE::OUT_QUAD:
+            return 1.0f - inv * inv;
+
+        case EASE_TYPE::IN_OUT_QUAD:
+            return t < 0.5f ? 2.0f * t * t : 1.0f - 2.0f * inv * inv;
+
+        case EASE_TYPE::IN_CUBIC:
+            return t * t * t;
+
+        case EASE_TYPE::OUT_CUBIC:
+            return 1.0f - inv * inv * inv;
+
+        case EASE_TYPE::IN_OUT_CUBIC:
+            return t < 0.5f ? 4.0f * t * t * t : 1.0f - 4.0f * inv * inv * inv;
+
+        default:
+            return t;
+        }
+    }
+
     float EaseOutCubic(float t)
     {
-        return 1.0f - powf(1.0f - t, 3.0f);
+        return Ease(EASE_TYPE::OUT_CUBIC, t);
     }
 }
