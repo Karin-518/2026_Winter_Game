@@ -29,19 +29,20 @@ PLAYER_STATE PlayerMoveState::Update(Player& owner)
 		return PLAYER_STATE::IDLE;
 	}
 	
+	// 歩きをデフォルトにしておく
+	Player::ANIM_TYPE anim = Player::ANIM_TYPE::WALK;
+	float pow = WALK_POW;
+
 	// 走る入力があれば、移動速度を上げる
 	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::SPRINT))
 	{
-		// 走るアニメーションの再生
-		owner.GetAnimationController()->Play(static_cast<int>(Player::ANIM_TYPE::RUN));
-		owner.MoveByInput(SPRINT_POW);
+		anim = Player::ANIM_TYPE::RUN;
+		pow = SPRINT_POW;
 	}
-	else
-	{
-		// 歩くアニメーションの再生
-		owner.GetAnimationController()->Play(static_cast<int>(Player::ANIM_TYPE::WALK));
-		owner.MoveByInput(WALK_POW);
-	}
+
+	// アニメーションの再生と移動
+	owner.GetAnimationController()->Play(static_cast<int>(anim));
+	owner.MoveByInput(pow);
 
 	// 何もなければ、切り替えない
 	return PLAYER_STATE::NONE;

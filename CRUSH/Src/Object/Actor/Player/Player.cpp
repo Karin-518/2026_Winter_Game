@@ -210,6 +210,8 @@ void Player::Draw(void)
 	DrawFormatString(0, 90, 0xffffff, "HP：%d / %d", health_.GetHp(), health_.GetMaxHp());
 	DrawFormatString(0, 110, 0xffffff, "無敵：%s", health_.IsInvincible() ? "あり" : "なし");
 
+	DrawFormatString(0, 150, 0xffffff, "ブレンド中：%s", animationController_->IsBlending() ? "はい" : "いいえ");
+
 #endif //_DEBUG
 }
 

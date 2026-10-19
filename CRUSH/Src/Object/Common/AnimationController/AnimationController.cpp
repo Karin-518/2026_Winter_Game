@@ -201,7 +201,7 @@ void AnimationController::ApplyBlendRate(void)
 
 	MV1SetAttachAnimBlendRate(modelId_, playAnim_.attachNo, rate);
 	if (prevAnim_.attachNo == -1) return;
-	MV1SetAttachAnimBlendRate(modelId_, prevAnim_.attachNo, 1.0f);
+	MV1SetAttachAnimBlendRate(modelId_, prevAnim_.attachNo, 1.0f - rate);
 }
 
 void AnimationController::SetSpeedRate(float rate)
@@ -240,7 +240,7 @@ bool AnimationController::IsPassed(float time) const
 
 	// ループ
 	// 前回位置～終端か、先頭～今回位置のどちらかに入っていれば通過
-	return time > preStep_ || time < playAnim_.step;
+	return time > preStep_ || time <= playAnim_.step;
 }
 
 bool AnimationController::IsInRange(float startTime, float endTime) const

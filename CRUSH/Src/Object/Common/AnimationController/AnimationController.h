@@ -7,7 +7,7 @@ class AnimationController
 public:
 
 	// ブレンドのデフォルトフレーム数
-	static constexpr float DEFAULT_BLEND_FRAME = 10.0f;
+	static constexpr float DEFAULT_BLEND_FRAME = 15.0f;
 
 	// アニメーションデータ
 	struct Animation
