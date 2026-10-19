@@ -10,6 +10,7 @@
 #include "../../Collider/Capsule/ColliderCapsule.h"
 #include "State/PlayerIdleState.h"
 #include "State/PlayerMoveState.h"
+#include "State/PlayerAttackState.h"
 #include "State/PlayerDeadState.h"
 
 #include "Player.h"
@@ -36,6 +37,9 @@ namespace
 
 	// アニメーションの速度
 	constexpr float ANIMATION_SPEED = 0.5f;
+
+	// 攻撃時のアニメーションの速度
+	constexpr float ATTACK_ANIMATION_SPEED = 0.7f;
 
 	// 入力値の補間地（小さいほど慣性が強い）
 	constexpr float INPUT_SMOOTH = 0.25f;
@@ -161,13 +165,14 @@ void Player::InitAnimation(void)
 	AddAnimation(ANIM_TYPE::IDLE, ResourceManager::SRC::PLAYER_ANIM_IDLE, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::WALK, ResourceManager::SRC::PLAYER_ANIM_WALK, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::RUN, ResourceManager::SRC::PLAYER_ANIM_RUN, ANIMATION_SPEED);
-	AddAnimation(ANIM_TYPE::ATTACK_1, ResourceManager::SRC::PLAYER_ANIM_ATTACK_1, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::ATTACK_1, ResourceManager::SRC::PLAYER_ANIM_ATTACK_1, ATTACK_ANIMATION_SPEED);
 }
 
 void Player::InitPost(void)
 {
 	state_.Register(PLAYER_STATE::IDLE, std::make_unique<PlayerIdleState>());
 	state_.Register(PLAYER_STATE::MOVE, std::make_unique<PlayerMoveState>());
+	state_.Register(PLAYER_STATE::ATTACK, std::make_unique<PlayerAttackState>());
 	state_.Register(PLAYER_STATE::DEAD, std::make_unique<PlayerDeadState>());
 	state_.Start(PLAYER_STATE::IDLE);
 
@@ -209,8 +214,6 @@ void Player::Draw(void)
 	// デバッグ表示
 	DrawFormatString(0, 90, 0xffffff, "HP：%d / %d", health_.GetHp(), health_.GetMaxHp());
 	DrawFormatString(0, 110, 0xffffff, "無敵：%s", health_.IsInvincible() ? "あり" : "なし");
-
-	DrawFormatString(0, 150, 0xffffff, "ブレンド中：%s", animationController_->IsBlending() ? "はい" : "いいえ");
 
 #endif //_DEBUG
 }

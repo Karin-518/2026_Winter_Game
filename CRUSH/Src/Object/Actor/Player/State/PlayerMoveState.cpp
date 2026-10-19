@@ -20,6 +20,12 @@ void PlayerMoveState::Enter(Player& owner)
 
 PLAYER_STATE PlayerMoveState::Update(Player& owner)
 {
+	// 攻撃入力があれば、攻撃ステートに切り替え
+	if (InputManager::GetInstance()->IsActionDown(INPUT_INFO::ACTION::ATTACK))
+	{
+		return PLAYER_STATE::ATTACK;
+	}
+
 	// 移動入力がなければ、待機ステートに切り替え
 	if (!InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_UP) &&
 		!InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_DOWN) &&
