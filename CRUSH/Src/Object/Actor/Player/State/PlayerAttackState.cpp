@@ -3,9 +3,19 @@
 #include "../Player.h"
 #include "PlayerAttackState.h"
 
+namespace
+{
+	constexpr int ATTACK_BLEND_FRAME = 4;
+}
+
 void PlayerAttackState::Enter(Player& owner)
 {
-	// 待機アニメーションを再生
+	// 攻撃アニメーションを再生
+	AnimationController::PlayParam param;
+	param.isLoop = false;
+	param.blendFrame = ATTACK_BLEND_FRAME;
+	param.isForce = true;
+
 	owner.GetAnimationController()->Play(static_cast<int>(Player::ANIM_TYPE::ATTACK_1),false);
 }
 
