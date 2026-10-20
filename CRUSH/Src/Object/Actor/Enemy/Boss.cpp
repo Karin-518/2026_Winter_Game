@@ -28,13 +28,13 @@ namespace
 	constexpr VECTOR LINE_END_POS = { 0.0f, -10.0f, 0.0f };
 
 	// 当たり判定のカプセルの開始位置
-	constexpr VECTOR START_CAPSULE_POS = { 0.0f, 110.0f, 0.0f };
+	constexpr VECTOR START_CAPSULE_POS = { 0.0f, 250.0f, 0.0f };
 
 	// 当たり判定のカプセルの終了位置
-	constexpr VECTOR END_CAPSULE_POS = { 0.0f, 30.0f, 0.0f };
+	constexpr VECTOR END_CAPSULE_POS = { 0.0f, 120.0f, 0.0f };
 
 	// 当たり判定のカプセルの半径
-	constexpr float CAPSULE_RADIUS = 20.0f;
+	constexpr float CAPSULE_RADIUS = 120.0f;
 
 	// ボスの最大HP
 	constexpr int MAX_HP = 500;

@@ -38,4 +38,7 @@ private:
 
 	// バトルが終わったかどうか確認
 	bool CheckBattleEnd(void);
+
+	// プレイヤーの攻撃をボスに当てる
+	void ResolvePlayerAttack(void);
 };

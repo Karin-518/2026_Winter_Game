@@ -1,10 +1,12 @@
-#include "../../../../Input/InputManager.h"
 #include "../../../Common/AnimationController/AnimationController.h"
+#include "../../../Common/Attack/AttackParam.h"
 #include "../Player.h"
+
 #include "PlayerAttackState.h"
 
 void PlayerAttackState::Enter(Player& owner)
 {
+	owner.StartAttack(ATTACK_ID::SLASH_1);
 }
 
 PLAYER_STATE PlayerAttackState::Update(Player& owner)
@@ -15,4 +17,9 @@ PLAYER_STATE PlayerAttackState::Update(Player& owner)
 	}
 
 	return PLAYER_STATE::NONE;
+}
+
+void PlayerAttackState::Exit(Player& owner)
+{
+	owner.EndAttack();
 }

@@ -3,8 +3,8 @@
 // UŒ‚‚Ìí—Ş
 enum class ATTACK_ID
 {
-	SHASH_1,
-	SHASH_2,
+	SLASH_1,
+	SLASH_2,
 
 	MAX
 };
@@ -20,7 +20,7 @@ enum class HIT_SHAPE
 struct AttackParam
 {
 	// UŒ‚‚Ìí—Ş
-	ATTACK_ID attackId = ATTACK_ID::SHASH_1;
+	ATTACK_ID attackId = ATTACK_ID::SLASH_1;
 
 	// ƒ_ƒ[ƒW—Ê
 	int damage = 0;

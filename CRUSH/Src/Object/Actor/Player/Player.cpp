@@ -50,6 +50,7 @@ namespace
 	// 無敵時間のフレーム
 	constexpr int HIT_INVINCIBLE_FRAME = 30;
 
+	// 攻撃アニメへのブレンドのフレーム数
 	constexpr int ATTACK_BLEND_FRAME = 4;
 }
 
@@ -57,7 +58,9 @@ Player::Player(Camera* camera)
 	:
 	camera_(camera),
 	health_(),
-	state_(*this)
+	state_(*this),
+	attackParams_(),
+	attackController_()
 {
 }
 
@@ -65,18 +68,50 @@ Player::~Player(void)
 {
 }
 
+void Player::Update(void)
+{
+	// 無敵の残りを減らす
+	health_.Update();
+
+	// ステートの更新
+	state_.Update();
+
+	ActorBase::Update();
+
+	attackController_.Update(*animationController_);
+}
+
+void Player::Draw(void)
+{
+	ActorBase::Draw();
+
+#ifdef _DEBUG
+	DrawFormatString(
+		0, 50, 0xffffff,
+		"キャラ角度　 ：(%.1f, %.1f, %.1f)",
+		Math::Rad2Deg(angle_.x),
+		Math::Rad2Deg(angle_.y),
+		Math::Rad2Deg(angle_.z)
+	);
+
+	// デバッグ表示
+	DrawFormatString(0, 90, 0xffffff, "HP：%d / %d", health_.GetHp(), health_.GetMaxHp());
+	DrawFormatString(0, 110, 0xffffff, "無敵：%s", health_.IsInvincible() ? "あり" : "なし");
+
+	attackController_.DrawDebug(pos_, GetForward());
+
+#endif //_DEBUG
+}
+
+void Player::Release(void)
+{
+	ActorBase::Release();
+}
+
 void Player::MoveByInput(float speed)
 {
-	// カメラ角度を取得
-	VECTOR cameraAngles = camera_->GetAngle();
-
-	// 移動量
-	VECTOR dir = Math::VECTOR_ZERO;
-
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_UP)) { dir = VAdd(dir, Math::DIR_F); }
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_LEFT)) { dir = VAdd(dir, Math::DIR_L); }
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_DOWN)) { dir = VAdd(dir, Math::DIR_B); }
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_RIGHT)) { dir = VAdd(dir, Math::DIR_R); }
+	// 入力の合成
+	VECTOR dir = CalcInputDir();
 
 	if (Math::EqualsVZero(dir)) return;
 
@@ -84,16 +119,8 @@ void Player::MoveByInput(float speed)
 	dir.z = preInputDir_.z + (dir.z - preInputDir_.z) * INPUT_SMOOTH;
 	preInputDir_ = dir;
 
-	// 正規化
-	dir = VNorm(dir);
-
-	// XYZの回転行列
-	// XZ平面移動にする場合は、XZの回転を考慮しないようにする
-	MATRIX mat = MGetIdent();
-	mat = MMult(mat, MGetRotY(cameraAngles.y));
-
-	// 回転行列を使用して、ベクトルを回転させる
-	moveDir_ = VTransform(dir, mat);
+	// 正規化とカメラの回転
+	moveDir_ = ToWorldDir(dir);
 
 	// 方向×スピードで移動量を作って、座標に足して移動
 	pos_ = VAdd(pos_, VScale(moveDir_, speed));
@@ -109,6 +136,7 @@ void Player::OnHit(int damage)
 
 	// 被弾後の無敵とのけぞり
 	health_.SetInvincible(HIT_INVINCIBLE_FRAME);
+	
 	//state_.RequestState(PLAYER_STATE::HIT);
 }
 
@@ -193,11 +221,65 @@ void Player::OnDead(void)
 
 void Player::InitAttackParam(void)
 {
+	AttackParam& slash1 = attackParams_[static_cast<int>(ATTACK_ID::SLASH_1)];
+	slash1.attackId = ATTACK_ID::SLASH_1;
+	slash1.damage = 100;
+	slash1.animType = static_cast<int>(ANIM_TYPE::ATTACK_1);
+
+	// 判定が出る区間
+	slash1.hitStart = 10.0f;
+	slash1.hitEnd = 20.0f;
+
+	// 判定の形（縦振りなら RECT、横振りなら FAN にする）
+	slash1.shape = HIT_SHAPE::RECT;
+	slash1.offset = 30.0f;
+	slash1.length = 300.0f;
+	slash1.width = 150.0f;
+	slash1.halfAngleDeg = 60.0f;
+}
+
+VECTOR Player::CalcInputDir(void) const
+{
+	VECTOR dir = Math::VECTOR_ZERO;
+
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_UP)) { dir = VAdd(dir, Math::DIR_F); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_LEFT)) { dir = VAdd(dir, Math::DIR_L); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_DOWN)) { dir = VAdd(dir, Math::DIR_B); }
+	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_RIGHT)) { dir = VAdd(dir, Math::DIR_R); }
+
+	return dir;
+}
+
+VECTOR Player::ToWorldDir(const VECTOR& localDir) const
+{
+	// カメラの Y 回転だけを使う
+	VECTOR cameraAngles = camera_->GetAngle();
+	MATRIX mat = MGetRotY(cameraAngles.y);
+
+	return VTransform(VNorm(localDir), mat);
+}
+
+void Player::FaceInputDir(void)
+{
+	VECTOR dir = CalcInputDir();
+
+	// ??がなければ、今の向きのまま
+	if (Math::EqualsVZero(dir)) return;
+
+	// 移動の補間の基準もそろえておく
+	preInputDir_ = VNorm(dir);
+
+	// 向きを即座に変える
+	moveDir_ = ToWorldDir(dir);
+	angle_.y = atan2f(moveDir_.x, moveDir_.z);
 }
 
 void Player::StartAttack(ATTACK_ID id)
 {
 	const AttackParam& param = attackParams_[static_cast<int>(id)];
+
+	// 入力があれば、その方向へすぐ向く
+	FaceInputDir();
 
 	// 攻撃アニメーションを再生
 	AnimationController::PlayParam playParam;
@@ -207,46 +289,15 @@ void Player::StartAttack(ATTACK_ID id)
 	animationController_->Play(param.animType, playParam);
 
 	// 判定の準備
-	//attackController_.Start(param);
+	attackController_.Start(param);
 }
 
 void Player::EndAttack(void)
 {
-	//attackController_.Stop();
+	attackController_.Stop();
 }
 
-void Player::Update(void)
+void Player::OnAttackHit(void)
 {
-	// 無敵の残りを減らす
-	health_.Update();
-
-	// ステートの更新
-	state_.Update();
-
-	ActorBase::Update();
-}
-
-void Player::Draw(void)
-{
-	ActorBase::Draw();
-
-#ifdef _DEBUG
-	DrawFormatString(
-		0, 50, 0xffffff,
-		"キャラ角度　 ：(%.1f, %.1f, %.1f)",
-		Math::Rad2Deg(angle_.x),
-		Math::Rad2Deg(angle_.y),
-		Math::Rad2Deg(angle_.z)
-	);
-
-	// デバッグ表示
-	DrawFormatString(0, 90, 0xffffff, "HP：%d / %d", health_.GetHp(), health_.GetMaxHp());
-	DrawFormatString(0, 110, 0xffffff, "無敵：%s", health_.IsInvincible() ? "あり" : "なし");
-
-#endif //_DEBUG
-}
-
-void Player::Release(void)
-{
-	ActorBase::Release();
+	attackController_.NotifyHit();
 }

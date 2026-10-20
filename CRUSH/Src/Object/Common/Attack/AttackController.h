@@ -1,7 +1,7 @@
 #pragma once
 #include <DxLib.h>
 
-class AttackParam;
+struct AttackParam;
 class AnimationController;
 
 /// <summary>

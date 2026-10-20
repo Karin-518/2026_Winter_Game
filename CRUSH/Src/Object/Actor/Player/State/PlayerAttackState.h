@@ -11,4 +11,6 @@ public:
 	void Enter(Player& owner) override;
 
 	PLAYER_STATE Update(Player& owner) override;
+
+	void Exit(Player& owner) override;
 };

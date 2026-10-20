@@ -5,6 +5,8 @@
 #include "../../Object/Actor/Player/Player.h"
 #include "../../Object/Actor/Enemy/Boss.h"
 #include "../../Object/Actor/Stage/Stage.h"
+#include "../../Object/Common/Attack/AttackParam.h"
+#include "../../Object/Common/Attack/AttackController.h"
 #include "../SceneManager.h"
 #include "../PauseScene/PauseScene.h"
 #include "../TitleScene/TitleScene.h"
@@ -116,6 +118,9 @@ void GameScene::Update(void)
 	// ボス更新
 	boss_->Update();
 
+	// 攻撃の命中
+	ResolvePlayerAttack();
+
 	// カメラの更新
 	camera_->Update();
 
@@ -186,12 +191,28 @@ bool GameScene::CheckBattleEnd(void)
 	// 相打ちはクリア判定
 	if (boss_->IsDead())
 	{
-		SceneManager::GetInstance()->ChangeScene(std::make_shared<TitleScene>());
+		SceneManager::GetInstance()->ChangeScene(std::make_shared<GameClear>());
 		return true;
 	}
 
 	if (!player_->IsDead()) return false;
 
-	SceneManager::GetInstance()->ChangeScene(std::make_shared<TitleScene>());
+	SceneManager::GetInstance()->ChangeScene(std::make_shared<GameOver>());
 	return true;
+}
+
+void GameScene::ResolvePlayerAttack(void)
+{
+	const AttackController& attack = player_->GetAttackController();
+
+	// 判定区域外、または1振りで当たった
+	if (!attack.CanHit()) return;
+
+	// 判定の形とボスの円が重なっていない
+	if (!attack.IsHit(player_->GetPos(), player_->GetForward(),
+		boss_->GetPos(), boss_->GetBodyRadius())) return;
+
+	// ダメージを与えて、当たったことを記憶
+	boss_->OnHit(attack.GetParam()->damage);
+	player_->OnAttackHit();
 }

@@ -52,6 +52,21 @@ public:
 	// 倒れたか
 	bool IsDead(void) const { return state_.GetStateId() == PLAYER_STATE::DEAD; }
 
+	// 攻撃開始
+	void StartAttack(ATTACK_ID id);
+
+	// 攻撃終了
+	void EndAttack(void);
+
+	// 自分の攻撃が当たったときに呼ばれる
+	void OnAttackHit(void);
+
+	// 攻撃の判定
+	const AttackController& GetAttackController(void) const { return attackController_; }
+
+	// 向いている方向
+	VECTOR GetForward(void) const { return { sinf(angle_.y), 0.0f, cosf(angle_.y) }; }
+
 private:
 
 	// カメラ
@@ -60,11 +75,13 @@ private:
 	// ヘルス
 	Health health_;
 
+	// 攻撃の判定
 	AttackController attackController_;
 
 	// ステートを管理
 	StateContext<Player, PLAYER_STATE> state_;
 
+	// 攻撃ごとのデータ
 	AttackParam attackParams_[static_cast<int>(ATTACK_ID::MAX)];
 
 private:
@@ -87,9 +104,15 @@ private:
 	// HPが0になったときに呼ぶ
 	void OnDead(void);
 
+	// 攻撃データの初期化
 	void InitAttackParam(void);
 
-	void StartAttack(ATTACK_ID id);
+	// 移動入力を合成した方向
+	VECTOR CalcInputDir(void) const;
 
-	void EndAttack(void);
+	// 移動入力を合成した方向
+	VECTOR ToWorldDir(const VECTOR& localDir) const;
+
+	// 入力があれば、その方向へすぐ向く
+	void FaceInputDir(void);
 };
