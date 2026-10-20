@@ -2,6 +2,8 @@
 #include "../ActorBase.h"
 #include "../../Common/State/StateContext.h"
 #include "../../Common/Health/Health.h"
+#include "../../Common/Attack/AttackController.h"
+#include "../../Common/Attack/AttackParam.h"
 #include "State/PlayerState.h"
 
 class Camera;
@@ -58,8 +60,12 @@ private:
 	// ヘルス
 	Health health_;
 
+	AttackController attackController_;
+
 	// ステートを管理
 	StateContext<Player, PLAYER_STATE> state_;
+
+	AttackParam attackParams_[static_cast<int>(ATTACK_ID::MAX)];
 
 private:
 
@@ -80,4 +86,10 @@ private:
 
 	// HPが0になったときに呼ぶ
 	void OnDead(void);
+
+	void InitAttackParam(void);
+
+	void StartAttack(ATTACK_ID id);
+
+	void EndAttack(void);
 };

@@ -142,6 +142,14 @@ void ActorBase::AddWallModel(const ColliderModel* model)
 	wallModels_.push_back(model);
 }
 
+float ActorBase::GetBodyRadius(void) const
+{
+	// カプセルがなければ0
+	if (bodyCapsule_ == nullptr) return 0.0f;
+
+	return bodyCapsule_->GetRadius();
+}
+
 void ActorBase::DelayRotate(void)
 {
 	// 移動方向から角度に変換する

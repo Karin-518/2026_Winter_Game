@@ -35,6 +35,9 @@ public:
 	// 攻撃が当たりそうなときに呼ばれる
 	virtual void OnHit(int damage) {}
 
+	// 体の半径
+	float GetBodyRadius(void) const;
+
 protected:
 
 	// アニメーション制御

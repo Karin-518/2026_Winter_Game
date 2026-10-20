@@ -49,6 +49,8 @@ namespace
 
 	// 無敵時間のフレーム
 	constexpr int HIT_INVINCIBLE_FRAME = 30;
+
+	constexpr int ATTACK_BLEND_FRAME = 4;
 }
 
 Player::Player(Camera* camera)
@@ -179,12 +181,38 @@ void Player::InitPost(void)
 	// HP を満タンにして、0 になったときの通知先を登録する
 	health_.Init(MAX_HP);
 	health_.SetOnDead([this]() { OnDead(); });
+
+	InitAttackParam();
 }
 
 void Player::OnDead(void)
 {
 	// 死亡は外部から切り替えを依頼
 	state_.RequestState(PLAYER_STATE::DEAD);
+}
+
+void Player::InitAttackParam(void)
+{
+}
+
+void Player::StartAttack(ATTACK_ID id)
+{
+	const AttackParam& param = attackParams_[static_cast<int>(id)];
+
+	// 攻撃アニメーションを再生
+	AnimationController::PlayParam playParam;
+	playParam.isLoop = false;
+	playParam.blendFrame = ATTACK_BLEND_FRAME;
+	playParam.isForce = true;
+	animationController_->Play(param.animType, playParam);
+
+	// 判定の準備
+	//attackController_.Start(param);
+}
+
+void Player::EndAttack(void)
+{
+	//attackController_.Stop();
 }
 
 void Player::Update(void)
