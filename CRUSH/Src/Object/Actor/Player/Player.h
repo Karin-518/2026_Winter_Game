@@ -20,6 +20,7 @@ public:
 		RUN,
 		ATTACK_1,
 		ROLL,
+
 		MAX,
 	};
 

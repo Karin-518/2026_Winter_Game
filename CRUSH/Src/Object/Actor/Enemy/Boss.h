@@ -13,6 +13,8 @@ public:
 	{
 		IDLE,
 		WALK,
+		ATTACK_BASIC,
+
 		MAX,
 	};
 
@@ -45,12 +47,6 @@ private:
 	// ヘルス
 	Health health_;
 
-	// 検知フラグ(視野)
-	bool isNoticeView_;
-
-	// 検知フラグ(聴覚)
-	bool isNoticeHearing_;
-
 private:
 
 	// リソースロード
@@ -67,12 +63,6 @@ private:
 
 	// 初期化後の個別処理
 	void InitPost(void) override;
-
-	// 視野描画
-	void DrawViewRange(void);
-
-	// 索敵
-	void Search(void);
 
 	// HPが0になったときに呼ぶ
 	void OnDead(void);
