@@ -38,6 +38,9 @@ public:
 	// 体の半径
 	float GetBodyRadius(void) const;
 
+	// 向いている方向
+	VECTOR GetForward(void) const { return { sinf(angle_.y), 0.0f, cosf(angle_.y) }; }
+
 protected:
 
 	// アニメーション制御

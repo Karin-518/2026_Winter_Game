@@ -66,9 +66,6 @@ public:
 	// UŒ‚‚Ì”»’è
 	const AttackController& GetAttackController(void) const { return attackController_; }
 
-	// Œü‚¢‚Ä‚¢‚é•ûŒü
-	VECTOR GetForward(void) const { return { sinf(angle_.y), 0.0f, cosf(angle_.y) }; }
-
 	// ‰ñ”ğŠJn
 	void StartDodge(int invincibleFrame);
 
