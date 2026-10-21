@@ -26,6 +26,12 @@ PLAYER_STATE PlayerMoveState::Update(Player& owner)
 		return PLAYER_STATE::ATTACK;
 	}
 
+	// 回避入力があれば、回避ステートに切り替え
+	if (InputManager::GetInstance()->IsActionDown(INPUT_INFO::ACTION::DODGE))
+	{
+		return PLAYER_STATE::DODGE;
+	}
+
 	// 移動入力がなければ、待機ステートに切り替え
 	if (!InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_UP) &&
 		!InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::MOVE_DOWN) &&

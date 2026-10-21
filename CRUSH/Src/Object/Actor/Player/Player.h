@@ -19,6 +19,7 @@ public:
 		WALK,
 		RUN,
 		ATTACK_1,
+		ROLL,
 		MAX,
 	};
 
@@ -66,6 +67,12 @@ public:
 
 	// Œü‚¢‚Ä‚¢‚é•ûŒü
 	VECTOR GetForward(void) const { return { sinf(angle_.y), 0.0f, cosf(angle_.y) }; }
+
+	// ‰ñ”ğŠJn
+	void StartDodge(int invincibleFrame);
+
+	// Œü‚¢‚Ä‚¢‚é•ûŒü‚Öi‚Ş
+	void MoveForward(float speed);
 
 private:
 

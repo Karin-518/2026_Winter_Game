@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Actor\Player\State\PlayerDodgeState.cpp" />
     <ClCompile Include="Src\Object\Common\Attack\AttackController.cpp" />
     <ClCompile Include="Src\Object\Actor\Player\State\PlayerAttackState.cpp" />
     <ClCompile Include="Src\Scene\GameOver\GameOver.cpp" />
@@ -58,6 +59,7 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Actor\Player\State\PlayerDodgeState.h" />
     <ClInclude Include="Src\Object\Common\Attack\AttackController.h" />
     <ClInclude Include="Src\Object\Actor\Player\State\PlayerAttackState.h" />
     <ClInclude Include="Src\Object\Common\Attack\AttackParam.h" />

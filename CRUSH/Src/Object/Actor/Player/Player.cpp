@@ -12,6 +12,7 @@
 #include "State/PlayerMoveState.h"
 #include "State/PlayerAttackState.h"
 #include "State/PlayerDeadState.h"
+#include "State/PlayerDodgeState.h"
 
 #include "Player.h"
 
@@ -52,6 +53,9 @@ namespace
 
 	// 攻撃アニメへのブレンドのフレーム数
 	constexpr int ATTACK_BLEND_FRAME = 4;
+
+	// アニメーション速度
+	constexpr float ROLL_ANIMATION_SPEED = 1.0f;
 }
 
 Player::Player(Camera* camera)
@@ -147,6 +151,7 @@ void Player::InitLoad(void)
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_WALK);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_RUN);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_ATTACK_1);
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_ROLL);
 }
 
 void Player::InitTransform(void)
@@ -196,6 +201,7 @@ void Player::InitAnimation(void)
 	AddAnimation(ANIM_TYPE::WALK, ResourceManager::SRC::PLAYER_ANIM_WALK, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::RUN, ResourceManager::SRC::PLAYER_ANIM_RUN, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::ATTACK_1, ResourceManager::SRC::PLAYER_ANIM_ATTACK_1, ATTACK_ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::ROLL, ResourceManager::SRC::PLAYER_ANIM_ROLL, ROLL_ANIMATION_SPEED);
 }
 
 void Player::InitPost(void)
@@ -204,6 +210,8 @@ void Player::InitPost(void)
 	state_.Register(PLAYER_STATE::MOVE, std::make_unique<PlayerMoveState>());
 	state_.Register(PLAYER_STATE::ATTACK, std::make_unique<PlayerAttackState>());
 	state_.Register(PLAYER_STATE::DEAD, std::make_unique<PlayerDeadState>());
+	state_.Register(PLAYER_STATE::DODGE, std::make_unique<PlayerDodgeState>());
+
 	state_.Start(PLAYER_STATE::IDLE);
 
 	// HP を満タンにして、0 になったときの通知先を登録する
@@ -233,7 +241,7 @@ void Player::InitAttackParam(void)
 	// 判定の形（縦振りなら RECT、横振りなら FAN にする）
 	slash1.shape = HIT_SHAPE::RECT;
 	slash1.offset = 30.0f;
-	slash1.length = 300.0f;
+	slash1.length = 250.0f;
 	slash1.width = 150.0f;
 	slash1.halfAngleDeg = 60.0f;
 }
@@ -300,4 +308,21 @@ void Player::EndAttack(void)
 void Player::OnAttackHit(void)
 {
 	attackController_.NotifyHit();
+}
+
+void Player::StartDodge(int invincibleFrame)
+{
+	animationController_->Play(static_cast<int>(ANIM_TYPE::ROLL), false);
+
+	// 入力があれば、その方向へすぐ向く
+	FaceInputDir();
+
+	// 前半だけ無敵
+	health_.SetInvincible(invincibleFrame);
+}
+
+void Player::MoveForward(float speed)
+{
+	// 方向×スピードで移動量を作って、座標に足して移動
+	pos_ = VAdd(pos_, VScale(moveDir_, speed));
 }

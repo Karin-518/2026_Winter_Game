@@ -29,6 +29,7 @@ void ResourceManager::Init(void)
 	Register(SRC::PLAYER_ANIM_WALK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Walk.mv1");
 	Register(SRC::PLAYER_ANIM_RUN, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Run.mv1");
 	Register(SRC::PLAYER_ANIM_ATTACK_1, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Attack1.mv1");
+	Register(SRC::PLAYER_ANIM_ROLL, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Roll.mv1");
 
 	// ƒ{ƒXƒ‚ƒfƒ‹
 	Register(SRC::BOSS, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Dragon.mv1");
