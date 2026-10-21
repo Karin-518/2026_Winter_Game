@@ -1,6 +1,8 @@
 #pragma once
 #include "../ActorBase.h"
+#include "../../Common/State/StateContext.h"
 #include "../../Common/Health/Health.h"
+#include "State/BossState.h"
 
 class Player;
 
@@ -46,6 +48,9 @@ private:
 
 	// ヘルス
 	Health health_;
+
+	// ステートを管理
+	StateContext<Boss, BOSS_STATE> state_;
 
 private:
 

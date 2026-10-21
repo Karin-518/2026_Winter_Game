@@ -17,6 +17,7 @@ AnimationController::AnimationController(int modelId)
 	speedRate_(1.0f),
 	tempSpeedRate_(1.0f),
 	tempSpeedFrame_(0),
+	preStep_(0.0f),
 	isLooped_(false),
 	loopCount_(0)
 {

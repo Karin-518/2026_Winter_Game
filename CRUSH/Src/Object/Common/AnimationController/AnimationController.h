@@ -132,7 +132,7 @@ private:
 	float tempSpeedRate_;
 
 	// 残りフレーム
-	float tempSpeedFrame_;
+	int tempSpeedFrame_;
 
 	// 前フレームの再生位置
 	float preStep_;

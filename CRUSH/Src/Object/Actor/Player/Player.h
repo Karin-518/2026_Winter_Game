@@ -36,9 +36,6 @@ public:
 	// 描画
 	void Draw(void) override;
 
-	// 解放
-	void Release(void) override;
-
 	// アニメーションの取得
 	AnimationController* GetAnimationController(void) const { return animationController_; }
 

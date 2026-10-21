@@ -1,5 +1,4 @@
 #include <memory>
-#include "../../../Application.h"
 #include "../../../Input/InputManager.h"
 #include "../../../Common/Math/Math.h"
 #include "../../../Common/Math/MatrixUtility.h"
@@ -56,6 +55,12 @@ namespace
 
 	// アニメーション速度
 	constexpr float ROLL_ANIMATION_SPEED = 1.0f;
+
+	// 初期位置
+	constexpr VECTOR INIT_POS = { -1673.0f, 0.0f, -1234.0f };
+
+	// 初期の向き(Y軸、度)
+	constexpr float INIT_ANGLE_DEG_Y = 73.0f;
 }
 
 Player::Player(Camera* camera)
@@ -105,11 +110,6 @@ void Player::Draw(void)
 	attackController_.DrawDebug(pos_, GetForward());
 
 #endif //_DEBUG
-}
-
-void Player::Release(void)
-{
-	ActorBase::Release();
 }
 
 void Player::MoveByInput(float speed)
@@ -163,7 +163,7 @@ void Player::InitTransform(void)
 	}
 
 	// モデルの角度
-	angle_ = Math::VECTOR_ZERO;
+	angle_ = { 0.0f, Math::Deg2Rad(INIT_ANGLE_DEG_Y), 0.0f };
 	localAngle_ = { 0.0f, Math::Deg2Rad(DEFAULT_LOCAL_ANGLE_DEG_Y), 0.0f };
 
 	// 角度から方向に変換する
@@ -177,7 +177,7 @@ void Player::InitTransform(void)
 	MV1SetRotationMatrix(modelId_, mat);
 
 	// モデルの位置設定
-	pos_ = Math::VECTOR_ZERO;
+	pos_ = INIT_POS;
 	MV1SetPosition(modelId_, pos_);;
 }
 

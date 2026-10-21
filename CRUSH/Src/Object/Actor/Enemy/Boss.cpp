@@ -1,3 +1,4 @@
+#include <memory>
 #include <cmath>
 #include "../../../Common/Math/Math.h"
 #include "../../../Common/Math/MatrixUtility.h"
@@ -6,6 +7,7 @@
 #include "../../Collider/Line/ColliderLine.h"
 #include "../../Collider/Capsule/ColliderCapsule.h"
 #include "../Player/Player.h"
+#include "State/BossIdleState.h"
 
 #include "Boss.h"
 
@@ -40,12 +42,19 @@ namespace
 
 	// アニメーション速度
 	constexpr float ANIMATION_SPEED = 0.3f;
+
+	// 初期位置
+	constexpr VECTOR INIT_POS = { -138.0f, 0.0f, -830.0f };
+
+	// 初期の向き(Y軸、度)
+	constexpr float INIT_ANGLE_DEG_Y = 255.0f;
 }
 
 Boss::Boss(Player* player)
 	:
 	player_(player),
-	health_()
+	health_(),
+	state_(*this)
 {
 }
 
@@ -55,6 +64,9 @@ Boss::~Boss(void)
 
 void Boss::Update(void)
 {
+	// ステートの更新
+	state_.Update();
+
 	ActorBase::Update();
 }
 
@@ -87,7 +99,7 @@ void Boss::InitTransform(void)
 	}
 
 	// モデルの角度
-	angle_ = { 0.0f, Math::Deg2Rad(45.0f), 0.0f };
+	angle_ = { 0.0f, Math::Deg2Rad(INIT_ANGLE_DEG_Y), 0.0f };
 	localAngle_ = { 0.0f, Math::Deg2Rad(180.0f), 0.0f };
 
 	// 角度から方向に変換する
@@ -100,7 +112,7 @@ void Boss::InitTransform(void)
 	MV1SetRotationMatrix(modelId_, mat);
 
 	// モデルの位置設定
-	pos_ = { 200.0f, 0.0f, 150.0f };
+	pos_ = INIT_POS;
 	MV1SetPosition(modelId_, pos_);
 }
 
@@ -127,12 +139,13 @@ void Boss::InitAnimation(void)
 
 void Boss::InitPost(void)
 {
+	state_.Register(BOSS_STATE::IDLE, std::make_unique<BossIdleState>());
+
+	state_.Start(BOSS_STATE::IDLE);
+
 	// HP を満タンにして、0 になったときの通知先を登録する
 	health_.Init(MAX_HP);
 	health_.SetOnDead([this]() { OnDead(); });
-
-	// 待機アニメーションを再生
-	animationController_->Play(static_cast<int>(ANIM_TYPE::IDLE));
 }
 
 void Boss::OnDead(void)

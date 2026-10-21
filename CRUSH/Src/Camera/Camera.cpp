@@ -15,7 +15,7 @@ namespace
 	constexpr float RESET_PITCH_DEG = 5.0f;
 
 	// カメラの初期角度
-	constexpr VECTOR DEFAULT_ANGLES = { RESET_PITCH_DEG * Math::DEG2RAD, 0.0f, 0.0f };
+	constexpr VECTOR DEFAULT_ANGLES = { RESET_PITCH_DEG * Math::DEG2RAD, 73.0f * Math::DEG2RAD, 0.0f };
 
 	// 追従対象からカメラへの相対座標
 	constexpr VECTOR FOLLOW_CAMERA_LOCAL_POS = { 0.0f, 160.0f, -350.0f };
