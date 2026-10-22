@@ -120,6 +120,7 @@ void GameScene::Update(void)
 
 	// 攻撃の命中
 	ResolvePlayerAttack();
+	ResolveBossAttack();
 
 	// カメラの更新
 	camera_->Update();
@@ -215,4 +216,20 @@ void GameScene::ResolvePlayerAttack(void)
 	// ダメージを与えて、当たったことを記憶
 	boss_->OnHit(attack.GetParam()->damage);
 	player_->OnAttackHit();
+}
+
+void GameScene::ResolveBossAttack(void)
+{
+	const AttackController& attack = boss_->GetAttackController();
+
+	// 判定区域外、または1振りで当たった
+	if (!attack.CanHit()) return;
+
+	// 判定の形とプレイヤーの円が重なっていない
+	if (!attack.IsHit(boss_->GetPos(), boss_->GetForward(),
+		player_->GetPos(), player_->GetBodyRadius())) return;
+
+	// ダメージを与えて、当たったことを記憶
+	player_->OnHit(attack.GetParam()->damage);
+	boss_->OnAttackHit();
 }

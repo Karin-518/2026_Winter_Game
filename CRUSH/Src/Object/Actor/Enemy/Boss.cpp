@@ -14,15 +14,6 @@
 
 namespace
 {
-	// 視野の広さ
-	constexpr float VIEW_RANGE = 600.0f;
-
-	// 視野角
-	constexpr float VIEW_ANGLE = 30.0f;
-
-	// 聴覚の広さ
-	constexpr float HEARING_RANGE = 400.0f;
-
 	// 足元の線分の始点
 	constexpr VECTOR LINE_START_POS = { 0.0f, 10.0f, 0.0f };
 
@@ -42,7 +33,7 @@ namespace
 	constexpr int MAX_HP = 500;
 
 	// アニメーション速度
-	constexpr float ANIMATION_SPEED = 0.3f;
+	constexpr float ANIMATION_SPEED = 0.5f;
 
 	// 初期位置
 	constexpr VECTOR INIT_POS = { -138.0f, 0.0f, -830.0f };
@@ -101,7 +92,7 @@ void Boss::StartAttack(void)
 	playParam.isLoop = false;
 	playParam.blendFrame = 10;
 	playParam.isForce = true;
-	animationController_->Play(static_cast<int>(ANIM_TYPE::ATTACK_BASIC), playParam);
+	animationController_->Play(static_cast<int>(ANIM_TYPE::ATTACK_BITE), playParam);
 
 	attackController_.Start(attackParam_);
 }
@@ -165,11 +156,12 @@ void Boss::InitAnimation(void)
 
 	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::IDLE), ANIMATION_SPEED, 10);
 	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::WALK), ANIMATION_SPEED, 17);
-	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::ATTACK_BASIC), ANIMATION_SPEED, 0);
+	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::ATTACK_BITE), ANIMATION_SPEED, 0);
 }
 
 void Boss::InitPost(void)
 {
+	// ステートの追加
 	state_.Register(BOSS_STATE::IDLE, std::make_unique<BossIdleState>());
 	state_.Register(BOSS_STATE::ATTACK, std::make_unique<BossAttackState>());
 
@@ -179,6 +171,7 @@ void Boss::InitPost(void)
 	health_.Init(MAX_HP);
 	health_.SetOnDead([this]() { OnDead(); });
 
+	// 攻撃パラメータの設定
 	InitAttackParam();
 }
 
@@ -188,20 +181,34 @@ void Boss::OnDead(void)
 
 void Boss::InitAttackParam(void)
 {
-	attackParam_.animType = static_cast<int>(ANIM_TYPE::ATTACK_BASIC);
+	attackParam_.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
+	attackParam_.damage = 50;
 
 	// 判定が出る区間
-	attackParam_.hitStart = 10.0f;
+	attackParam_.hitStart = 15.0f;
 	attackParam_.hitEnd = 20.0f;
 
 	// 判定の形
-	attackParam_.shape = HIT_SHAPE::FAN;
-	attackParam_.offset = 30.0f;
-	attackParam_.length = 50.0f;
-	attackParam_.width = 400.0f;
-	attackParam_.halfAngleDeg = 60.0f;
+	attackParam_.shape = HIT_SHAPE::RECT;
+	attackParam_.offset = 500.0f;
+	attackParam_.length = 300.0f;
+	attackParam_.width = 100.0f;
 }
 
 void Boss::FacePlayer(void)
 {
+	// 追従対象か向き先がなければ何もしない
+	if (player_ == nullptr) return;
+
+	// 追従対象から向き先へのベクトル
+	VECTOR dir = VSub(player_->GetPos(), pos_);
+
+	// 左右の角度だけ扱うため、上下の成分を0にする
+	dir.y = 0.0f;
+
+	// 同じ位置にいたら、向きを変えない
+	if (Math::EqualsVZero(dir)) return;
+
+	// 向きを変える
+	moveDir_ = VNorm(dir);
 }

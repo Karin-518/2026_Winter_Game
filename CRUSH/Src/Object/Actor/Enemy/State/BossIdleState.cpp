@@ -11,6 +11,9 @@ namespace
 
 void BossIdleState::Enter(Boss& owner)
 {
+    // フレームの初期化
+    frame_ = 0;
+
     // 待機アニメーションを再生
     owner.GetAnimationController()->Play(static_cast<int>(Boss::ANIM_TYPE::IDLE));
 }

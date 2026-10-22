@@ -17,7 +17,7 @@ public:
 	{
 		IDLE,
 		WALK,
-		ATTACK_BASIC,
+		ATTACK_BITE,	// Šš‚Ý‚Â‚«
 
 		MAX,
 	};

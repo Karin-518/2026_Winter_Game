@@ -36,10 +36,13 @@ namespace
 	constexpr float CAPSULE_RADIUS = 20.0f;
 
 	// アニメーションの速度
-	constexpr float ANIMATION_SPEED = 0.5f;
+	constexpr float ANIMATION_SPEED = 0.6f;
 
 	// 攻撃時のアニメーションの速度
-	constexpr float ATTACK_ANIMATION_SPEED = 0.7f;
+	constexpr float ATTACK_ANIMATION_SPEED = 1.0f;
+
+	// 回避時のアニメーションの速度
+	constexpr float ROLL_ANIMATION_SPEED = 1.0f;
 
 	// 入力値の補間地（小さいほど慣性が強い）
 	constexpr float INPUT_SMOOTH = 0.25f;
@@ -48,13 +51,10 @@ namespace
 	constexpr int MAX_HP = 100;
 
 	// 無敵時間のフレーム
-	constexpr int HIT_INVINCIBLE_FRAME = 30;
+	constexpr int HIT_INVINCIBLE_FRAME = 60;
 
 	// 攻撃アニメへのブレンドのフレーム数
 	constexpr int ATTACK_BLEND_FRAME = 4;
-
-	// アニメーション速度
-	constexpr float ROLL_ANIMATION_SPEED = 1.0f;
 
 	// 初期位置
 	constexpr VECTOR INIT_POS = { -1673.0f, 0.0f, -1234.0f };
@@ -207,6 +207,7 @@ void Player::InitAnimation(void)
 
 void Player::InitPost(void)
 {
+	// ステートの追加
 	state_.Register(PLAYER_STATE::IDLE, std::make_unique<PlayerIdleState>());
 	state_.Register(PLAYER_STATE::MOVE, std::make_unique<PlayerMoveState>());
 	state_.Register(PLAYER_STATE::ATTACK, std::make_unique<PlayerAttackState>());
@@ -219,6 +220,7 @@ void Player::InitPost(void)
 	health_.Init(MAX_HP);
 	health_.SetOnDead([this]() { OnDead(); });
 
+	// 攻撃パラメータの設定
 	InitAttackParam();
 }
 
@@ -244,7 +246,6 @@ void Player::InitAttackParam(void)
 	slash1.offset = 30.0f;
 	slash1.length = 250.0f;
 	slash1.width = 150.0f;
-	slash1.halfAngleDeg = 60.0f;
 }
 
 VECTOR Player::CalcInputDir(void) const

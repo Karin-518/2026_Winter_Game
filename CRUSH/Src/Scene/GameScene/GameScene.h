@@ -41,4 +41,7 @@ private:
 
 	// プレイヤーの攻撃をボスに当てる
 	void ResolvePlayerAttack(void);
+
+	// ボスの攻撃をプレイヤーに当てる
+	void ResolveBossAttack(void);
 };
