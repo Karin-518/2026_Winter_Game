@@ -1,5 +1,4 @@
 #include <DxLib.h>
-#include "../../Application.h"
 #include "../../Input/InputManager.h"
 #include "../../Audio/AudioManager.h"
 #include "../../Common/Collision/Collision.h"
@@ -54,7 +53,7 @@ void PauseScene::Update(void)
 		}
 		else if (Collision2D::HitPointRect(mouseX, mouseY, exitRect_))
 		{
-			Application::GetInstance()->SetEnd(true);
+			SceneManager::GetInstance()->GameEnd();
 			return;
 		}
 	}

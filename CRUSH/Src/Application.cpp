@@ -16,8 +16,7 @@ Application::Application(void)
 	:
 	isInitFail_(false),
 	isReleaseFail_(false),
-	fps_(nullptr),
-	isEnd_(false)
+	fps_(nullptr)
 {
 }
 
@@ -73,7 +72,7 @@ void Application::Init(void)
 void Application::Run(void)
 {
 	// ゲームループ
-	while (ProcessMessage() == 0 && !isEnd_)
+	while (ProcessMessage() == 0 && !SceneManager::GetInstance()->GetGameEnd())
 	{
 		// フレームレート更新
 		// 1/60秒経過していないなら再ループさせる
@@ -127,9 +126,4 @@ bool Application::IsInitFail(void) const
 bool Application::IsReleaseFail(void) const
 {
 	return isReleaseFail_;
-}
-
-void Application::SetEnd(bool isEnd)
-{
-	isEnd_ = isEnd;
 }
