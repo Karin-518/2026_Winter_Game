@@ -2,6 +2,8 @@
 #include "../ActorBase.h"
 #include "../../Common/State/StateContext.h"
 #include "../../Common/Health/Health.h"
+#include "../../Common/Attack/AttackController.h"
+#include "../../Common/Attack/AttackParam.h"
 #include "State/BossState.h"
 
 class Player;
@@ -41,6 +43,18 @@ public:
 	// 倒れたか
 	bool IsDead(void) const { return health_.IsDead(); }
 
+	// 攻撃開始
+	void StartAttack(void);
+
+	// 攻撃終了
+	void EndAttack(void);
+
+	// 自分の攻撃が当たったときに呼ばれる
+	void OnAttackHit(void);
+
+	// 攻撃の判定
+	const AttackController& GetAttackController(void) const { return attackController_; }
+
 private:
 
 	// プレイヤー
@@ -51,6 +65,12 @@ private:
 
 	// ステートを管理
 	StateContext<Boss, BOSS_STATE> state_;
+
+	// 攻撃の判定
+	AttackController attackController_;
+
+	// 攻撃ごとのデータ
+	AttackParam attackParam_;
 
 private:
 
@@ -71,4 +91,10 @@ private:
 
 	// HPが0になったときに呼ぶ
 	void OnDead(void);
+
+	// 攻撃データの初期化
+	void InitAttackParam(void);
+
+	// プレイヤーの方向を見る
+	void FacePlayer(void);
 };

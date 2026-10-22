@@ -87,6 +87,7 @@ void Player::Update(void)
 
 	ActorBase::Update();
 
+	// UŒ‚‚ÌXV
 	attackController_.Update(*animationController_);
 }
 

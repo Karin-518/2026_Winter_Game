@@ -11,4 +11,8 @@ public:
 	void Enter(Boss& owner) override;
 
 	BOSS_STATE Update(Boss& owner) override;
+
+private:
+
+	int frame_ = 0;
 };

@@ -8,6 +8,7 @@
 #include "../../Collider/Capsule/ColliderCapsule.h"
 #include "../Player/Player.h"
 #include "State/BossIdleState.h"
+#include "State/BossAttackState.h"
 
 #include "Boss.h"
 
@@ -68,6 +69,9 @@ void Boss::Update(void)
 	state_.Update();
 
 	ActorBase::Update();
+
+	// 攻撃の更新
+	attackController_.Update(*animationController_);
 }
 
 void Boss::Draw(void)
@@ -77,12 +81,39 @@ void Boss::Draw(void)
 #ifdef _DEBUG
 	// デバッグ表示
 	DrawFormatString(0, 130, 0xffffff, "ボスHP：%d / %d", health_.GetHp(), health_.GetMaxHp());
+
+	attackController_.DrawDebug(pos_, GetForward());
 #endif //_DEBUG
 }
 
 void Boss::OnHit(int damage)
 {
 	health_.Damage(damage);
+}
+
+void Boss::StartAttack(void)
+{
+	// プレイヤーの方向
+	FacePlayer();
+
+	// 攻撃アニメーションを再生
+	AnimationController::PlayParam playParam;
+	playParam.isLoop = false;
+	playParam.blendFrame = 10;
+	playParam.isForce = true;
+	animationController_->Play(static_cast<int>(ANIM_TYPE::ATTACK_BASIC), playParam);
+
+	attackController_.Start(attackParam_);
+}
+
+void Boss::EndAttack(void)
+{
+	attackController_.Stop();
+}
+
+void Boss::OnAttackHit(void)
+{
+	attackController_.NotifyHit();
 }
 
 void Boss::InitLoad(void)
@@ -140,14 +171,37 @@ void Boss::InitAnimation(void)
 void Boss::InitPost(void)
 {
 	state_.Register(BOSS_STATE::IDLE, std::make_unique<BossIdleState>());
+	state_.Register(BOSS_STATE::ATTACK, std::make_unique<BossAttackState>());
 
 	state_.Start(BOSS_STATE::IDLE);
 
 	// HP を満タンにして、0 になったときの通知先を登録する
 	health_.Init(MAX_HP);
 	health_.SetOnDead([this]() { OnDead(); });
+
+	InitAttackParam();
 }
 
 void Boss::OnDead(void)
+{
+}
+
+void Boss::InitAttackParam(void)
+{
+	attackParam_.animType = static_cast<int>(ANIM_TYPE::ATTACK_BASIC);
+
+	// 判定が出る区間
+	attackParam_.hitStart = 10.0f;
+	attackParam_.hitEnd = 20.0f;
+
+	// 判定の形
+	attackParam_.shape = HIT_SHAPE::FAN;
+	attackParam_.offset = 30.0f;
+	attackParam_.length = 50.0f;
+	attackParam_.width = 400.0f;
+	attackParam_.halfAngleDeg = 60.0f;
+}
+
+void Boss::FacePlayer(void)
 {
 }

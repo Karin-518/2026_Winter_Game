@@ -16,6 +16,7 @@ PLAYER_STATE PlayerAttackState::Update(Player& owner)
 		return PLAYER_STATE::IDLE;
 	}
 
+	// âΩÇ‡Ç»ÇØÇÍÇŒÅAêÿÇËë÷Ç¶Ç»Ç¢
 	return PLAYER_STATE::NONE;
 }
 

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Actor\Enemy\State\BossAttackState.cpp" />
     <ClCompile Include="Src\Object\Actor\Enemy\State\BossIdleState.cpp" />
     <ClCompile Include="Src\Object\Actor\Player\State\PlayerDodgeState.cpp" />
     <ClCompile Include="Src\Object\Common\Attack\AttackController.cpp" />
@@ -60,6 +61,7 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Actor\Enemy\State\BossAttackState.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\State\BossIdleState.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\State\BossState.h" />
     <ClInclude Include="Src\Object\Actor\Player\State\PlayerDodgeState.h" />
