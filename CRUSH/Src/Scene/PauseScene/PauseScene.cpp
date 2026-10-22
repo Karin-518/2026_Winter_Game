@@ -4,6 +4,7 @@
 #include "../../Common/Collision/Collision.h"
 #include "../SceneManager.h"
 #include "../GameScene/GameScene.h"
+#include "../Confirm/ConfirmScene.h"
 
 #include "PauseScene.h"
 
@@ -86,7 +87,7 @@ void PauseScene::Update(void)
 	// 選択処理
 	UpdateSelect();
 
-	// 選択したものを実行
+	// 選択した項目を実行
 	Decide();
 }
 
@@ -211,7 +212,7 @@ void PauseScene::Execute(MENU_TYPE type)
 		break;
 
 	case MENU_TYPE::EXIT:
-		SceneManager::GetInstance()->GameEnd();
+		SceneManager::GetInstance()->PushScene(std::make_shared<ConfirmScene>());
 		break;
 
 	default:

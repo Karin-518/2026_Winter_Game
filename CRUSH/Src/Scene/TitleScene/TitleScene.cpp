@@ -3,6 +3,7 @@
 #include "../../Audio/AudioManager.h"
 #include "../SceneManager.h"
 #include "../GameScene/GameScene.h"
+#include "../Confirm/ConfirmScene.h"
 
 #include "TitleScene.h"
 
@@ -38,6 +39,13 @@ void TitleScene::Update(void)
 	{
 		// ゲームシーンへ
 		SceneManager::GetInstance()->ChangeScene(std::make_shared<GameScene>());
+		return;
+	}
+
+	// Esc を押したら終了確認へ
+	if (InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::CANCEL))
+	{
+		SceneManager::GetInstance()->PushScene(std::make_shared<ConfirmScene>());
 		return;
 	}
 }
