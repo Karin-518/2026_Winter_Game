@@ -142,15 +142,15 @@ void PauseScene::SelectByAction(void)
 	int size = static_cast<int>(menuButtons_.size());
 
 	// ‰º‚Ö
-	if (InputManager::GetInstance()->IsActionDown(INPUT_INFO::ACTION::UI_MOVE_DOWN))
+	if (InputManager::GetInstance()->IsActionDown(INPUT_INFO::ACTION::UI_MOVE_DOWN) && selectIndex_ < size - 1)
 	{
-		selectIndex_ = (selectIndex_ + 1) % size;
+		selectIndex_++;
 	}
 
 	// ã‚Ö
-	if (InputManager::GetInstance()->IsActionDown(INPUT_INFO::ACTION::UI_MOVE_UP))
+	if (InputManager::GetInstance()->IsActionDown(INPUT_INFO::ACTION::UI_MOVE_UP) && selectIndex_ > 0)
 	{
-		selectIndex_ = (selectIndex_ - 1 + size) % size;
+		selectIndex_--;
 	}
 }
 
