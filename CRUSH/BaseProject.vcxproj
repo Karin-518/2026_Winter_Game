@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\UI\HpBar\HpBar.cpp" />
     <ClCompile Include="Src\Scene\Confirm\ConfirmScene.cpp" />
     <ClCompile Include="Src\Object\Actor\Enemy\State\BossAttackState.cpp" />
     <ClCompile Include="Src\Object\Actor\Enemy\State\BossIdleState.cpp" />
@@ -62,6 +63,7 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\UI\HpBar\HpBar.h" />
     <ClInclude Include="Src\Scene\Confirm\ConfirmScene.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\State\BossAttackState.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\State\BossIdleState.h" />

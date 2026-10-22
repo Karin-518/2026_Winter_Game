@@ -1,5 +1,6 @@
 #pragma once
 #include "../SceneBase.h"
+#include "../../UI/HpBar/HpBar.h"
 
 class Camera;
 class Stage;
@@ -32,6 +33,10 @@ private:
 
 	// ボス
 	Boss* boss_;
+
+	HpBar playerHpBar_;
+
+	HpBar bossHpBar_;
 
 	// ステージの当たり判定を、アクターとカメラに登録する
 	void RegisterStageCollider(void);

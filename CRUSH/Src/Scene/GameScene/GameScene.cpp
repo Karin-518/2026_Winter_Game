@@ -20,7 +20,9 @@ GameScene::GameScene(void)
 	camera_(nullptr),
 	stage_(nullptr),
 	player_(nullptr),
-	boss_(nullptr)
+	boss_(nullptr),
+	playerHpBar_(20, 20, 300, 20, 0x00ff00),
+	bossHpBar_(200, 600, 600, 16, 0xff0000)
 {
 }
 
@@ -86,21 +88,6 @@ void GameScene::LoadEnd(void)
 
 void GameScene::Update(void)
 {
-#ifdef _DEBUG
-	if (CheckHitKey(KEY_INPUT_C))
-	{
-		SceneManager::GetInstance()->ChangeScene(std::make_shared<GameClear>());
-		return;
-	}
-
-	if (CheckHitKey(KEY_INPUT_O))
-	{
-		SceneManager::GetInstance()->ChangeScene(std::make_shared<GameOver>());
-		return;
-	}
-
-#endif //_DEBUG
-
 	if (InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::PAUSE))
 	{
 		// ポーズシーンへ
@@ -124,6 +111,10 @@ void GameScene::Update(void)
 	// カメラの更新
 	camera_->Update();
 
+	playerHpBar_.Update(player_->GetHealth().GetHp(), player_->GetHealth().GetMaxHp());
+
+	bossHpBar_.Update(boss_->GetHealth().GetHp(), boss_->GetHealth().GetMaxHp());
+
 	// 勝敗がついていたら、何もしない
 	if (CheckBattleEnd()) return;
 }
@@ -144,6 +135,10 @@ void GameScene::Draw(void)
 
 	// デバッグ描画
 	camera_->DrawDebug();
+
+	playerHpBar_.Draw();
+	bossHpBar_.Draw();
+	DrawString(200, 580, "BOSS", 0xffffff);
 }
 
 void GameScene::Release(void)

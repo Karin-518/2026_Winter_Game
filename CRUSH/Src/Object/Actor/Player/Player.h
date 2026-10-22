@@ -43,7 +43,7 @@ public:
 	void MoveByInput(float speed);
 
 	// ƒwƒ‹ƒX‚Ìæ“¾
-	Health& GetHealth(void) { return health_; }
+	const Health& GetHealth(void) { return health_; }
 
 	// UŒ‚‚ª“–‚½‚è‚»‚¤‚È‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
 	void OnHit(int damage) override;

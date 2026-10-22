@@ -37,6 +37,9 @@ public:
 	// アニメーションの取得
 	AnimationController* GetAnimationController(void) const { return animationController_; }
 
+	// ヘルスの取得
+	const Health& GetHealth(void) { return health_; }
+
 	// 攻撃が当たりそうなときに呼ばれる
 	void OnHit(int damage) override;
 
