@@ -112,7 +112,7 @@ private:
 
 private:
 	
-	// 方向回転によるXYZの移動（マウス）
+	// 方向回転によるXYZの移動（キーボード・マウス）
 	void MoveXYZDirection(void);
 
 	// 方向回転によるXYZの移動（ゲームパッド）

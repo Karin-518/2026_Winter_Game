@@ -104,7 +104,6 @@ void GameScene::Update(void)
 	if (InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::PAUSE))
 	{
 		// ポーズシーンへ
-		InputManager::GetInstance()->SetMouseLock(false);
 		SceneManager::GetInstance()->PushScene(std::make_shared<PauseScene>());
 		return;
 	}
