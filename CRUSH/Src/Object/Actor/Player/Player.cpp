@@ -1,4 +1,5 @@
 #include <memory>
+#include "../../../Audio/AudioManager.h"
 #include "../../../Input/InputManager.h"
 #include "../../../Common/Math/Math.h"
 #include "../../../Common/Math/MatrixUtility.h"
@@ -298,6 +299,9 @@ void Player::StartAttack(ATTACK_ID id)
 	playParam.blendFrame = ATTACK_BLEND_FRAME;
 	playParam.isForce = true;
 	animationController_->Play(param.animType, playParam);
+
+	// SE‚ğÄ¶
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_SWING_1);
 
 	// ”»’è‚Ì€”õ
 	attackController_.Start(param);

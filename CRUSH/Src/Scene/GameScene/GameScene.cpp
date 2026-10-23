@@ -1,5 +1,6 @@
 #include <DxLib.h>
 #include "../../Application.h"
+#include "../../Audio/AudioManager.h"
 #include "../../Input/InputManager.h"
 #include "../../Camera/Camera.h"
 #include "../../Object/Actor/Player/Player.h"
@@ -47,6 +48,9 @@ void GameScene::Init(void)
 
 void GameScene::Load(void)
 {
+	// サウンド読みこみ
+	AudioManager::GetInstance()->LoadSceneSound(LoadScene::GAME);
+
 	// 生成処理
 	camera_ = new Camera();				// カメラの生成
 	stage_ = new Stage();				// ステージの生成
