@@ -95,6 +95,8 @@ void Player::Draw(void)
 {
 	ActorBase::Draw();
 
+	attackController_.DrawDebug(pos_, GetForward());
+
 #ifdef _DEBUG
 	DrawFormatString(
 		0, 50, 0xffffff,
@@ -107,8 +109,6 @@ void Player::Draw(void)
 	// デバッグ表示
 	DrawFormatString(0, 90, 0xffffff, "HP：%d / %d", health_.GetHp(), health_.GetMaxHp());
 	DrawFormatString(0, 110, 0xffffff, "無敵：%s", health_.IsInvincible() ? "あり" : "なし");
-
-	attackController_.DrawDebug(pos_, GetForward());
 
 #endif //_DEBUG
 }
@@ -139,9 +139,10 @@ void Player::OnHit(int damage)
 	// 倒れたら、のけぞらない
 	if (health_.IsDead()) return;
 
-	// 被弾後の無敵とのけぞり
+	// 無敵
 	health_.SetInvincible(HIT_INVINCIBLE_FRAME);
 	
+	// のけぞり
 	//state_.RequestState(PLAYER_STATE::HIT);
 }
 
@@ -179,7 +180,7 @@ void Player::InitTransform(void)
 
 	// モデルの位置設定
 	pos_ = INIT_POS;
-	MV1SetPosition(modelId_, pos_);;
+	MV1SetPosition(modelId_, pos_);
 }
 
 void Player::InitCollider(void)
