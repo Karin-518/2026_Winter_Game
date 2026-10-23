@@ -54,6 +54,7 @@ void Application::Init(void)
 	// サウンド
 	AudioManager::CreateInstance();
 	AudioManager::GetInstance()->Init();
+	AudioManager::GetInstance()->LoadSceneSound(LoadScene::SYSTEM);
 
 	// リソース管理
 	ResourceManager::CreateInstance();
@@ -105,6 +106,7 @@ void Application::Delete(void)
 	ResourceManager::DeleteInstance();
 
 	// サウンド削除
+	AudioManager::GetInstance()->DeleteSceneSound(LoadScene::SYSTEM);
 	AudioManager::GetInstance()->DeleteAll();
 	AudioManager::DeleteInstance();
 

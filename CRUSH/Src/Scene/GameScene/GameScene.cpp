@@ -166,6 +166,9 @@ void GameScene::Release(void)
 	camera_->Release();
 	delete camera_;
 	camera_ = nullptr;
+
+	// ‰¹‚Ì‰ð•ú
+	AudioManager::GetInstance()->DeleteSceneSound(LoadScene::GAME);
 }
 
 void GameScene::RegisterStageCollider(void)
