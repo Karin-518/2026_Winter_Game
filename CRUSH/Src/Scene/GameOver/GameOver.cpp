@@ -7,7 +7,9 @@
 
 GameOver::GameOver(void)
 	:
-	handle_(-1)
+	handle_(-1),
+	alpha_(0.0f),
+	isIncreasing_(false)
 {
 }
 
@@ -17,6 +19,8 @@ GameOver::~GameOver(void)
 
 void GameOver::Init(void)
 {
+	alpha_ = 255.0f;
+	isIncreasing_ = false;
 }
 
 void GameOver::Load(void)
@@ -36,12 +40,40 @@ void GameOver::Update(void)
 		SceneManager::GetInstance()->JumpScene(std::make_shared<TitleScene>());
 		return;
 	}
+
+	// ボタンのアルファ値を変化させる
+	if (isIncreasing_)
+	{
+		alpha_ += 5.0f;
+
+		// 増加が最大になったら減少に切り替える
+		if (alpha_ >= 255.0f)
+		{
+			alpha_ = 255.0f;
+			isIncreasing_ = false;
+		}
+	}
+	else
+	{
+		alpha_ -= 5.0f; // 減少速度
+
+		// 減少が最小になったら増加に切り替える
+		if (alpha_ <= 0.0f)
+		{
+			alpha_ = 0.0f;
+			isIncreasing_ = true;
+		}
+	}
 }
 
 void GameOver::Draw(void)
 {
 	DrawBox(0, 0, 1024, 640, 0x000000, true);
-	DrawString(10, 10, "ゲームオーバー", 0xffffff);
+	DrawString(420, 200, "ゲームオーバー", 0xffffff);
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(alpha_));
+	DrawString(400, 500, "Press Space to Title", 0xffffff, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void GameOver::Release(void)
