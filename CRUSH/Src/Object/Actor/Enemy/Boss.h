@@ -1,12 +1,16 @@
 #pragma once
+#include <vector>
+#include <memory>
 #include "../ActorBase.h"
 #include "../../Common/State/StateContext.h"
 #include "../../Common/Health/Health.h"
 #include "../../Common/Attack/AttackController.h"
 #include "../../Common/Attack/AttackParam.h"
 #include "State/BossState.h"
+#include "ColliderPart.h"
 
 class Player;
+class BossPart;
 
 class Boss : public ActorBase
 {
@@ -28,11 +32,8 @@ public:
 	// デストラクタ
 	~Boss(void) override;
 
-	// 更新
-	void Update(void) override;
-
-	// 描画
-	void Draw(void) override;
+	void Update(void) override;		// 更新
+	void Draw(void) override;		// 描画
 
 	// アニメーションの取得
 	AnimationController* GetAnimationController(void) const { return animationController_; }
@@ -58,6 +59,10 @@ public:
 	// 攻撃の判定
 	const AttackController& GetAttackController(void) const { return attackController_; }
 
+	// 攻撃が当たった部位を探す
+	const ColliderPart* FindHitPart(
+		const AttackController& attack, const VECTOR& attackerPos, const VECTOR& forward) const;
+
 private:
 
 	// プレイヤー
@@ -75,6 +80,9 @@ private:
 	// 攻撃ごとのデータ
 	AttackParam attackParam_;
 
+	// 部位の当たり判定
+	std::vector<std::unique_ptr<ColliderPart>> parts_;
+
 private:
 
 	// リソースロード
@@ -91,6 +99,9 @@ private:
 
 	// 初期化後の個別処理
 	void InitPost(void) override;
+
+	// 部位の初期化
+	void InitParts(void);
 
 	// HPが0になったときに呼ぶ
 	void OnDead(void);

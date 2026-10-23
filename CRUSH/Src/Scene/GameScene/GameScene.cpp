@@ -203,9 +203,9 @@ void GameScene::ResolvePlayerAttack(void)
 	// 判定区域外、または1振りで当たった
 	if (!attack.CanHit()) return;
 
-	// 判定の形とボスの円が重なっていない
-	if (!attack.IsHit(player_->GetPos(), player_->GetForward(),
-		boss_->GetPos(), boss_->GetBodyRadius())) return;
+	const ColliderPart* hitPart = boss_->FindHitPart(
+		attack, player_->GetPos(), player_->GetForward());
+	if (hitPart == nullptr) return;
 
 	// ダメージを与えて、当たったことを記憶
 	boss_->OnHit(attack.GetParam()->damage);

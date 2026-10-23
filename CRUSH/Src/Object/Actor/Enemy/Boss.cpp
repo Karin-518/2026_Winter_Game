@@ -40,6 +40,15 @@ namespace
 
 	// 初期の向き(Y軸、度)
 	constexpr float INIT_ANGLE_DEG_Y = 255.0f;
+
+	constexpr BossPartParam PART_PARAMS[] =
+	{
+		{ BOSS_PART::HEAD,   "Tongue02",   "Neck01",     70.0f, 1.0f },
+		{ BOSS_PART::BODY,   "Chest",  "joint19",     100.0f, 1.0f },
+		{ BOSS_PART::TAIL,   "joint20",  "joint23",  40.0f, 1.0f },
+		{ BOSS_PART::WING_L, "WingRing01_L", "WingRing05_L", 70.0f, 0.0f },
+		{ BOSS_PART::WING_R, "WingRing01_R", "WingRing05_R", 70.0f, 0.0f },
+	};
 }
 
 Boss::Boss(Player* player)
@@ -61,6 +70,11 @@ void Boss::Update(void)
 
 	ActorBase::Update();
 
+	for (auto& part : parts_)
+	{
+		part->Update();
+	}
+
 	// 攻撃の更新
 	attackController_.Update(*animationController_);
 }
@@ -69,11 +83,17 @@ void Boss::Draw(void)
 {
 	ActorBase::Draw();
 
+	attackController_.DrawDebug(pos_, GetForward());
+
 #ifdef _DEBUG
 	// デバッグ表示
 	DrawFormatString(0, 130, 0xffffff, "ボスHP：%d / %d", health_.GetHp(), health_.GetMaxHp());
 
-	attackController_.DrawDebug(pos_, GetForward());
+	for (const auto& part : parts_)
+	{
+		part->Draw();
+	}
+
 #endif //_DEBUG
 }
 
@@ -105,6 +125,21 @@ void Boss::EndAttack(void)
 void Boss::OnAttackHit(void)
 {
 	attackController_.NotifyHit();
+}
+
+const ColliderPart* Boss::FindHitPart(const AttackController& attack, const VECTOR& attackerPos, const VECTOR& forward) const
+{
+	// 攻撃範囲の中心
+	VECTOR attackCenter = VAdd(attackerPos, VScale(forward, attack.GetParam()->offset));
+
+	for (const auto& part : parts_)
+	{
+		VECTOR closest = part->GetClosestPos(attackCenter);
+
+		if (attack.IsHit(attackerPos, forward, closest, part->GetRadius())) return part.get();
+	}
+
+	return nullptr;
 }
 
 void Boss::InitLoad(void)
@@ -147,6 +182,9 @@ void Boss::InitCollider(void)
 	// 体のカプセル(壁判定)
 	bodyCapsule_ = new ColliderCapsule(
 		ColliderBase::TAG::ENEMY, &pos_, START_CAPSULE_POS, END_CAPSULE_POS, CAPSULE_RADIUS);
+
+	// 部位ごとの当たり判定
+	InitParts();
 }
 
 void Boss::InitAnimation(void)
@@ -173,6 +211,14 @@ void Boss::InitPost(void)
 
 	// 攻撃パラメータの設定
 	InitAttackParam();
+}
+
+void Boss::InitParts(void)
+{
+	for (const auto& param : PART_PARAMS)
+	{
+		parts_.push_back(std::make_unique<ColliderPart>(modelId_, param));
+	}
 }
 
 void Boss::OnDead(void)
