@@ -18,4 +18,7 @@ public:
 private:
 
 	int handle_;
+
+	float alpha_;
+	bool isIncreasing_;
 };

@@ -17,6 +17,7 @@ public:
 		PLAYER_ANIM_ROLL,
 		BOSS,
 		STAGE,
+		TITLE_LOGO,
 	};
 
 	// シングルトン（生成・取得・削除）

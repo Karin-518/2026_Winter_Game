@@ -1,4 +1,6 @@
 #include <DxLib.h>
+#include "../../Application.h"
+#include "../../Resource/ResourceManager.h"
 #include "../../Input/InputManager.h"
 #include "../../Audio/AudioManager.h"
 #include "../SceneManager.h"
@@ -8,8 +10,11 @@
 #include "TitleScene.h"
 
 TitleScene::TitleScene(void)
+	:
+	handle_(-1),
+	alpha_(0.0f),
+	isIncreasing_(false)
 {
-	handle_ = -1;
 }
 
 TitleScene::~TitleScene(void)
@@ -18,12 +23,14 @@ TitleScene::~TitleScene(void)
 
 void TitleScene::Init(void)
 {
+	alpha_ = 255.0f;
+	isIncreasing_ = false;
 }
 
 void TitleScene::Load(void)
 {
 	AudioManager::GetInstance()->LoadSceneSound(LoadScene::TITLE);
-	handle_ = LoadGraph("Data/Image/Title.png");
+	handle_ = ResourceManager::GetInstance()->Load(ResourceManager::SRC::TITLE_LOGO).GetHandleId();
 }
 
 void TitleScene::LoadEnd(void)
@@ -34,6 +41,13 @@ void TitleScene::LoadEnd(void)
 
 void TitleScene::Update(void)
 {
+	// Esc を押したら終了確認へ
+	if (InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::CANCEL))
+	{
+		SceneManager::GetInstance()->PushScene(std::make_shared<ConfirmScene>());
+		return;
+	}
+
 	// スペースが押されると次のシーンへ
 	if(InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::DECIDE))
 	{
@@ -42,17 +56,38 @@ void TitleScene::Update(void)
 		return;
 	}
 
-	// Esc を押したら終了確認へ
-	if (InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::CANCEL))
+	// ボタンのアルファ値を変化させる
+	if (isIncreasing_)
 	{
-		SceneManager::GetInstance()->PushScene(std::make_shared<ConfirmScene>());
-		return;
+		alpha_ += 5.0f;
+
+		// 増加が最大になったら減少に切り替える
+		if (alpha_ >= 255.0f)
+		{
+			alpha_ = 255.0f;
+			isIncreasing_ = false;
+		}
+	}
+	else
+	{
+		alpha_ -= 5.0f; // 減少速度
+
+		// 減少が最小になったら増加に切り替える
+		if (alpha_ <= 0.0f)
+		{
+			alpha_ = 0.0f;
+			isIncreasing_ = true;
+		}
 	}
 }
 
 void TitleScene::Draw(void)
 {
-	DrawGraph(0, 0, handle_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2 - 100, 2.0, 0.0, handle_, true);
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(alpha_));
+	DrawString(400, 500, "Press Space to Start", 0xffffff,true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void TitleScene::Release(void)
