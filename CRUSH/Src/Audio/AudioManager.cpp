@@ -33,7 +33,7 @@ void AudioManager::Init(void)
 void AudioManager::LoadSceneSound(LoadScene scene)
 {
 	// 空のテーブルを用意
-	const std::unordered_map<SoundID, std::string>* table = nullptr;
+	const std::unordered_map<SoundID, SoundData>* table = nullptr;
 
 	// シーンで読み込みたいテーブルを切り替える
 	switch (scene)
@@ -47,25 +47,33 @@ void AudioManager::LoadSceneSound(LoadScene scene)
 	if (!table) return;
 
 	// 指定したテーブルのサウンドを全て読み込む
-	for (auto& [id, path] : *table) 
+	for (auto& [id, data] : *table) 
 	{
 		// 既に読み込まれていたら削除
 		auto it = handles_.find(id);
 		if (it != handles_.end())
 		{
-			DeleteSoundMem(it->second);
+			DeleteSoundMem(it->second.handle);
 			handles_.erase(it);
 		}
 
 		// サウンドを読み込む
-		handles_[id] = LoadSoundMem(path.c_str());
+		SoundResource res;
+
+		// サウンドを読み込む
+		res.handle = LoadSoundMem(data.path.c_str());
+
+		res.volume = data.volume;
+
+		// サウンドを読み込む
+		handles_[id] = res;
 	}
 }
 
 void AudioManager::DeleteSceneSound(LoadScene scene)
 {
 	// 空のテーブルを用意
-	const std::unordered_map<SoundID, std::string>* table = nullptr;
+	const std::unordered_map<SoundID, SoundData>* table = nullptr;
 
 	// シーンで削除したいテーブルを切り替える
 	switch (scene)
@@ -88,7 +96,7 @@ void AudioManager::DeleteSceneSound(LoadScene scene)
 		if (it != handles_.end())
 		{
 			// 削除する
-			DeleteSoundMem(it->second);
+			DeleteSoundMem(it->second.handle);
 			// 配列からも削除
 			handles_.erase(it);
 		}
@@ -106,7 +114,7 @@ void AudioManager::PlayBGM(SoundID id)
 		return;
 
 	// 現在のBGMが同じならスキップ
-	if (currentBgm_ == id && CheckSoundMem(it->second))
+	if (currentBgm_ == id && CheckSoundMem(it->second.handle))
 		return;
 
 	// 別のBGMが再生中なら停止
@@ -117,13 +125,14 @@ void AudioManager::PlayBGM(SoundID id)
 	currentBgm_ = id;
 
 	// 実音量を計算
-	int volume = static_cast<int>(bgmVolume_ * (masterVolume_ / 255.0f));
+	auto& sound = it->second;
+	int volume = static_cast<int>(sound.volume * (bgmVolume_ / 255.0f) * (masterVolume_ / 255.0f));
 
 	// 音量を変更
-	ChangeVolumeSoundMem(volume, it->second);
+	ChangeVolumeSoundMem(volume, sound.handle);
 
 	// BGMなのでループ再生
-	PlaySoundMem(it->second, DX_PLAYTYPE_LOOP, true);
+	PlaySoundMem(sound.handle, DX_PLAYTYPE_LOOP, true);
 }
 
 void AudioManager::StopBGM()
@@ -138,7 +147,7 @@ void AudioManager::StopBGM()
 	// サウンドが読み込まれているか？
 	if (it != handles_.end())
 		// 読み込まれているのでサウンドを止める
-		StopSoundMem(it->second);
+		StopSoundMem(it->second.handle);
 
 	// 現在のBGMを再生していない状態に更新
 	currentBgm_ = SoundID::NON;
@@ -155,13 +164,14 @@ void AudioManager::PlaySE(SoundID id)
 		return;
 
 	// 実音量を計算
-	int volume = static_cast<int>(seVolume_ * (masterVolume_ / 255.0f));
+	auto sound = it->second;
+	int volume = static_cast<int>(sound.volume * (seVolume_ / 255.0f) * (masterVolume_ / 255.0f));
 
 	// 音量を変更
-	ChangeVolumeSoundMem(volume, it->second);
+	ChangeVolumeSoundMem(volume, sound.handle);
 
 	// SEは複数同時再生を許可
-	PlaySoundMem(it->second, DX_PLAYTYPE_BACK, true);
+	PlaySoundMem(sound.handle, DX_PLAYTYPE_BACK, true);
 }
 
 void AudioManager::DeleteAll(void)
@@ -171,13 +181,13 @@ void AudioManager::DeleteAll(void)
 		return;
 
 	// 全てのサウンドを検索
-	for (auto& [id, handle] : handles_)
+	for (auto& [id, data] : handles_)
 	{
 		// エラーサウンドかをチェック
-		if (CheckSoundMem(handle) != -1)
+		if (CheckSoundMem(data.handle) != -1)
 		{
 			// 削除する
-			DeleteSoundMem(handle);
+			DeleteSoundMem(data.handle);
 		}
 	}
 
@@ -200,10 +210,11 @@ void AudioManager::SetBgmVolume(int volume)
 		if (it != handles_.end())
 		{
 			// 実音量を計算
-			int volume = static_cast<int>(bgmVolume_ * (masterVolume_ / 255.0f));
+			auto& sound = it->second;
+			int volume = static_cast<int>(sound.volume * (bgmVolume_ / 255.0f) * (masterVolume_ / 255.0f));
 
 			// 音量を変更
-			ChangeVolumeSoundMem(volume, it->second);
+			ChangeVolumeSoundMem(volume, sound.handle);
 		}
 	}
 }
@@ -229,10 +240,11 @@ void AudioManager::SetMasterVolume(int volume)
 		if (it != handles_.end())
 		{
 			// 実音量を計算
-			int volume = static_cast<int>(bgmVolume_ * (masterVolume_ / 255.0f));
+			auto& sound = it->second;
+			int volume = static_cast<int>(sound.volume * (bgmVolume_ / 255.0f) * (masterVolume_ / 255.0f));
 
 			// 音量を変更
-			ChangeVolumeSoundMem(volume, it->second);
+			ChangeVolumeSoundMem(volume, sound.handle);
 		}
 	}
 }

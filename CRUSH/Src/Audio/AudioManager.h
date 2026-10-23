@@ -49,7 +49,7 @@ public:
 	int GetMasterVolume(int volume) const { return masterVolume_; }
 
 private:
-	std::unordered_map<SoundID, int> handles_;	// ハンドル管理用
+	std::unordered_map<SoundID, SoundResource> handles_;	// ハンドル管理用
 
 	// 現在再生されているBGM
 	SoundID currentBgm_;

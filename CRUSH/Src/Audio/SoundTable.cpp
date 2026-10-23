@@ -5,7 +5,7 @@
 // システム用
 namespace SoundTable_System 
 {
-	const std::unordered_map<SoundID, std::string> Table = 
+	const std::unordered_map<SoundID, SoundData> Table =
 	{
 	};
 }
@@ -13,7 +13,7 @@ namespace SoundTable_System
 // タイトル画面用
 namespace SoundTable_Title
 {
-	const std::unordered_map<SoundID, std::string> Table =
+	const std::unordered_map<SoundID, SoundData> Table =
 	{
 	};
 }
@@ -21,7 +21,9 @@ namespace SoundTable_Title
 // ゲーム画面用
 namespace SoundTable_Game 
 {
-	const std::unordered_map<SoundID, std::string> Table = 
+	const std::unordered_map<SoundID, SoundData> Table =
 	{
+		{ SoundID::SE_PLAYER_SWING_1, { "Data/Audio/SE/Player/SE_PLAYER_SWING_1.mp3", 150} },
+
 	};
 }
