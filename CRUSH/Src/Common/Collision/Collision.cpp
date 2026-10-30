@@ -1,7 +1,7 @@
 #include <algorithm>
+#include "../Math/Math.h"
 
 #include "Collision.h"
-#include "../Math/Math.h"
 
 namespace Collision3D
 {

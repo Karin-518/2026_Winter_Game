@@ -4,10 +4,12 @@ class FpsControl
 {
 public:
 
-	FpsControl(void);	// コンストラクタ
-	~FpsControl(void);	// デストラクタ
+	// コンストラクタ
+	FpsControl(void);
+	
+	// デストラクタ
+	~FpsControl(void);
 
-public:
 	// 初期化（DxLib_Init の後に呼ぶ）
 	void Init(void);
 
@@ -24,12 +26,20 @@ public:
 private:
 
 	// 時間はすべてマイクロ秒（1秒 = 1,000,000）
-	long long currentTime_;			// 現在の時間
-	long long prevFrameTime_;		// 前回のフレームを始めた予定の時間
-	long long updateFrameRateTime_;	// フレームレートを更新した時間
+	// 現在の時間
+	long long currentTime_;
 
-	int frameCnt_;					// フレームカウント用
-	float frameRate_;				// フレームレート (表示用)
+	// 前回のフレームを始めた予定の時間
+	long long prevFrameTime_;
+
+	// フレームレートを更新した時間
+	long long updateFrameRateTime_;
+
+	// フレームカウント用
+	int frameCnt_;
+
+	// フレームレート (表示用)
+	float frameRate_;
 
 	// 次のフレームの開始時間を決める
 	void AdvanceFrameTime(long long elapsed);

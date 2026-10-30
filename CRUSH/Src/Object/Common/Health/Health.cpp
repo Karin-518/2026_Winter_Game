@@ -40,13 +40,6 @@ bool Health::Damage(int damage)
 		return true;
 	}
 
-	// ”¼•ªˆÈ‰º‚É‚È‚Á‚½‚çA1‰ñ‚¾‚¯’Ê’m
-	if (!isHalfNotified_ && hp_ * 2 <= maxHp_)
-	{
-		isHalfNotified_ = true;
-		Notify(onHalf_);
-	}
-
 	return true;
 }
 

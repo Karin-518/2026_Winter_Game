@@ -10,15 +10,30 @@ class Boss;
 class GameScene : public SceneBase
 {
 public:
-	GameScene(void);				// コンストラクタ
-	~GameScene(void) override;		// デストラクタ
 
-	void Init(void)		override;	// 初期化
-	void Load(void)		override;	// 読み込み
-	void LoadEnd(void)	override;	// 読み込み後の処理
-	void Update(void)	override;	// 更新
-	void Draw(void)		override;	// 描画
-	void Release(void)	override;	// 解放
+	// コンストラクタ
+	GameScene(void);
+
+	// デストラクタ
+	~GameScene(void) override;
+
+	// 初期化
+	void Init(void) override;
+
+	// 読み込み
+	void Load(void) override;
+	
+	// 読み込み後の処理
+	void LoadEnd(void) override;
+	
+	// 更新
+	void Update(void) override;
+	
+	// 描画
+	void Draw(void) override;
+	
+	// 解放
+	void Release(void) override;
 
 private:
 
@@ -34,8 +49,10 @@ private:
 	// ボス
 	Boss* boss_;
 
+	// プレイヤーのHPバー
 	HpBar playerHpBar_;
 
+	// ボスのHPバー
 	HpBar bossHpBar_;
 
 	// ステージの当たり判定を、アクターとカメラに登録する

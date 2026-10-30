@@ -1,5 +1,6 @@
 #include <DxLib.h>
 #include <EffekseerForDXLib.h>
+
 #include "Resource.h"
 
 namespace
@@ -7,7 +8,6 @@ namespace
 	// ハンドルを持っていないことを表す値
 	constexpr int INVALID_HANDLE = -1;
 }
-
 
 Resource::Resource(void)
 	:

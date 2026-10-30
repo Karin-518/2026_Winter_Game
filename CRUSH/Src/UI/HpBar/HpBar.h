@@ -10,16 +10,29 @@ public:
 	// デストラクタ
 	~HpBar(void);
 
-	void Update(int hp, int maxHp);	// 更新
-	void Draw(void) const;			// 描画
+	// 更新
+	void Update(int hp, int maxHp);
+
+	// 描画
+	void Draw(void) const;
 
 private:
 
-	int posX_;				// 左上のX座標
-	int posY_;				// 左上のY座標
-	int width_;				// バー全体の幅
-	int height_;			// バーの高さ
-	unsigned int color_;	// 残りHPの色
+	// 左上のX座標
+	int posX_;
 
-	float rate_;			// 残りHPの割合（0.0～1.0）
+	// 左上のY座標
+	int posY_;
+
+	// バー全体の幅
+	int width_;
+
+	// バーの高さ
+	int height_;
+
+	// 残りHPの色
+	unsigned int color_;
+
+	// 残りHPの割合（0.0～1.0）
+	float rate_;
 };

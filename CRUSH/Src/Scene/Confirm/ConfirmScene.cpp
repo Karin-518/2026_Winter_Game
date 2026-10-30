@@ -103,18 +103,18 @@ void ConfirmScene::Draw(void)
 	// 項目の描画（画像ができるまでは枠と文字で表示）
 	for (const auto& button : menuButtons_)
 	{
-		DrawBox(button.rect.left, button.rect.top,
-			button.rect.right, button.rect.bottom,
+		DrawBox(button.rect_.left, button.rect_.top,
+			button.rect_.right, button.rect_.bottom,
 			UNSELECT_COLOR, FALSE);
 
-		DrawString(button.rect.left + TEXT_OFFSET_X, button.rect.top + TEXT_OFFSET_Y,
-			GetMenuLabel(button.menuType), TEXT_COLOR);
+		DrawString(button.rect_.left + TEXT_OFFSET_X, button.rect_.top + TEXT_OFFSET_Y,
+			GetMenuLabel(button.menuType_), TEXT_COLOR);
 	}
 
 	if (menuButtons_.empty()) return;
 
 	// 選択中の項目の枠を白で上書きする
-	const RECT& selectRect = menuButtons_[selectIndex_].rect;
+	const RECT& selectRect = menuButtons_[selectIndex_].rect_;
 	DrawBox(selectRect.left, selectRect.top,
 		selectRect.right, selectRect.bottom,
 		SELECT_COLOR, FALSE);
@@ -170,7 +170,7 @@ void ConfirmScene::SelectByMouse(void)
 	int index = 0;
 
 	// カーソルが乗っているボタンを先頭から探す（見つかったらそこで止まる）
-	while (index < size && !Collision2D::HitPointRect(mouseX, mouseY, menuButtons_[index].rect))
+	while (index < size && !Collision2D::HitPointRect(mouseX, mouseY, menuButtons_[index].rect_))
 	{
 		index++;
 	}
@@ -187,7 +187,7 @@ void ConfirmScene::Decide(void)
 
 	if (!IsDecidedByAction() && !IsDecidedByMouse()) return;
 
-	Execute(menuButtons_[selectIndex_].menuType);
+	Execute(menuButtons_[selectIndex_].menuType_);
 }
 
 bool ConfirmScene::IsDecidedByAction(void)
@@ -203,7 +203,7 @@ bool ConfirmScene::IsDecidedByMouse(void)
 	GetMousePoint(&mouseX, &mouseY);
 
 	// 選択中のボタンの上でクリックしたときだけ決定
-	return Collision2D::HitPointRect(mouseX, mouseY, menuButtons_[selectIndex_].rect);
+	return Collision2D::HitPointRect(mouseX, mouseY, menuButtons_[selectIndex_].rect_);
 }
 
 void ConfirmScene::Execute(MENU_TYPE type)

@@ -12,12 +12,14 @@ class InputManager
 {
 
 public:
+
 	// シングルトン（生成・取得・削除）
 	static void CreateInstance(void) { if (instance_ == nullptr) { instance_ = new InputManager(); } };
 	static InputManager* GetInstance(void) { return instance_; };
 	static void DeleteInstance(void) { if (instance_ != nullptr) { delete instance_; instance_ = nullptr; } }
 
 private:
+
 	// インスタンス
 	static InputManager* instance_;
 	
@@ -32,6 +34,7 @@ private:
 
 public:
 
+	// キーバインドの際のスロット数
 	static constexpr int MAX_BIND_PER_TYPE = 3;
 
 	// 入力種別

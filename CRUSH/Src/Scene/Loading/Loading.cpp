@@ -1,8 +1,9 @@
 #include <DxLib.h>
+
 #include "Loading.h"
 
 // コンストラクタ
-Loading::Loading()
+Loading::Loading(void)
 	: handle_(-1)
 	, posX_(0)
 	, posY_(0)
@@ -11,7 +12,7 @@ Loading::Loading()
 {}
 
 // デストラクタ
-Loading::~Loading()
+Loading::~Loading(void)
 {}
 
 // 初期化

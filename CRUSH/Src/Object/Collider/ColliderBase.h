@@ -57,4 +57,3 @@ private:
 	const VECTOR* followPos_;
 
 };
-

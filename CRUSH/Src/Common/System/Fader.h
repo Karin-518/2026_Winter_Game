@@ -2,7 +2,6 @@
 
 class Fader
 {
-
 public:
 
 	// フェードが進む速さ
@@ -16,9 +15,20 @@ public:
 		FADE_IN		// 徐々に明転
 	};
 
+	// コンストラクタ
 	Fader(void);
 
+	// デストラクタ
 	~Fader(void);
+
+	// 初期化
+	void Init(void);
+
+	// 更新
+	void Update(void);
+
+	// 描画
+	void Draw(void);
 
 	// 状態の取得
 	STATE GetState(void) const;
@@ -28,10 +38,6 @@ public:
 
 	// 指定フェードを開始する
 	void SetFade(STATE state);
-
-	void Init(void);
-	void Update(void);
-	void Draw(void);
 
 private:
 

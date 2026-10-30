@@ -86,8 +86,6 @@ private:
 	// 攻撃ごとのデータ
 	AttackParam attackParams_[static_cast<int>(ATTACK_ID::MAX)];
 
-private:
-
 	// リソースロード
 	void InitLoad(void) override;
 

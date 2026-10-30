@@ -57,8 +57,6 @@ private:
 	// 1U‚è‚Å“–‚½‚Á‚½‚©
 	bool hasHit_;
 
-private:
-
 	// ”»’è‚ÌªŒ³
 	VECTOR CalcOrigin(const VECTOR& ownerPos, const VECTOR& forward) const;
 
@@ -71,4 +69,3 @@ private:
 	// î‚ğ•`‚­
 	void DrawDebugFan(const VECTOR& origin, const VECTOR& forward, unsigned int color) const;
 };
-

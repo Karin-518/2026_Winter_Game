@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include <vector>
 #include <DxLib.h>
 #include "../../Resource/ResourceManager.h"
@@ -13,15 +12,29 @@ class ActorBase
 {
 public:
 
-	ActorBase(void);			// コンストラクタ
-	virtual ~ActorBase(void);	// デストラクタ
+	// コンストラクタ
+	ActorBase(void);
 
-	void Init(void);			// 初期化
-	void Load(void);			// 読み込み
-	void LoadEnd(void);			// 読み込み後
-	virtual void Update(void);	// 更新
-	virtual void Draw(void);	// 描画
-	virtual void Release(void);	// 解放
+	// デストラクタ
+	virtual ~ActorBase(void);
+
+	// 初期化
+	void Init(void);
+
+	// 読み込み
+	void Load(void);
+
+	// 読み込み後
+	void LoadEnd(void);
+
+	// 更新
+	virtual void Update(void);
+
+	// 描画
+	virtual void Draw(void);
+
+	// 解放
+	virtual void Release(void);
 
 	// 座標を取得
 	const VECTOR& GetPos(void) const { return pos_; }
@@ -50,10 +63,19 @@ protected:
 	int animType_;
 
 	// モデル情報
+	// モデルのハンドル
 	int modelId_;
+
+	// 座標
 	VECTOR pos_;
+
+	// 角度
 	VECTOR angle_;
+
+	// ローカル角度
 	VECTOR localAngle_;
+	
+	// 大きさ
 	VECTOR scale_;
 
 	// 足元の線分(地面判定用)
@@ -98,6 +120,7 @@ protected:
 	// リソースからアニメーションを登録する
 	void AddAnimation(int type, ResourceManager::SRC src, float speed);
 
+	// アニメーション追加のテンプレート
 	template <typename T>
 	void AddAnimation(T type, ResourceManager::SRC src, float speed)
 	{
@@ -114,5 +137,4 @@ private:
 
 	// 当たり判定の解放
 	void ReleaseCollider(void);
-
 };

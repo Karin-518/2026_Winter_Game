@@ -57,13 +57,18 @@ public:
 	// アニメーション再生（詳細設定版）
 	void Play(int type, const PlayParam& param);
 
+	// 更新
 	void Update(void);
+	
+	// 解放
 	void Release(void);
-
 
 	// 速度制御
 	// 再生速度の倍率（ずっと有効。1.0が通常）
+	// 速度の倍率をセット
 	void SetSpeedRate(float rate);
+
+	// 速度の倍率を取得
 	float GetSpeedRate(void)const { return speedRate_; }
 
 	// 指定フレームだけ再生速度を変える
@@ -105,15 +110,19 @@ private:
 	// 種類別のアニメーションデータ
 	std::map<int, Animation> animations_;
 
-	// 再生中のアニメーション
+	// アニメーションタイプ
 	int playType_;
+
+	// 再生中のアニメーション
 	Animation playAnim_;
 
-	// アニメーションをループするかしないか
+	// アニメーションをループするか
 	bool isLoop_;
 
 	// フェードアウト中のアニメーション
 	Animation prevAnim_;
+
+	// ループだったか
 	bool isPrevLoop_;
 
 	// ブレンドの神勅

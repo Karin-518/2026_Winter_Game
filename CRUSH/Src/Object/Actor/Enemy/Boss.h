@@ -32,8 +32,11 @@ public:
 	// デストラクタ
 	~Boss(void) override;
 
-	void Update(void) override;		// 更新
-	void Draw(void) override;		// 描画
+	// 更新
+	void Update(void) override;
+
+	// 描画
+	void Draw(void) override;
 
 	// アニメーションの取得
 	AnimationController* GetAnimationController(void) const { return animationController_; }
@@ -82,8 +85,6 @@ private:
 
 	// 部位の当たり判定
 	std::vector<std::unique_ptr<ColliderPart>> parts_;
-
-private:
 
 	// リソースロード
 	void InitLoad(void) override;

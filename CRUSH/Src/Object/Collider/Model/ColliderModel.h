@@ -28,4 +28,3 @@ private:
 	// ƒ‚ƒfƒ‹‚Ìƒnƒ“ƒhƒ‹ID
 	int modelId_;
 };
-

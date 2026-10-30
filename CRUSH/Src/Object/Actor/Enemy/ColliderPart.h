@@ -12,8 +12,11 @@ public:
 	// デストラクタ
 	~ColliderPart(void);
 
-	void Update(void);	// 更新
-	void Draw(void);	// 描画
+	// 更新
+	void Update(void);
+
+	// 描画
+	void Draw(void);
 
 	// 線分上で指定位置に近い点を取得
 	VECTOR GetClosestPos(const VECTOR& pos) const;

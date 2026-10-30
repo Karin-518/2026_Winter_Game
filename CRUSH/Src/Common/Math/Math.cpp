@@ -1,8 +1,8 @@
-#include "Math.h"
-
 #include <sstream>
 #include <cmath>
 #include <algorithm>
+
+#include "Math.h"
 
 namespace Math
 {

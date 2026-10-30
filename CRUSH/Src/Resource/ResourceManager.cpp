@@ -1,5 +1,6 @@
 #include <DxLib.h>
 #include "../Application.h"
+
 #include "ResourceManager.h"
 
 ResourceManager* ResourceManager::instance_ = nullptr;

@@ -3,6 +3,7 @@
 #include "../../Common/Collision/Collision.h"
 #include "../SceneManager.h"
 #include "../TitleScene/TitleScene.h"
+
 #include "GameClear.h"
 
 GameClear::GameClear(void)

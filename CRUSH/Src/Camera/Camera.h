@@ -109,8 +109,6 @@ private:
 
 	// 目標の上下の角度
 	float resetToPitch_;
-
-private:
 	
 	// 方向回転によるXYZの移動（キーボード・マウス）
 	void MoveXYZDirection(void);

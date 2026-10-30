@@ -11,6 +11,7 @@ Application* Application::instance_ = nullptr;
 
 const std::string Application::PATH_MODEL = "Data/Model/";
 const std::string Application::PATH_IMAGE = "Data/Image/";
+const std::string Application::PATH_EFFECT = "Data/effect/";
 
 Application::Application(void)
 	:
@@ -51,12 +52,12 @@ void Application::Init(void)
 	InputManager::CreateInstance();
 	InputManager::GetInstance()->Init();
 
-	// サウンド
+	// サウンド管理初期化
 	AudioManager::CreateInstance();
 	AudioManager::GetInstance()->Init();
 	AudioManager::GetInstance()->LoadSceneSound(LoadScene::SYSTEM);
 
-	// リソース管理
+	// リソース管理初期化
 	ResourceManager::CreateInstance();
 	ResourceManager::GetInstance()->Init();
 
@@ -82,12 +83,20 @@ void Application::Run(void)
 		// 画面を初期化
 		ClearDrawScreen();
 
-		InputManager::GetInstance()->Update();	// 入力制御更新
-		SceneManager::GetInstance()->Update();	// シーン管理更新
-		SceneManager::GetInstance()->Draw();	// シーン管理描画
+		// 入力制御更新
+		InputManager::GetInstance()->Update();
 
-		fps_->CalcFrameRate();	// フレームレート計算
-		fps_->DrawFrameRate();	// フレームレート描画
+		// シーン管理更新
+		SceneManager::GetInstance()->Update();
+		
+		// シーン管理描画
+		SceneManager::GetInstance()->Draw();
+
+		// フレームレート計算
+		fps_->CalcFrameRate();
+		
+		// フレームレート描画
+		fps_->DrawFrameRate();
 
 		ScreenFlip();
 	}
@@ -95,9 +104,6 @@ void Application::Run(void)
 
 void Application::Delete(void)
 {
-	// 入力制御削除
-	InputManager::DeleteInstance();
-
 	// シーン管理解放・削除
 	SceneManager::GetInstance()->Delete();
 	SceneManager::DeleteInstance();
@@ -110,6 +116,9 @@ void Application::Delete(void)
 	AudioManager::GetInstance()->DeleteAll();
 	AudioManager::DeleteInstance();
 
+	// 入力制御削除
+	InputManager::DeleteInstance();
+
 	// フレームレート解放
 	delete fps_;
 
@@ -118,14 +127,4 @@ void Application::Delete(void)
 	{
 		isReleaseFail_ = true;
 	}
-}
-
-bool Application::IsInitFail(void) const
-{
-	return isInitFail_;
-}
-
-bool Application::IsReleaseFail(void) const
-{
-	return isReleaseFail_;
 }

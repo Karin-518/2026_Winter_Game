@@ -3,6 +3,7 @@
 #include "../../Common/Collision/Collision.h"
 #include "../SceneManager.h"
 #include "../TitleScene/TitleScene.h"
+
 #include "GameOver.h"
 
 GameOver::GameOver(void)

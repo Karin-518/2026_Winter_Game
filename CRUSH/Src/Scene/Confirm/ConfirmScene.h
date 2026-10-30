@@ -19,20 +19,34 @@ public:
 	// 選択項目のデータ
 	struct MenuData
 	{
-		MENU_TYPE menuType;
-		int graphHandle;
-		RECT rect;
+		MENU_TYPE menuType_;
+		int graphHandle_;
+		RECT rect_;
 	};
 
-	ConfirmScene(void);				// コンストラクタ
-	~ConfirmScene(void) override;	// デストラクタ
+	// コンストラクタ
+	ConfirmScene(void);
+	
+	// デストラクタ
+	~ConfirmScene(void) override;
 
-	void Init(void)	override;		// 初期化
-	void Load(void)	override;		// 読み込み
-	void LoadEnd(void) override;	// 読み込み後の処理
-	void Update(void) override;		// 更新
-	void Draw(void) override;		// 描画
-	void Release(void) override;	// 解放
+	// 初期化
+	void Init(void)	override;
+	
+	// 読み込み
+	void Load(void)	override;
+	
+	// 読み込み後
+	void LoadEnd(void) override;
+	
+	// 更新
+	void Update(void) override;
+	
+	// 描画
+	void Draw(void) override;
+	
+	// 解放
+	void Release(void) override;
 
 private:
 

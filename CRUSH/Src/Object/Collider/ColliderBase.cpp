@@ -24,4 +24,3 @@ VECTOR ColliderBase::GetRotPos(const VECTOR& localPos) const
 
 	return VAdd(*followPos_, localPos);
 }
-

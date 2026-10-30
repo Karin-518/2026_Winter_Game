@@ -1,4 +1,5 @@
 #include "../Model/ColliderModel.h"
+
 #include "ColliderLine.h"
 
 ColliderLine::ColliderLine(TAG tag, const VECTOR* followPos, const VECTOR& localStart, const VECTOR& localEnd)

@@ -1,5 +1,6 @@
 #include <cmath>
 #include <DxLib.h>
+
 #include "AnimationController.h"
 
 AnimationController::AnimationController(int modelId)
