@@ -48,6 +48,9 @@ public:
 	// UŒ‚‚ª“–‚½‚è‚»‚¤‚È‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
 	virtual void OnHit(int damage) {}
 
+	// ©•ª‚ÌUŒ‚‚ª“–‚½‚Á‚½‚ÉŒÄ‚Î‚ê‚é
+	virtual void OnAttackHit(void) {}
+
 	// ‘Ì‚Ì”¼Œa
 	float GetBodyRadius(void) const;
 

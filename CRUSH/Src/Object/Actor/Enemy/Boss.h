@@ -57,7 +57,7 @@ public:
 	void EndAttack(void);
 
 	// ©•ª‚ÌUŒ‚‚ª“–‚½‚Á‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
-	void OnAttackHit(void);
+	void OnAttackHit(void) override;
 
 	// UŒ‚‚Ì”»’è
 	const AttackController& GetAttackController(void) const { return attackController_; }
