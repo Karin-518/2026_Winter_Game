@@ -343,3 +343,8 @@ void Player::MoveForward(float speed)
 	// 方向×スピードで移動量を作って、座標に足して移動
 	pos_ = VAdd(pos_, VScale(moveDir_, speed));
 }
+
+const Hurtbox* Player::GetHurtbox(void) const
+{
+	return hurtbox_.get();
+}

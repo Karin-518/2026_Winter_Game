@@ -6,8 +6,6 @@
 #include "../../Object/Actor/Player/Player.h"
 #include "../../Object/Actor/Enemy/Boss.h"
 #include "../../Object/Actor/Stage/Stage.h"
-#include "../../Object/Common/Attack/AttackParam.h"
-#include "../../Object/Common/Attack/AttackController.h"
 #include "../SceneManager.h"
 #include "../PauseScene/PauseScene.h"
 #include "../TitleScene/TitleScene.h"
@@ -88,6 +86,9 @@ void GameScene::LoadEnd(void)
 
 	// ステージの当たり判定ができた後に登録する
 	RegisterStageCollider();
+
+	// 攻撃と食らい判定を登録
+	RegisterCollision();
 }
 
 void GameScene::Update(void)
@@ -109,8 +110,7 @@ void GameScene::Update(void)
 	boss_->Update();
 
 	// 攻撃の命中
-	ResolvePlayerAttack();
-	ResolveBossAttack();
+	collisionManager_.Update();
 
 	// カメラの更新
 	camera_->Update();
@@ -147,6 +147,9 @@ void GameScene::Draw(void)
 
 void GameScene::Release(void)
 {
+	// 登録を外してから、アクターを消す
+	collisionManager_.Clear();
+
 	// ボス解放
 	boss_->Release();
 	delete boss_;
@@ -203,34 +206,17 @@ bool GameScene::CheckBattleEnd(void)
 	return true;
 }
 
-void GameScene::ResolvePlayerAttack(void)
+void GameScene::RegisterCollision(void)
 {
-	const AttackController& attack = player_->GetAttackController();
+	// 攻撃
+	collisionManager_.AddAttack(&player_->GetAttackController(), player_, ColliderBase::TAG::PLAYER);
+	collisionManager_.AddAttack(&boss_->GetAttackController(), boss_, ColliderBase::TAG::ENEMY);
 
-	// 判定区域外、または1振りで当たった
-	if (!attack.CanHit()) return;
+	// 食らい判定
+	collisionManager_.AddHurtbox(player_->GetHurtbox());
 
-	const ColliderPart* hitPart = boss_->FindHitPart(
-		attack, player_->GetPos(), player_->GetForward());
-	if (hitPart == nullptr) return;
-
-	// ダメージを与えて、当たったことを記憶
-	boss_->OnHit(attack.GetParam()->damage);
-	player_->OnAttackHit();
-}
-
-void GameScene::ResolveBossAttack(void)
-{
-	const AttackController& attack = boss_->GetAttackController();
-
-	// 判定区域外、または1振りで当たった
-	if (!attack.CanHit()) return;
-
-	// 判定の形とプレイヤーの円が重なっていない
-	if (!attack.IsHit(boss_->GetPos(), boss_->GetForward(),
-		player_->GetPos(), player_->GetBodyRadius())) return;
-
-	// ダメージを与えて、当たったことを記憶
-	player_->OnHit(attack.GetParam()->damage);
-	boss_->OnAttackHit();
+	for (const Hurtbox* hurtbox : boss_->GetHurtboxes())
+	{
+		collisionManager_.AddHurtbox(hurtbox);
+	}
 }

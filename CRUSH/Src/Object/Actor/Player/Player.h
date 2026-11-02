@@ -9,6 +9,7 @@
 
 class Camera;
 class PlayerHurtbox;
+class Hurtbox;
 
 class Player : public ActorBase
 {
@@ -70,6 +71,9 @@ public:
 
 	// Œü‚¢‚Ä‚¢‚é•ûŒü‚Öi‚Ş
 	void MoveForward(float speed);
+
+	// H‚ç‚¢”»’è
+	const Hurtbox* GetHurtbox(void) const;
 
 private:
 

@@ -127,19 +127,16 @@ void Boss::OnAttackHit(void)
 	attackController_.NotifyHit();
 }
 
-const ColliderPart* Boss::FindHitPart(const AttackController& attack, const VECTOR& attackerPos, const VECTOR& forward) const
+std::vector<const Hurtbox*> Boss::GetHurtboxes(void) const
 {
-	// UŒ‚”ÍˆÍ‚Ì’†S
-	VECTOR attackCenter = VAdd(attackerPos, VScale(forward, attack.GetParam()->offset));
+	std::vector<const Hurtbox*> hurtboxes;
 
 	for (const auto& part : parts_)
 	{
-		VECTOR closest = part->GetClosestPos(attackCenter);
-
-		if (attack.IsHit(attackerPos, forward, closest, part->GetRadius())) return part.get();
+		hurtboxes.push_back(part.get());
 	}
 
-	return nullptr;
+	return hurtboxes;
 }
 
 void Boss::InitLoad(void)

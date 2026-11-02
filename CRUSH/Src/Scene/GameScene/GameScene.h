@@ -1,6 +1,7 @@
 #pragma once
 #include "../SceneBase.h"
 #include "../../UI/HpBar/HpBar.h"
+#include "../../Object/Collider/CollisionManager.h"
 
 class Camera;
 class Stage;
@@ -55,15 +56,15 @@ private:
 	// ボスのHPバー
 	HpBar bossHpBar_;
 
+	// 攻撃と食らい判定の当たり
+	CollisionManager collisionManager_;
+
 	// ステージの当たり判定を、アクターとカメラに登録する
 	void RegisterStageCollider(void);
 
 	// バトルが終わったかどうか確認
 	bool CheckBattleEnd(void);
 
-	// プレイヤーの攻撃をボスに当てる
-	void ResolvePlayerAttack(void);
-
-	// ボスの攻撃をプレイヤーに当てる
-	void ResolveBossAttack(void);
+	// 攻撃と食らい判定を登録
+	void RegisterCollision(void);
 };

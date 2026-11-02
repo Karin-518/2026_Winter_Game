@@ -62,9 +62,8 @@ public:
 	// UŒ‚‚Ì”»’è
 	const AttackController& GetAttackController(void) const { return attackController_; }
 
-	// UŒ‚‚ª“–‚½‚Á‚½•”ˆÊ‚ğ’T‚·
-	const ColliderPart* FindHitPart(
-		const AttackController& attack, const VECTOR& attackerPos, const VECTOR& forward) const;
+	// •”ˆÊ‚ÌH‚ç‚¢”»’è‚ğ‚Ü‚Æ‚ß‚Äæ“¾
+	std::vector<const Hurtbox*> GetHurtboxes(void) const;
 
 private:
 
