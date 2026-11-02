@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "../ActorBase.h"
 #include "../../Common/State/StateContext.h"
 #include "../../Common/Health/Health.h"
@@ -7,6 +8,7 @@
 #include "State/PlayerState.h"
 
 class Camera;
+class PlayerHurtbox;
 
 class Player : public ActorBase
 {
@@ -85,6 +87,9 @@ private:
 
 	// 攻撃ごとのデータ
 	AttackParam attackParams_[static_cast<int>(ATTACK_ID::MAX)];
+
+	// 食らい判定
+	std::unique_ptr <PlayerHurtbox> hurtbox_;
 
 	// リソースロード
 	void InitLoad(void) override;

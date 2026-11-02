@@ -13,6 +13,7 @@
 #include "State/PlayerAttackState.h"
 #include "State/PlayerDeadState.h"
 #include "State/PlayerDodgeState.h"
+#include "PlayerHurtbox.h"
 
 #include "Player.h"
 
@@ -88,6 +89,9 @@ void Player::Update(void)
 
 	ActorBase::Update();
 
+	// 移動が反映された位置に合わせる
+	hurtbox_->Update();
+
 	// 攻撃の更新
 	attackController_.Update(*animationController_);
 }
@@ -99,6 +103,9 @@ void Player::Draw(void)
 	attackController_.DrawDebug(pos_, GetForward());
 
 #ifdef _DEBUG
+
+	hurtbox_->DrawDebug();
+
 	DrawFormatString(
 		0, 50, 0xffffff,
 		"キャラ角度　 ：(%.1f, %.1f, %.1f)",
@@ -193,6 +200,9 @@ void Player::InitCollider(void)
 	// 体のカプセル(壁判定)
 	bodyCapsule_ = new ColliderCapsule(
 		ColliderBase::TAG::PLAYER, &pos_, START_CAPSULE_POS, END_CAPSULE_POS, CAPSULE_RADIUS);
+
+	// 食らい判定
+	hurtbox_ = std::make_unique<PlayerHurtbox>(this, bodyCapsule_);
 }
 
 void Player::InitAnimation(void)

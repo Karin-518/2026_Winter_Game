@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Actor\Player\PlayerHurtbox.cpp" />
     <ClCompile Include="Src\Object\Collider\CollisionManager.cpp" />
     <ClCompile Include="Src\Object\Actor\Enemy\ColliderPart.cpp" />
     <ClCompile Include="Src\Object\Collider\Hurtbox.cpp" />
@@ -66,6 +67,7 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Actor\Player\PlayerHurtbox.h" />
     <ClInclude Include="Src\Object\Collider\CollisionManager.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\ColliderPart.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\BossPart.h" />
