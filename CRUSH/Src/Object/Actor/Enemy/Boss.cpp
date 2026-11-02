@@ -91,7 +91,7 @@ void Boss::Draw(void)
 
 	for (const auto& part : parts_)
 	{
-		part->Draw();
+		part->DrawDebug();
 	}
 
 #endif //_DEBUG
@@ -217,7 +217,7 @@ void Boss::InitParts(void)
 {
 	for (const auto& param : PART_PARAMS)
 	{
-		parts_.push_back(std::make_unique<ColliderPart>(modelId_, param));
+		parts_.push_back(std::make_unique<ColliderPart>(modelId_, param,this));
 	}
 }
 
