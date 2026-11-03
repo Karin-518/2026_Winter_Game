@@ -23,6 +23,7 @@ public:
 		RUN,
 		ATTACK_1,
 		ROLL,
+		HIT,
 
 		MAX,
 	};
@@ -74,6 +75,12 @@ public:
 
 	// 食らい判定
 	const Hurtbox* GetHurtbox(void) const;
+
+	// のけぞり開始
+	void StartHit(void);
+
+	// 無敵の残り香指定フレームより短ければ延ばす
+	void ExtendInvincible(int frame);
 
 private:
 

@@ -13,6 +13,7 @@
 #include "State/PlayerAttackState.h"
 #include "State/PlayerDeadState.h"
 #include "State/PlayerDodgeState.h"
+#include "State/PlayerHitState.h"
 #include "PlayerHurtbox.h"
 
 #include "Player.h"
@@ -63,6 +64,12 @@ namespace
 
 	// 初期の向き(Y軸、度)
 	constexpr float INIT_ANGLE_DEG_Y = 73.0f;
+
+	// のけぞりのアニメーションの速度
+	constexpr float HIT_ANIMATION_SPEED = 1.5f;
+
+	// のけぞりアニメーションへのブレンドンフレーム数
+	constexpr int HIT_BLEND_FRAME = 4;
 }
 
 Player::Player(Camera* camera)
@@ -151,17 +158,19 @@ void Player::OnHit(int damage)
 	health_.SetInvincible(HIT_INVINCIBLE_FRAME);
 	
 	// のけぞり
-	//state_.RequestState(PLAYER_STATE::HIT);
+	state_.RequestState(PLAYER_STATE::HIT);
 }
 
 void Player::InitLoad(void)
 {
+	// モデル、モデルアニメーションのロード
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_IDLE);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_WALK);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_RUN);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_ATTACK_1);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_ROLL);
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_HIT);
 }
 
 void Player::InitTransform(void)
@@ -210,11 +219,13 @@ void Player::InitAnimation(void)
 	// モデルアニメーション制御の初期化
 	animationController_ = new AnimationController(modelId_);
 
+	// モデルアニメーションの追加
 	AddAnimation(ANIM_TYPE::IDLE, ResourceManager::SRC::PLAYER_ANIM_IDLE, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::WALK, ResourceManager::SRC::PLAYER_ANIM_WALK, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::RUN, ResourceManager::SRC::PLAYER_ANIM_RUN, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::ATTACK_1, ResourceManager::SRC::PLAYER_ANIM_ATTACK_1, ATTACK_ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::ROLL, ResourceManager::SRC::PLAYER_ANIM_ROLL, ROLL_ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::HIT, ResourceManager::SRC::PLAYER_ANIM_HIT, HIT_ANIMATION_SPEED);
 }
 
 void Player::InitPost(void)
@@ -225,6 +236,7 @@ void Player::InitPost(void)
 	state_.Register(PLAYER_STATE::ATTACK, std::make_unique<PlayerAttackState>());
 	state_.Register(PLAYER_STATE::DEAD, std::make_unique<PlayerDeadState>());
 	state_.Register(PLAYER_STATE::DODGE, std::make_unique<PlayerDodgeState>());
+	state_.Register(PLAYER_STATE::HIT, std::make_unique<PlayerHitState>());
 
 	state_.Start(PLAYER_STATE::IDLE);
 
@@ -347,4 +359,19 @@ void Player::MoveForward(float speed)
 const Hurtbox* Player::GetHurtbox(void) const
 {
 	return hurtbox_.get();
+}
+
+void Player::StartHit(void)
+{
+	// のけぞりアニメーションを再生
+	AnimationController::PlayParam playParam;
+	playParam.isLoop = false;
+	playParam.blendFrame = HIT_BLEND_FRAME;
+	playParam.isForce = true;
+	animationController_->Play(static_cast<int>(ANIM_TYPE::HIT), playParam);
+}
+
+void Player::ExtendInvincible(int frame)
+{
+	health_.SetInvincible(frame);
 }

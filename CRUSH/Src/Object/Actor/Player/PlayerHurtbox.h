@@ -10,7 +10,7 @@ public:
 	// コンストラクタ
 	PlayerHurtbox(ActorBase* owner, const ColliderCapsule* bodyCapsule);
 
-	// デストラクタ
+	// �?��トラクタ
 	~PlayerHurtbox(void) override;
 
 	// 更新
@@ -18,6 +18,6 @@ public:
 
 private:
 
-	// 位置を合わせる
+	// 位置を合わせ�?
 	const ColliderCapsule* bodyCapsule_;
 };

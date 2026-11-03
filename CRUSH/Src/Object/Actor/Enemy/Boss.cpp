@@ -225,7 +225,7 @@ void Boss::OnDead(void)
 void Boss::InitAttackParam(void)
 {
 	attackParam_.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
-	attackParam_.damage = 50;
+	attackParam_.damage = 10;
 
 	// ”»’è‚ªo‚é‹æŠÔ
 	attackParam_.hitStart = 15.0f;
