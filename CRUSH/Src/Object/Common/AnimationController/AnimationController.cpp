@@ -20,7 +20,8 @@ AnimationController::AnimationController(int modelId)
 	tempSpeedFrame_(0),
 	preStep_(0.0f),
 	isLooped_(false),
-	loopCount_(0)
+	loopCount_(0),
+	rootFrameIndex_(-1)
 {
 }
 
@@ -99,6 +100,10 @@ void AnimationController::Play(int type, const PlayParam& param)
 	// 再生位置の初期化
 	playAnim_.step = param.startStep;
 	MV1SetAttachAnimTime(modelId_, playAnim_.attachNo, playAnim_.step);
+
+	// 打消しの基準になる再生開始時の腰の位置を覚えておく
+	playAnim_.rootStartPos = GetRootLocalPos(playAnim_);
+
 	preStep_ = playAnim_.step;
 	isLooped_ = false;
 	loopCount_ = 0;
@@ -251,6 +256,30 @@ bool AnimationController::IsInRange(float startTime, float endTime) const
 	return startTime <= playAnim_.step && playAnim_.step <= endTime;
 }
 
+void AnimationController::SetRootFrame(int frameIndex)
+{
+	rootFrameIndex_ = frameIndex;
+}
+
+void AnimationController::SetCancelRootMove(int type)
+{
+	auto it = animations_.find(type);
+	if (it == animations_.end()) return;
+
+	it->second.isCancelRootMove = true;
+}
+
+VECTOR AnimationController::GetRootMove(void) const
+{
+	// ApplyBlendRate と同じ計算で、再生中のアニメの混ざり具合を出す
+	float playWeight = Math::Ease(blendEase_, blendRate_);
+
+	VECTOR playRootMove = VScale(CalcRootMove(playAnim_), playWeight);
+	VECTOR prevRootMove = VScale(CalcRootMove(prevAnim_), 1.0f - playWeight);
+
+	return VAdd(playRootMove, prevRootMove);
+}
+
 void AnimationController::DetachPrev(void)
 {
 	if (prevAnim_.attachNo == -1) return;
@@ -276,4 +305,23 @@ float AnimationController::CalcCurveRate(void) const
 {
 	float t = Math::Ease(playAnim_.curveEase, GetRate());
 	return Math::Lerp(playAnim_.curveStartRate, playAnim_.curveEndRate, t);
+}
+
+VECTOR AnimationController::GetRootLocalPos(const Animation& anim) const
+{
+	// 腰が未設定、またはアタッチされていない
+	if (rootFrameIndex_ == -1) return VGet(0.0f, 0.0f, 0.0f);
+	if (anim.attachNo == -1) return VGet(0.0f, 0.0f, 0.0f);
+
+	return MV1GetAttachAnimFrameLocalPosition(modelId_, anim.attachNo, rootFrameIndex_);
+}
+
+VECTOR AnimationController::CalcRootMove(const Animation& anim) const
+{
+	// 打ち消さないアニメ、腰が未設定、アタッチされていない
+	if (!anim.isCancelRootMove) return VGet(0.0f, 0.0f, 0.0f);
+	if (rootFrameIndex_ == -1) return VGet(0.0f, 0.0f, 0.0f);
+	if (anim.attachNo == -1) return VGet(0.0f, 0.0f, 0.0f);
+
+	return VSub(GetRootLocalPos(anim), anim.rootStartPos);
 }

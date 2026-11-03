@@ -88,11 +88,11 @@ void ActorBase::Update(void)
 	CollisionWall();
 	CollisionGround();
 
-	// モデルに座標を設定する
-	MV1SetPosition(modelId_, pos_);
-
 	// アニメーションの更新
 	animationController_->Update();
+
+	// モデルに座標を設定
+	ApplyModelPos();
 }
 
 void ActorBase::Draw(void)
@@ -199,4 +199,32 @@ void ActorBase::ReleaseCollider(void)
 
 	groundModels_.clear();
 	wallModels_.clear();
+}
+
+void ActorBase::ApplyModelPos(void)
+{
+	VECTOR rootMoveLocal = animationController_->GetRootMove();
+
+	// 腰の親フレームの向き・大きさで、ワールドでの移動量に直す
+	VECTOR rootMoveWorld = VTransformSR(rootMoveLocal, CalcRootParentMatrix());
+
+	// 上下の動きは見た目に残す
+	rootMoveWorld.y = 0.0f;
+
+	MV1SetPosition(modelId_, VSub(pos_, rootMoveWorld));
+}
+
+MATRIX ActorBase::CalcRootParentMatrix(void) const
+{
+	int rootFrameIndex = animationController_->GetRootFrame();
+
+	// 腰が未設定なら、モデル全体の行列
+	if (rootFrameIndex == -1) return MV1GetLocalWorldMatrix(modelId_);
+
+	int parentFrameIndex = MV1GetFrameParent(modelId_, rootFrameIndex);
+
+	// 腰に親がないなら、モデル全体の行列
+	if (parentFrameIndex < 0) return MV1GetLocalWorldMatrix(modelId_);
+
+	return MV1GetFrameLocalWorldMatrix(modelId_, parentFrameIndex);
 }

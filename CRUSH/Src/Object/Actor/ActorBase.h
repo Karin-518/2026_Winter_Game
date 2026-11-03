@@ -140,4 +140,10 @@ private:
 
 	// 当たり判定の解放
 	void ReleaseCollider(void);
+
+	// モデルに座標を設定
+	void ApplyModelPos(void);
+
+	// 腰の親フレームの行列
+	MATRIX CalcRootParentMatrix(void) const;
 };

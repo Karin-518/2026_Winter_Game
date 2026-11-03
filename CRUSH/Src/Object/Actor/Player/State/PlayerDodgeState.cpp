@@ -11,7 +11,7 @@ namespace
     constexpr int INVINCIBLE_FRAME = 15;
 
     // ‰ñ”ð‚Ì‘¬‚³
-    constexpr float DODGE_SPEED = 10.0f;
+    constexpr float DODGE_SPEED = 8.0f;
 }
 
 void PlayerDodgeState::Enter(Player& owner)

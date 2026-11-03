@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <DxLib.h>
 #include "../../../Common/Math/Math.h"
 
 class AnimationController
@@ -22,6 +23,9 @@ public:
 		float curveStartRate = 1.0f;		// 開始倍率
 		float curveEndRate = 1.0f;			// 終了倍率
 		Math::EASE_TYPE curveEase = Math::EASE_TYPE::LINEAR;	// 速度カーブ
+
+		bool isCancelRootMove = false;	// 腰の前進を打ち消すか
+		VECTOR rootStartPos = {};		// 再生をはじめたときの腰の位置
 	};
 
 	// 再生時の設定
@@ -102,6 +106,18 @@ public:
 	// 再生中のアニメーション情報を取得
 	const Animation& GetPlayAnim(void) const { return playAnim_; }
 
+	// 腰のフレームを設定
+	void SetRootFrame(int frameIndex);
+
+	// 腰のフレームを取得
+	int GetRootFrame(void) const { return rootFrameIndex_; }
+
+	// 腰の全身を打ち消すアニメを設定
+	void SetCancelRootMove(int type);
+
+	// アニメが腰を動かした量
+	VECTOR GetRootMove(void) const;
+
 private:
 
 	// アニメーションするモデルのハンドルID
@@ -152,6 +168,9 @@ private:
 	// ループ回数
 	int loopCount_;
 
+	// 腰のフレーム番号
+	int rootFrameIndex_;
+
 	// 追加の共通処理
 	void Register(int type, float speed, Animation animation);
 
@@ -181,4 +200,10 @@ private:
 
 	// 速度カーブの倍率
 	float CalcCurveRate(void) const;
+
+	// 今の再生位置での腰の位置
+	VECTOR GetRootLocalPos(const Animation& anim) const;
+
+	// 1つのアニメが再生を始めてから腰を動かした量
+	VECTOR CalcRootMove(const Animation& anim) const;
 };

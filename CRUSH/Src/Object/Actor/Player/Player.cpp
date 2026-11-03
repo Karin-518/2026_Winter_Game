@@ -73,6 +73,9 @@ namespace
 
 	// 剣を持たせる手のフレーム名
 	constexpr TCHAR HAND_FRAME_NAME[] = _T("mixamorig:RightHand");
+
+	// 腰のフレーム名
+	constexpr TCHAR ROOT_FRAME_NAME[] = _T("mixamorig:Hips");
 }
 
 Player::Player(Camera* camera)
@@ -241,6 +244,10 @@ void Player::InitAnimation(void)
 	AddAnimation(ANIM_TYPE::ATTACK_1, ResourceManager::SRC::PLAYER_ANIM_ATTACK_1, ATTACK_ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::ROLL, ResourceManager::SRC::PLAYER_ANIM_ROLL, ROLL_ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::HIT, ResourceManager::SRC::PLAYER_ANIM_HIT, HIT_ANIMATION_SPEED);
+
+	// 回避アニメの前進を打ち消す
+	animationController_->SetRootFrame(MV1SearchFrame(modelId_, ROOT_FRAME_NAME));
+	animationController_->SetCancelRootMove(static_cast<int>(ANIM_TYPE::ROLL));
 }
 
 void Player::InitPost(void)
