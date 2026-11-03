@@ -6,6 +6,7 @@
 #include "../../Common/Health/Health.h"
 #include "../../Common/Attack/AttackController.h"
 #include "../../Common/Attack/AttackParam.h"
+#include "BossAttackSelector.h"
 #include "State/BossState.h"
 #include "ColliderPart.h"
 
@@ -65,6 +66,9 @@ public:
 	// 部位の食らい判定をまとめて取得
 	std::vector<const Hurtbox*> GetHurtboxes(void) const;
 
+	// 攻撃を選ぶ
+	bool SelectAttack(void);
+
 private:
 
 	// プレイヤー
@@ -80,7 +84,13 @@ private:
 	AttackController attackController_;
 
 	// 攻撃ごとのデータ
-	AttackParam attackParam_;
+	AttackParam attackParams_[static_cast<int>(BOSS_ATTACK_ID::MAX)];
+
+	// 攻撃を決めるセレクター
+	BossAttackSelector attackSelector_;
+
+	// 次に出す攻撃
+	BOSS_ATTACK_ID nextAttackId_;
 
 	// 部位の当たり判定
 	std::vector<std::unique_ptr<ColliderPart>> parts_;
@@ -111,4 +121,7 @@ private:
 
 	// プレイヤーの方向を見る
 	void FacePlayer(void);
+
+	// プレイヤーとボスとの距離を測る
+	float CalcDistanceToPlayer(void) const;
 };

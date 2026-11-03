@@ -1,5 +1,6 @@
 #include <memory>
 #include <cmath>
+#include <limits>
 #include "../../../Common/Math/Math.h"
 #include "../../../Common/Math/MatrixUtility.h"
 #include "../../../Resource/ResourceManager.h"
@@ -49,13 +50,23 @@ namespace
 		{ BOSS_PART::WING_L, "WingRing01_L", "WingRing05_L", 70.0f, 0.0f },
 		{ BOSS_PART::WING_R, "WingRing01_R", "WingRing05_R", 70.0f, 0.0f },
 	};
+
+	// 近距離とみなす半径
+	constexpr float NEAR_RADIUS = 900.0f;
+
+	// 長距離とみなす半径
+	constexpr float FAR_RADIUS = 3000.0f;
 }
 
 Boss::Boss(Player* player)
 	:
 	player_(player),
 	health_(),
-	state_(*this)
+	state_(*this),
+	attackController_(),
+	attackParams_(),
+	attackSelector_(),
+	nextAttackId_(BOSS_ATTACK_ID::NONE)
 {
 }
 
@@ -74,6 +85,9 @@ void Boss::Update(void)
 	{
 		part->Update();
 	}
+
+	// 重みの回復
+	attackSelector_.Update();
 
 	// 攻撃の更新
 	attackController_.Update(*animationController_);
@@ -94,6 +108,7 @@ void Boss::Draw(void)
 		part->DrawDebug();
 	}
 
+	attackSelector_.DrawDebug();
 #endif //_DEBUG
 }
 
@@ -104,6 +119,12 @@ void Boss::OnHit(int damage)
 
 void Boss::StartAttack(void)
 {
+	// 攻撃が選ばれていなければ何もしない
+	if (nextAttackId_ == BOSS_ATTACK_ID::NONE) return;
+
+	// 使う攻撃のデータ
+	const AttackParam& param = attackParams_[static_cast<int>(nextAttackId_)];
+
 	// プレイヤーの方向
 	FacePlayer();
 
@@ -112,9 +133,9 @@ void Boss::StartAttack(void)
 	playParam.isLoop = false;
 	playParam.blendFrame = 10;
 	playParam.isForce = true;
-	animationController_->Play(static_cast<int>(ANIM_TYPE::ATTACK_BITE), playParam);
+	animationController_->Play(param.animType, playParam);
 
-	attackController_.Start(attackParam_);
+	attackController_.Start(param);
 }
 
 void Boss::EndAttack(void)
@@ -137,6 +158,19 @@ std::vector<const Hurtbox*> Boss::GetHurtboxes(void) const
 	}
 
 	return hurtboxes;
+}
+
+bool Boss::SelectAttack(void)
+{
+	// 距離を測る
+	float distance = CalcDistanceToPlayer();
+
+	// 攻撃を選択
+	nextAttackId_ = attackSelector_.Select(distance);
+
+	if (nextAttackId_ != BOSS_ATTACK_ID::NONE) return true;
+
+	return false;
 }
 
 void Boss::InitLoad(void)
@@ -208,6 +242,9 @@ void Boss::InitPost(void)
 
 	// 攻撃パラメータの設定
 	InitAttackParam();
+
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 70.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, 0.0f, NEAR_RADIUS, 70.0f);
 }
 
 void Boss::InitParts(void)
@@ -224,18 +261,34 @@ void Boss::OnDead(void)
 
 void Boss::InitAttackParam(void)
 {
-	attackParam_.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
-	attackParam_.damage = 10;
+	AttackParam& bite = attackParams_[static_cast<int>(BOSS_ATTACK_ID::BITE)];
+	bite.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
+	bite.damage = 10;
 
 	// 判定が出る区間
-	attackParam_.hitStart = 15.0f;
-	attackParam_.hitEnd = 20.0f;
+	bite.hitStart = 15.0f;
+	bite.hitEnd = 20.0f;
 
 	// 判定の形
-	attackParam_.shape = HIT_SHAPE::RECT;
-	attackParam_.offset = 500.0f;
-	attackParam_.length = 300.0f;
-	attackParam_.width = 100.0f;
+	bite.shape = HIT_SHAPE::RECT;
+	bite.offset = 500.0f;
+	bite.length = 300.0f;
+	bite.width = 100.0f;
+
+
+	AttackParam& rush = attackParams_[static_cast<int>(BOSS_ATTACK_ID::RUSH)];
+	rush.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
+	rush.damage = 10;
+
+	// 判定が出る区間
+	rush.hitStart = 15.0f;
+	rush.hitEnd = 20.0f;
+
+	// 判定の形
+	rush.shape = HIT_SHAPE::RECT;
+	rush.offset = 500.0f;
+	rush.length = 300.0f;
+	rush.width = 100.0f;
 }
 
 void Boss::FacePlayer(void)
@@ -254,4 +307,18 @@ void Boss::FacePlayer(void)
 
 	// 向きを変える
 	moveDir_ = VNorm(dir);
+}
+
+float Boss::CalcDistanceToPlayer(void) const
+{
+	// プレイヤーがいなければ、どの攻撃も届かない遠いところを設定する
+	if (player_ == nullptr) return (std::numeric_limits<float>::max)();
+
+	VECTOR playerPos = player_->GetPos();
+	VECTOR bossPos = pos_;
+
+	// XZで距離を出すため、Y軸は0.0ｆにする
+	playerPos.y = bossPos.y = 0.0f;
+
+	return Math::Distance(playerPos, bossPos);
 }

@@ -22,11 +22,14 @@ BOSS_STATE BossIdleState::Update(Boss& owner)
 {
     frame_++;
 
-    // 待機時間に達したら、攻撃ステートへ遷移
-    if (frame_ >= WAIT_FRAME)
-    {
-        return BOSS_STATE::ATTACK;
-    }
+    // 待機時間に達していなければ、待ち続ける
+    if (frame_ < WAIT_FRAME) return BOSS_STATE::NONE;
+
+    // 攻撃を選べたら、攻撃ステートへ
+    if (owner.SelectAttack()) return BOSS_STATE::ATTACK;
+
+    // 届く攻撃がなければ、もう一度待つ
+    frame_ = 0;
 
     // 何もなければ、切り替えない
     return BOSS_STATE::NONE;
