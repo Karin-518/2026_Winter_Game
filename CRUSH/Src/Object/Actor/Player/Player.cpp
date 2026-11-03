@@ -70,15 +70,19 @@ namespace
 
 	// のけぞりアニメーションへのブレンドンフレーム数
 	constexpr int HIT_BLEND_FRAME = 4;
+
+	// 剣を持たせる手のフレーム名
+	constexpr TCHAR HAND_FRAME_NAME[] = _T("mixamorig:RightHand");
 }
 
 Player::Player(Camera* camera)
 	:
 	camera_(camera),
 	health_(),
+	attackController_(),
 	state_(*this),
 	attackParams_(),
-	attackController_()
+	weapon_()
 {
 }
 
@@ -99,6 +103,9 @@ void Player::Update(void)
 	// 移動が反映された位置に合わせる
 	hurtbox_->Update();
 
+	// 反映された手の位置に合わせる
+	weapon_.Update();
+
 	// 攻撃の更新
 	attackController_.Update(*animationController_);
 }
@@ -107,9 +114,12 @@ void Player::Draw(void)
 {
 	ActorBase::Draw();
 
-	attackController_.DrawDebug(pos_, GetForward());
+	// 剣の描画
+	weapon_.Draw();
 
 #ifdef _DEBUG
+
+	attackController_.DrawDebug(pos_, GetForward());
 
 	hurtbox_->DrawDebug();
 
@@ -163,8 +173,13 @@ void Player::OnHit(int damage)
 
 void Player::InitLoad(void)
 {
-	// モデル、モデルアニメーションのロード
+	// モデルのロード
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER);
+
+	// 剣のロード
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_SWORD);
+
+	// モデルアニメーションのロード
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_IDLE);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_WALK);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_RUN);
@@ -246,6 +261,9 @@ void Player::InitPost(void)
 
 	// 攻撃パラメータの設定
 	InitAttackParam();
+
+	// 剣を右手に持たせる
+	weapon_.Init(modelId_, HAND_FRAME_NAME);
 }
 
 void Player::OnDead(void)

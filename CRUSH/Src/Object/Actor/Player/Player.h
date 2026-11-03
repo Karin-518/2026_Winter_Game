@@ -6,6 +6,7 @@
 #include "../../Common/Attack/AttackController.h"
 #include "../../Common/Attack/AttackParam.h"
 #include "State/PlayerState.h"
+#include "PlayerWeapon.h"
 
 class Camera;
 class PlayerHurtbox;
@@ -98,6 +99,9 @@ private:
 
 	// 攻撃ごとのデータ
 	AttackParam attackParams_[static_cast<int>(ATTACK_ID::MAX)];
+
+	// 剣
+	PlayerWeapon weapon_;
 
 	// 食らい判定
 	std::unique_ptr <PlayerHurtbox> hurtbox_;

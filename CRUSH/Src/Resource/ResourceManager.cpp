@@ -25,6 +25,10 @@ void ResourceManager::Init(void)
 {
 	// プレイヤーモデル
 	Register(SRC::PLAYER, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Warrior.mv1");
+
+	// プレイヤーの剣モデル
+	Register(SRC::PLAYER_SWORD, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/sword.mv1");
+
 	// プレイヤーのアニメーション
 	Register(SRC::PLAYER_ANIM_IDLE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Idle.mv1");
 	Register(SRC::PLAYER_ANIM_WALK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Walk.mv1");
@@ -40,7 +44,6 @@ void ResourceManager::Init(void)
 	Register(SRC::STAGE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Stage/Stage.mv1");
 
 	Register(SRC::TITLE_LOGO, Resource::TYPE::IMG, Application::PATH_IMAGE + "CRUSHLOGO.png");
-
 }
 
 void ResourceManager::Release(void)
