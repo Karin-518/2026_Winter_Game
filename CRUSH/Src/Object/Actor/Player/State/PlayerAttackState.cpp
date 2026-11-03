@@ -6,7 +6,7 @@
 
 void PlayerAttackState::Enter(Player& owner)
 {
-	owner.StartAttack(ATTACK_ID::SLASH_1);
+	owner.StartAttack(PLAYER_ATTACK_ID::SLASH_1);
 }
 
 PLAYER_STATE PlayerAttackState::Update(Player& owner)

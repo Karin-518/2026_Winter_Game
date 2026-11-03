@@ -1,11 +1,12 @@
 #pragma once
 #include <memory>
-#include "../ActorBase.h"
 #include "../../Common/State/StateContext.h"
 #include "../../Common/Health/Health.h"
 #include "../../Common/Attack/AttackController.h"
 #include "../../Common/Attack/AttackParam.h"
+#include "../ActorBase.h"
 #include "State/PlayerState.h"
+#include "PlayerAttackType.h"
 #include "PlayerWeapon.h"
 
 class Camera;
@@ -57,7 +58,7 @@ public:
 	bool IsDead(void) const { return state_.GetStateId() == PLAYER_STATE::DEAD; }
 
 	// 攻撃開始
-	void StartAttack(ATTACK_ID id);
+	void StartAttack(PLAYER_ATTACK_ID id);
 
 	// 攻撃終了
 	void EndAttack(void);
@@ -98,7 +99,7 @@ private:
 	StateContext<Player, PLAYER_STATE> state_;
 
 	// 攻撃ごとのデータ
-	AttackParam attackParams_[static_cast<int>(ATTACK_ID::MAX)];
+	AttackParam attackParams_[static_cast<int>(PLAYER_ATTACK_ID::MAX)];
 
 	// 剣
 	PlayerWeapon weapon_;

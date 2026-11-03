@@ -1,14 +1,5 @@
 #pragma once
 
-// 攻撃の種類
-enum class ATTACK_ID
-{
-	SLASH_1,
-	SLASH_2,
-
-	MAX
-};
-
 // 判定の形
 enum class HIT_SHAPE
 {
@@ -19,9 +10,6 @@ enum class HIT_SHAPE
 // 攻撃ごとのデータ
 struct AttackParam
 {
-	// 攻撃の種類
-	ATTACK_ID attackId = ATTACK_ID::SLASH_1;
-
 	// ダメージ量
 	int damage = 0;
 

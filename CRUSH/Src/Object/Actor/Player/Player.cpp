@@ -281,8 +281,7 @@ void Player::OnDead(void)
 
 void Player::InitAttackParam(void)
 {
-	AttackParam& slash1 = attackParams_[static_cast<int>(ATTACK_ID::SLASH_1)];
-	slash1.attackId = ATTACK_ID::SLASH_1;
+	AttackParam& slash1 = attackParams_[static_cast<int>(PLAYER_ATTACK_ID::SLASH_1)];
 	slash1.damage = 100;
 	slash1.animType = static_cast<int>(ANIM_TYPE::ATTACK_1);
 
@@ -333,7 +332,7 @@ void Player::FaceInputDir(void)
 	angle_.y = atan2f(moveDir_.x, moveDir_.z);
 }
 
-void Player::StartAttack(ATTACK_ID id)
+void Player::StartAttack(PLAYER_ATTACK_ID id)
 {
 	const AttackParam& param = attackParams_[static_cast<int>(id)];
 
