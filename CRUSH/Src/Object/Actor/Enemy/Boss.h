@@ -22,6 +22,7 @@ public:
 	{
 		IDLE,
 		WALK,
+		RUN,
 		ATTACK_BITE,	// Šš‚Ý‚Â‚«
 
 		MAX,

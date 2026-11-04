@@ -52,9 +52,6 @@ private:
 	// 無敵の残りフレーム
 	int invincibleFrame_;
 
-	// 半分以下を通知したか
-	bool isHalfNotified_;
-
 	// HPが0になったときの通知先
 	std::function<void(void)> onDead_;
 

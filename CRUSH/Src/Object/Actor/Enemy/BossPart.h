@@ -7,8 +7,6 @@ enum class BOSS_PART
 	HEAD,
 	BODY,
 	TAIL,
-	WING_L,
-	WING_R,
 };
 
 // ボスの部位種類のパラメータ

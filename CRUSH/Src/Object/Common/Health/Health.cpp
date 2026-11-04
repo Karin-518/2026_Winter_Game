@@ -4,8 +4,7 @@ Health::Health(void)
 	:
 	hp_(0),
 	maxHp_(0),
-	invincibleFrame_(0),
-	isHalfNotified_(false)
+	invincibleFrame_(0)
 {
 }
 
@@ -14,7 +13,6 @@ void Health::Init(int maxHp)
 	maxHp_ = maxHp;
 	hp_ = maxHp_;
 	invincibleFrame_ = 0;
-	isHalfNotified_ = false;
 }
 
 void Health::Update(void)
