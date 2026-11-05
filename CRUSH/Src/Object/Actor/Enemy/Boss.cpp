@@ -13,6 +13,7 @@
 #include "State/BossDeadState.h"
 #include "Action/BossBiteAction.h"
 #include "Action/BossRushAction.h"
+#include "Action/BossTailSpinAction.h"
 
 #include "Boss.h"
 
@@ -116,9 +117,9 @@ void Boss::Draw(void)
 #endif //_DEBUG
 }
 
-void Boss::OnHit(int damage)
+bool Boss::OnHit(int damage)
 {
-	health_.Damage(damage);
+	return health_.Damage(damage);
 }
 
 bool Boss::IsDead(void) const
@@ -265,6 +266,7 @@ void Boss::InitPost(void)
 	InitAttackParam();
 
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 50.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_SPIN, 0.0f, NEAR_RADIUS, 30.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 40.0f);
 }
 
@@ -319,9 +321,27 @@ void Boss::InitAttackParam(void)
 	rush.recoveryFrame = 50;
 	rush.isManualActive = true;
 
+	AttackParam& tailSpin = attackParams_[static_cast<int>(BOSS_ATTACK_ID::TAIL_SPIN)];
+	tailSpin.animType = static_cast<int>(ANIM_TYPE::IDLE);
+	tailSpin.damage = 20;
+
+	// îªíËÇÃå`
+	tailSpin.shape = HIT_SHAPE::FAN;
+	tailSpin.offset = 0.0f;
+	tailSpin.length = 900.0f;
+	tailSpin.halfAngleDeg = 180.0f;
+
+	// ó≠ÇﬂÇ∆åÑ
+	tailSpin.windupFrame = 50;
+	tailSpin.windupAnimRate = 1.0f;
+	tailSpin.recoveryFrame = 60;
+	tailSpin.isManualActive = true;
+
 	// çUåÇÇ≤Ç∆ÇÃìÆÇ´
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::BITE)] = std::make_unique<BossBiteAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::RUSH)] = std::make_unique<BossRushAction>();
+	attackActions_[static_cast<int>(BOSS_ATTACK_ID::TAIL_SPIN)] = std::make_unique<BossTailSpinAction>();
+
 }
 
 void Boss::FacePlayer(void)
@@ -354,4 +374,10 @@ float Boss::CalcDistanceToPlayer(void) const
 	playerPos.y = bossPos.y = 0.0f;
 
 	return Math::Distance(playerPos, bossPos);
+}
+
+void Boss::RotateMoveDir(float addRad)
+{
+	// à⁄ìÆï˚å¸ÇYé≤Ç‹ÇÌÇËÇ…âÒÇ∑
+	moveDir_ = VTransform(moveDir_, MGetRotY(addRad));
 }

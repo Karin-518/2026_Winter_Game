@@ -159,19 +159,20 @@ void Player::MoveByInput(float speed)
 	pos_ = VAdd(pos_, VScale(moveDir_, speed));
 }
 
-void Player::OnHit(int damage)
+bool Player::OnHit(int damage)
 {
 	// ダメージが通らなかったら何もしない
-	if (!health_.Damage(damage)) return;
+	if (!health_.Damage(damage)) return false;
 
 	// 倒れたら、のけぞらない
-	if (health_.IsDead()) return;
+	if (health_.IsDead()) return true;
 
 	// 無敵
 	health_.SetInvincible(HIT_INVINCIBLE_FRAME);
 	
 	// のけぞり
 	state_.RequestState(PLAYER_STATE::HIT);
+	return true;
 }
 
 bool Player::IsDead(void) const

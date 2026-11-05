@@ -53,7 +53,7 @@ public:
 	const Health& GetHealth(void) { return health_; }
 
 	// UŒ‚‚ª“–‚½‚è‚»‚¤‚È‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
-	void OnHit(int damage) override;
+	bool OnHit(int damage) override;
 
 	// “|‚ê‚½‚©
 	bool IsDead(void) const;

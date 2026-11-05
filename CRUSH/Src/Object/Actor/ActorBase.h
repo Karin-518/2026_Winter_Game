@@ -46,7 +46,7 @@ public:
 	void AddWallModel(const ColliderModel* model);
 
 	// UŒ‚‚ª“–‚½‚è‚»‚¤‚È‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
-	virtual void OnHit(int damage) {}
+	virtual bool OnHit(int damage) { return false; }
 
 	// ©•ª‚ÌUŒ‚‚ª“–‚½‚Á‚½‚ÉŒÄ‚Î‚ê‚é
 	virtual void OnAttackHit(void) {}

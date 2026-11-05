@@ -51,8 +51,11 @@ void CollisionManager::CheckAttack(const AttackEntry& entry)
 		if (!IsTarget(entry, *hurtbox)) continue;
 		if (!IsOverlap(entry, *hurtbox)) continue;
 
-		// 当たった側と、攻撃した側に知らせる
-		hurtbox->GetOwner()->OnHit(entry.attack_->GetParam()->damage);
+		// 当たった側に知らせる
+		bool isDamaged = hurtbox->GetOwner()->OnHit(entry.attack_->GetParam()->damage);
+		if (!isDamaged) continue;
+
+		// 攻撃した側に知らせる
 		entry.owner_->OnAttackHit();
 
 		// 1振りで当たるのは1回

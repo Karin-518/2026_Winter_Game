@@ -48,7 +48,7 @@ public:
 	const Health& GetHealth(void) { return health_; }
 
 	// 攻撃が当たりそうなときに呼ばれる
-	void OnHit(int damage) override;
+	bool OnHit(int damage) override;
 
 	// 倒れたか
 	bool IsDead(void) const;
@@ -85,6 +85,9 @@ public:
 
 	// プレイヤーとボスとの距離を測る
 	float CalcDistanceToPlayer(void) const;
+
+	// 回転
+	void RotateMoveDir(float addRad);
 
 protected:
 

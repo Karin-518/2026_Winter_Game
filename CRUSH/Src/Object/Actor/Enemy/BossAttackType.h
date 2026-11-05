@@ -7,6 +7,7 @@ enum class BOSS_ATTACK_ID
 
 	BITE,		// 噛みつき（近距離）
 	RUSH,		// 突進（中～遠距離）
+	TAIL_SPIN,	// 尻尾回転（近距離）
 
 	MAX
 };
