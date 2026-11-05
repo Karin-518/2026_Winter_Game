@@ -8,10 +8,10 @@
 #include "../../Common/Attack/AttackParam.h"
 #include "BossAttackSelector.h"
 #include "State/BossState.h"
+#include "Action/BossAttackAction.h"
 #include "ColliderPart.h"
 
 class Player;
-class BossPart;
 
 class Boss : public ActorBase
 {
@@ -71,6 +71,32 @@ public:
 	// 攻撃を選ぶ
 	bool SelectAttack(void);
 
+	// 攻撃判定のオン・オフ
+	void SetAttackActive(bool isActive);
+
+	// 今の攻撃データ
+	const AttackParam& GetCurrentAttackParam(void) const { return attackParams_[static_cast<int>(nextAttackId_)]; }
+
+	// 今の攻撃の動き
+	BossAttackAction* GetCurrentAction(void) const { return attackActions_[static_cast<int>(nextAttackId_)].get(); }
+
+protected:
+
+	// リソースロード
+	void InitLoad(void) override;
+
+	// 大きさ、回転、座標の初期化
+	void InitTransform(void) override;
+
+	// アニメーションの初期化
+	void InitAnimation(void) override;
+
+	// 当たり判定の作成
+	void InitCollider(void) override;
+
+	// 初期化後の個別処理
+	void InitPost(void) override;
+
 private:
 
 	// プレイヤー
@@ -88,6 +114,9 @@ private:
 	// 攻撃ごとのデータ
 	AttackParam attackParams_[static_cast<int>(BOSS_ATTACK_ID::MAX)];
 
+	// 攻撃ごとの動き
+	std::unique_ptr<BossAttackAction> attackActions_[static_cast<int>(BOSS_ATTACK_ID::MAX)];
+
 	// 攻撃を決めるセレクター
 	BossAttackSelector attackSelector_;
 
@@ -96,21 +125,6 @@ private:
 
 	// 部位の当たり判定
 	std::vector<std::unique_ptr<ColliderPart>> parts_;
-
-	// リソースロード
-	void InitLoad(void) override;
-
-	// 大きさ、回転、座標の初期化
-	void InitTransform(void) override;
-
-	// アニメーションの初期化
-	void InitAnimation(void) override;
-
-	// 当たり判定の作成
-	void InitCollider(void) override;
-
-	// 初期化後の個別処理
-	void InitPost(void) override;
 
 	// 部位の初期化
 	void InitParts(void);

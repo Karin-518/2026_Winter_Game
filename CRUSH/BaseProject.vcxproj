@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Actor\Enemy\Action\BossBiteAction.cpp" />
     <ClCompile Include="Src\Object\Actor\Enemy\State\BossDeadState.cpp" />
     <ClCompile Include="Src\Object\Actor\Enemy\BossAttackSelector.cpp" />
     <ClCompile Include="Src\Object\Actor\Player\PlayerWeapon.cpp" />
@@ -71,6 +72,8 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Actor\Enemy\Action\BossBiteAction.h" />
+    <ClInclude Include="Src\Object\Actor\Enemy\Action\BossAttackAction.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\State\BossDeadState.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\BossAttackSelector.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\BossAttackType.h" />

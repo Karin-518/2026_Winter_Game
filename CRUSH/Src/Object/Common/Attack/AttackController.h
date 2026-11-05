@@ -26,6 +26,9 @@ public:
 	// 判定区画かどうかを更新
 	void Update(const AnimationController& anim);
 
+	// 判定のオンオフを外から決める
+	void SetActive(bool isActive) { manualActive_ = isActive; }
+
 	// このフレームで当てていいか
 	bool CanHit(void) const;
 
@@ -56,6 +59,9 @@ private:
 
 	// 1振りで当たったか
 	bool hasHit_;
+
+	// 外から指定された判定のオン・オフ
+	bool manualActive_;
 
 	// 判定の根元
 	VECTOR CalcOrigin(const VECTOR& ownerPos, const VECTOR& forward) const;

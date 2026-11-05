@@ -82,6 +82,23 @@ public:
 	// 無敵の残り香指定フレームより短ければ延ばす
 	void ExtendInvincible(int frame);
 
+protected:
+
+	// リソースロード
+	void InitLoad(void) override;
+
+	// 大きさ、回転、座標の初期化
+	void InitTransform(void) override;
+
+	// 当たり判定の作成
+	void InitCollider(void) override;
+
+	// アニメーションの初期化
+	void InitAnimation(void) override;
+
+	// 初期化後の個別処理
+	void InitPost(void) override;
+
 private:
 
 	// カメラ
@@ -104,21 +121,6 @@ private:
 
 	// 食らい判定
 	std::unique_ptr <PlayerHurtbox> hurtbox_;
-
-	// リソースロード
-	void InitLoad(void) override;
-
-	// 大きさ、回転、座標の初期化
-	void InitTransform(void) override;
-
-	// 当たり判定の作成
-	void InitCollider(void) override;
-
-	// アニメーションの初期化
-	void InitAnimation(void) override;
-
-	// 初期化後の個別処理
-	void InitPost(void) override;
 
 	// HPが0になったときに呼ぶ
 	void OnDead(void);

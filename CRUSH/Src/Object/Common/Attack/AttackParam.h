@@ -34,4 +34,16 @@ struct AttackParam
 
 	// 半分の角度
 	float halfAngleDeg = 0.0f;
+
+	// trueなら、アニメの区間を見ずにSetActiveで判定を出す
+	bool isManualActive = false;
+
+	// 溜めの長さ
+	int windupFrame = 0;
+
+	// 溜めの中のアニメの速さ
+	float windupAnimRate = 1.0f;
+
+	// 攻撃後の隙
+	int recoveryFrame = 0;
 };

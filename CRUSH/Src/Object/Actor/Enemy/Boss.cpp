@@ -11,6 +11,7 @@
 #include "State/BossIdleState.h"
 #include "State/BossAttackState.h"
 #include "State/BossDeadState.h"
+#include "Action/BossBiteAction.h"
 
 #include "Boss.h"
 
@@ -100,7 +101,7 @@ void Boss::Draw(void)
 	// デバッグ表示
 	DrawFormatString(0, 130, 0xffffff, "ボスHP：%d / %d", health_.GetHp(), health_.GetMaxHp());
 
-	//attackController_.DrawDebug(pos_, GetForward());
+	attackController_.DrawDebug(pos_, GetForward());
 
 	for (const auto& part : parts_)
 	{
@@ -184,6 +185,11 @@ bool Boss::SelectAttack(void)
 	return false;
 }
 
+void Boss::SetAttackActive(bool isActive)
+{
+	attackController_.SetActive(isActive);
+}
+
 void Boss::InitLoad(void)
 {
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::BOSS);
@@ -258,7 +264,7 @@ void Boss::InitPost(void)
 	InitAttackParam();
 
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 50.0f);
-	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, 0.0f, NEAR_RADIUS, 40.0f);
+	//attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, 0.0f, NEAR_RADIUS, 40.0f);
 }
 
 void Boss::InitParts(void)
@@ -291,6 +297,11 @@ void Boss::InitAttackParam(void)
 	bite.length = 300.0f;
 	bite.width = 100.0f;
 
+	// 溜めと隙
+	bite.windupFrame = 80;
+	bite.windupAnimRate = 0.2f;
+	bite.recoveryFrame = 30;
+
 	AttackParam& rush = attackParams_[static_cast<int>(BOSS_ATTACK_ID::RUSH)];
 	rush.animType = static_cast<int>(ANIM_TYPE::RUN);
 	rush.damage = 10;
@@ -304,6 +315,9 @@ void Boss::InitAttackParam(void)
 	rush.offset = 500.0f;
 	rush.length = 300.0f;
 	rush.width = 100.0f;
+
+	// 攻撃ごとの動き
+	attackActions_[static_cast<int>(BOSS_ATTACK_ID::BITE)] = std::make_unique<BossBiteAction>();
 }
 
 void Boss::FacePlayer(void)

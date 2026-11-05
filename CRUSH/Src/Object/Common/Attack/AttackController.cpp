@@ -26,7 +26,8 @@ AttackController::AttackController(void)
     :
     param_(nullptr),
     isActive_(false),
-    hasHit_(false)
+    hasHit_(false),
+    manualActive_(false)
 {
 }
 
@@ -39,12 +40,14 @@ void AttackController::Start(const AttackParam& param)
     param_ = &param;
     isActive_ = false;
     hasHit_ = false;
+    manualActive_ = false;
 }
 
 void AttackController::Stop(void)
 {
     param_ = nullptr;
     isActive_ = false;
+    manualActive_ = false;
 }
 
 void AttackController::Update(const AnimationController& anim)
@@ -53,6 +56,13 @@ void AttackController::Update(const AnimationController& anim)
 
     // 攻撃中でなければ何もしない
     if (param_ == nullptr) return;
+
+    // 手動の攻撃は、ステートが決めた値をそのまま使う
+    if (param_->isManualActive)
+    {
+        isActive_ = manualActive_;
+        return;
+    }
 
     // 再生位置が判定区間に入っているか
     isActive_ = anim.IsInRange(param_->hitStart, param_->hitEnd);
