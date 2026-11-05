@@ -8,10 +8,10 @@ namespace
 	constexpr float LOWER_WEIGHT_RATE = 0.5f;
 
 	// 重みの下限（絶対に来ない時間を作らないために下限を決める）
-	constexpr float MIN_WEIGHT = 10.0f;
+	constexpr float MIN_WEIGHT = 0.0f;
 
 	// 1秒あたりに戻す重み
-	constexpr float RECOVER_WEIGHT_PER_SEC = 2.5f;
+	constexpr float RECOVER_WEIGHT_PER_SEC = 1.0f;
 
 	// フレームレート
 	constexpr float FPS = 60.0f;

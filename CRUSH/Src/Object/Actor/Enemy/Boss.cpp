@@ -10,6 +10,7 @@
 #include "../Player/Player.h"
 #include "State/BossIdleState.h"
 #include "State/BossAttackState.h"
+#include "State/BossDeadState.h"
 
 #include "Boss.h"
 
@@ -99,7 +100,7 @@ void Boss::Draw(void)
 	// デバッグ表示
 	DrawFormatString(0, 130, 0xffffff, "ボスHP：%d / %d", health_.GetHp(), health_.GetMaxHp());
 
-	attackController_.DrawDebug(pos_, GetForward());
+	//attackController_.DrawDebug(pos_, GetForward());
 
 	for (const auto& part : parts_)
 	{
@@ -116,6 +117,15 @@ void Boss::Draw(void)
 void Boss::OnHit(int damage)
 {
 	health_.Damage(damage);
+}
+
+bool Boss::IsDead(void) const
+{
+	// 死亡ステートでなければ、終わっていない
+	if (state_.GetStateId() != BOSS_STATE::DEAD) return false;
+
+	// アニメーションが最後まで再生したか
+	return animationController_->IsEnd();
 }
 
 void Boss::StartAttack(void)
@@ -228,6 +238,7 @@ void Boss::InitAnimation(void)
 	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::WALK), ANIMATION_SPEED, 17);
 	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::RUN), ANIMATION_SPEED, 13);
 	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::ATTACK_BITE), ANIMATION_SPEED, 0);
+	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::DEAD), ANIMATION_SPEED, 3);
 }
 
 void Boss::InitPost(void)
@@ -235,18 +246,19 @@ void Boss::InitPost(void)
 	// ステートの追加
 	state_.Register(BOSS_STATE::IDLE, std::make_unique<BossIdleState>());
 	state_.Register(BOSS_STATE::ATTACK, std::make_unique<BossAttackState>());
+	state_.Register(BOSS_STATE::DEAD, std::make_unique<BossDeadState>());
 
 	state_.Start(BOSS_STATE::IDLE);
 
-	// HP を満タンにして、0 になったときの通知先を登録する
+	// HPを満タンにして、0になったときの通知先を登録する
 	health_.Init(MAX_HP);
 	health_.SetOnDead([this]() { OnDead(); });
 
 	// 攻撃パラメータの設定
 	InitAttackParam();
 
-	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 70.0f);
-	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 70.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 50.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, 0.0f, NEAR_RADIUS, 40.0f);
 }
 
 void Boss::InitParts(void)
@@ -259,13 +271,15 @@ void Boss::InitParts(void)
 
 void Boss::OnDead(void)
 {
+	// 死亡は外部から切り替えを依頼
+	state_.RequestState(BOSS_STATE::DEAD);
 }
 
 void Boss::InitAttackParam(void)
 {
 	AttackParam& bite = attackParams_[static_cast<int>(BOSS_ATTACK_ID::BITE)];
 	bite.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
-	bite.damage = 10;
+	bite.damage = 50;
 
 	// 判定が出る区間
 	bite.hitStart = 15.0f;
@@ -276,7 +290,6 @@ void Boss::InitAttackParam(void)
 	bite.offset = 500.0f;
 	bite.length = 300.0f;
 	bite.width = 100.0f;
-
 
 	AttackParam& rush = attackParams_[static_cast<int>(BOSS_ATTACK_ID::RUSH)];
 	rush.animType = static_cast<int>(ANIM_TYPE::RUN);

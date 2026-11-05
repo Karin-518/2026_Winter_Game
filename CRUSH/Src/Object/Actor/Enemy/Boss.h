@@ -24,6 +24,7 @@ public:
 		WALK,
 		RUN,
 		ATTACK_BITE,	// Šš‚İ‚Â‚«
+		DEAD,
 
 		MAX,
 	};
@@ -50,7 +51,7 @@ public:
 	void OnHit(int damage) override;
 
 	// “|‚ê‚½‚©
-	bool IsDead(void) const { return health_.IsDead(); }
+	bool IsDead(void) const;
 
 	// UŒ‚ŠJn
 	void StartAttack(void);

@@ -122,7 +122,7 @@ void Player::Draw(void)
 
 #ifdef _DEBUG
 
-	attackController_.DrawDebug(pos_, GetForward());
+	//attackController_.DrawDebug(pos_, GetForward());
 
 	hurtbox_->DrawDebug();
 
