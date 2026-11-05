@@ -174,6 +174,15 @@ void Player::OnHit(int damage)
 	state_.RequestState(PLAYER_STATE::HIT);
 }
 
+bool Player::IsDead(void) const
+{
+	// 死亡ステートでなければ、終わっていない
+	if (state_.GetStateId() != PLAYER_STATE::DEAD) return false;
+
+	// アニメーションが最後まで再生したか
+	return animationController_->IsEnd();
+}
+
 void Player::InitLoad(void)
 {
 	// モデルのロード
@@ -189,6 +198,7 @@ void Player::InitLoad(void)
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_ATTACK_1);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_ROLL);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_HIT);
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_DEATH);
 }
 
 void Player::InitTransform(void)
@@ -244,6 +254,7 @@ void Player::InitAnimation(void)
 	AddAnimation(ANIM_TYPE::ATTACK_1, ResourceManager::SRC::PLAYER_ANIM_ATTACK_1, ATTACK_ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::ROLL, ResourceManager::SRC::PLAYER_ANIM_ROLL, ROLL_ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::HIT, ResourceManager::SRC::PLAYER_ANIM_HIT, HIT_ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::DEAD, ResourceManager::SRC::PLAYER_ANIM_DEATH, ANIMATION_SPEED);
 
 	// 回避アニメの前進を打ち消す
 	animationController_->SetRootFrame(MV1SearchFrame(modelId_, ROOT_FRAME_NAME));

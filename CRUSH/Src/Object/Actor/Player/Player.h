@@ -26,6 +26,7 @@ public:
 		ATTACK_1,
 		ROLL,
 		HIT,
+		DEAD,
 
 		MAX,
 	};
@@ -55,7 +56,7 @@ public:
 	void OnHit(int damage) override;
 
 	// ì|ÇÍÇΩÇ©
-	bool IsDead(void) const { return state_.GetStateId() == PLAYER_STATE::DEAD; }
+	bool IsDead(void) const;
 
 	// çUåÇäJén
 	void StartAttack(PLAYER_ATTACK_ID id);
