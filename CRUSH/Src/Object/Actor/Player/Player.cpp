@@ -42,7 +42,7 @@ namespace
 	constexpr float ANIMATION_SPEED = 0.6f;
 
 	// 攻撃時のアニメーションの速度
-	constexpr float ATTACK_ANIMATION_SPEED = 1.0f;
+	constexpr float ATTACK_ANIMATION_SPEED = 0.8f;
 
 	// 回避時のアニメーションの速度
 	constexpr float ROLL_ANIMATION_SPEED = 1.0f;
@@ -72,10 +72,10 @@ namespace
 	constexpr int HIT_BLEND_FRAME = 4;
 
 	// 剣を持たせる手のフレーム名
-	constexpr TCHAR HAND_FRAME_NAME[] = _T("mixamorig:RightHand");
+	constexpr TCHAR HAND_FRAME_NAME[] = "mixamorig:RightHand";
 
 	// 腰のフレーム名
-	constexpr TCHAR ROOT_FRAME_NAME[] = _T("mixamorig:Hips");
+	constexpr TCHAR ROOT_FRAME_NAME[] = "mixamorig:Hips";
 }
 
 Player::Player(Camera* camera)
@@ -286,14 +286,14 @@ void Player::InitAttackParam(void)
 	slash1.animType = static_cast<int>(ANIM_TYPE::ATTACK_1);
 
 	// 判定が出る区間
-	slash1.hitStart = 10.0f;
-	slash1.hitEnd = 20.0f;
+	slash1.hitStart = 18.0f;
+	slash1.hitEnd = 25.0f;
 
 	// 判定の形（縦振りなら RECT、横振りなら FAN にする）
 	slash1.shape = HIT_SHAPE::RECT;
 	slash1.offset = 30.0f;
 	slash1.length = 250.0f;
-	slash1.width = 150.0f;
+	slash1.width = 180.0f;
 }
 
 VECTOR Player::CalcInputDir(void) const
