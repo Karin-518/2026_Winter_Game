@@ -80,6 +80,12 @@ public:
 	// 今の攻撃の動き
 	BossAttackAction* GetCurrentAction(void) const { return attackActions_[static_cast<int>(nextAttackId_)].get(); }
 
+	// プレイヤーの方向を見る
+	void FacePlayer(void);
+
+	// プレイヤーとボスとの距離を測る
+	float CalcDistanceToPlayer(void) const;
+
 protected:
 
 	// リソースロード
@@ -134,10 +140,4 @@ private:
 
 	// 攻撃データの初期化
 	void InitAttackParam(void);
-
-	// プレイヤーの方向を見る
-	void FacePlayer(void);
-
-	// プレイヤーとボスとの距離を測る
-	float CalcDistanceToPlayer(void) const;
 };

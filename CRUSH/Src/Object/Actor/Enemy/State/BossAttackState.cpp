@@ -45,8 +45,8 @@ void BossAttackState::Exit(Boss& owner)
 void BossAttackState::UpdateWindup(Boss& owner)
 {
 	action_->UpdateWindup(owner);
-
 	// —­‚ß‚ªI‚í‚Á‚Ä‚¢‚È‚¯‚ê‚Î‘Ò‚Â
+
 	if (phaseFrame_ < owner.GetCurrentAttackParam().windupFrame) return;
 
 	// UŒ‚–{‘Ì‚Ö

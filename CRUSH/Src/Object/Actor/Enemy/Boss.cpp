@@ -12,6 +12,7 @@
 #include "State/BossAttackState.h"
 #include "State/BossDeadState.h"
 #include "Action/BossBiteAction.h"
+#include "Action/BossRushAction.h"
 
 #include "Boss.h"
 
@@ -264,7 +265,7 @@ void Boss::InitPost(void)
 	InitAttackParam();
 
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 50.0f);
-	//attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, 0.0f, NEAR_RADIUS, 40.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 40.0f);
 }
 
 void Boss::InitParts(void)
@@ -285,7 +286,7 @@ void Boss::InitAttackParam(void)
 {
 	AttackParam& bite = attackParams_[static_cast<int>(BOSS_ATTACK_ID::BITE)];
 	bite.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
-	bite.damage = 50;
+	bite.damage = 10;
 
 	// îªíËÇ™èoÇÈãÊä‘
 	bite.hitStart = 15.0f;
@@ -304,20 +305,23 @@ void Boss::InitAttackParam(void)
 
 	AttackParam& rush = attackParams_[static_cast<int>(BOSS_ATTACK_ID::RUSH)];
 	rush.animType = static_cast<int>(ANIM_TYPE::RUN);
-	rush.damage = 10;
-
-	// îªíËÇ™èoÇÈãÊä‘
-	rush.hitStart = 15.0f;
-	rush.hitEnd = 20.0f;
+	rush.damage = 20;
 
 	// îªíËÇÃå`
 	rush.shape = HIT_SHAPE::RECT;
-	rush.offset = 500.0f;
-	rush.length = 300.0f;
-	rush.width = 100.0f;
+	rush.offset = -300.0f;
+	rush.length = 1000.0f;
+	rush.width = 300.0f;
+
+	// ó≠ÇﬂÇ∆åÑ
+	rush.windupFrame = 80;
+	rush.windupAnimRate = 0.2f;
+	rush.recoveryFrame = 50;
+	rush.isManualActive = true;
 
 	// çUåÇÇ≤Ç∆ÇÃìÆÇ´
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::BITE)] = std::make_unique<BossBiteAction>();
+	attackActions_[static_cast<int>(BOSS_ATTACK_ID::RUSH)] = std::make_unique<BossRushAction>();
 }
 
 void Boss::FacePlayer(void)
