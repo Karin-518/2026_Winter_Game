@@ -53,7 +53,7 @@ namespace
 	constexpr float NEAR_RADIUS = 900.0f;
 
 	// í∑ãóó£Ç∆Ç›Ç»Ç∑îºåa
-	constexpr float FAR_RADIUS = 3000.0f;
+	constexpr float FAR_RADIUS = 2000.0f;
 }
 
 Boss::Boss(Player* player)
@@ -107,6 +107,9 @@ void Boss::Draw(void)
 	}
 
 	attackSelector_.DrawDebug();
+
+	DrawSphere3D(pos_, NEAR_RADIUS, 8, 0xff0000, 0xff0000, false);
+	DrawSphere3D(pos_, FAR_RADIUS, 8, 0x00ff00, 0x00ff00, false);
 #endif //_DEBUG
 }
 
@@ -243,7 +246,7 @@ void Boss::InitPost(void)
 	InitAttackParam();
 
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 70.0f);
-	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, 0.0f, NEAR_RADIUS, 70.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 70.0f);
 }
 
 void Boss::InitParts(void)
@@ -276,7 +279,7 @@ void Boss::InitAttackParam(void)
 
 
 	AttackParam& rush = attackParams_[static_cast<int>(BOSS_ATTACK_ID::RUSH)];
-	rush.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
+	rush.animType = static_cast<int>(ANIM_TYPE::RUN);
 	rush.damage = 10;
 
 	// îªíËÇ™èoÇÈãÊä‘
