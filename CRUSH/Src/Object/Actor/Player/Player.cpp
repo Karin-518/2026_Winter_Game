@@ -47,7 +47,7 @@ namespace
 	// 回避時のアニメーションの速度
 	constexpr float ROLL_ANIMATION_SPEED = 1.0f;
 
-	// 入力値の補間地（小さいほど慣性が強い）
+	// 入力値の補間値（小さいほど慣性が強い）
 	constexpr float INPUT_SMOOTH = 0.25f;
 
 	// プレイヤーの最大HP
@@ -68,7 +68,7 @@ namespace
 	// のけぞりのアニメーションの速度
 	constexpr float HIT_ANIMATION_SPEED = 1.5f;
 
-	// のけぞりアニメーションへのブレンドンフレーム数
+	// のけぞりアニメーションへのブレンドフレーム数
 	constexpr int HIT_BLEND_FRAME = 4;
 
 	// 剣を持たせる手のフレーム名
