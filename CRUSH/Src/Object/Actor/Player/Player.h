@@ -73,9 +73,6 @@ public:
 	// 回避開始
 	void StartDodge(int invincibleFrame);
 
-	// 向いている方向へ進む
-	void MoveForward(float speed);
-
 	// 食らい判定
 	const Hurtbox* GetHurtbox(void) const;
 

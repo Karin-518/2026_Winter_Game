@@ -57,6 +57,9 @@ public:
 	// 向いている方向
 	VECTOR GetForward(void) const { return { sinf(angle_.y), 0.0f, cosf(angle_.y) }; }
 
+	// 移動方向へ進む
+	void MoveByDir(float speed);
+
 protected:
 
 	// アニメーション制御

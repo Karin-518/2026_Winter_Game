@@ -150,6 +150,12 @@ float ActorBase::GetBodyRadius(void) const
 	return bodyCapsule_->GetRadius();
 }
 
+void ActorBase::MoveByDir(float speed)
+{
+	// 方向×スピードで移動量を作って、座標に足して移動
+	pos_ = VAdd(pos_, VScale(moveDir_, speed));
+}
+
 void ActorBase::DelayRotate(void)
 {
 	// 移動方向から角度に変換する

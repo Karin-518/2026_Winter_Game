@@ -32,7 +32,7 @@ PLAYER_STATE PlayerDodgeState::Update(Player& owner)
         return PLAYER_STATE::IDLE;
     }
 
-    owner.MoveForward(DODGE_SPEED);
+    owner.MoveByDir(DODGE_SPEED);
 
     return PLAYER_STATE::NONE;
 }
