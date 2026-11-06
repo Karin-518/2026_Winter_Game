@@ -1,6 +1,6 @@
 #include "../../Application.h"
-#include "../../Input/InputManager.h"
 #include "../../Audio/AudioManager.h"
+#include "../../Input/InputManager.h"
 #include "../../Common/Collision/Collision.h"
 #include "../SceneManager.h"
 #include "../GameScene/GameScene.h"
@@ -15,6 +15,13 @@ namespace
 
 	// EXIT
 	constexpr RECT EXIT_RECT = { 250, 290, 500, 350 };
+
+	// 初期選択
+	constexpr int DEFAULT_SELECT_INDEX = 0;
+
+
+	// 何も選択していないときの添え字
+	constexpr int NO_SELECT_INDEX = -1;
 
 	// 無効なハンドル
 	constexpr int INVALID_HANDLE = -1;
@@ -42,7 +49,7 @@ namespace
 
 PauseScene::PauseScene(void)
 	:
-	selectIndex_(0),
+	selectIndex_(DEFAULT_SELECT_INDEX),
 	menuButtons_{}
 {
 }
@@ -53,7 +60,7 @@ PauseScene::~PauseScene(void)
 
 void PauseScene::Init(void)
 {
-	selectIndex_ = 0;
+	selectIndex_ = DEFAULT_SELECT_INDEX;
 
 	// ポーズ中はマウスカーソルを動かせるようにする
 	InputManager::GetInstance()->SetMouseLock(false);
@@ -79,6 +86,7 @@ void PauseScene::Update(void)
 	// ポーズ中にポーズボタンを押したら
 	if (InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::PAUSE))
 	{
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON_CANCEL);
 		// ゲームシーンへ
 		Execute(MENU_TYPE::CONTINUE);
 		return;
@@ -108,6 +116,8 @@ void PauseScene::Draw(void)
 	}
 
 	if (menuButtons_.empty()) return;
+
+	if (selectIndex_ == NO_SELECT_INDEX) return;
 
 	// 選択中の項目の枠を白で上書きする
 	const RECT& selectRect = menuButtons_[selectIndex_].rect_;
@@ -139,17 +149,32 @@ void PauseScene::SelectByAction(void)
 {
 	if (menuButtons_.empty()) return;
 
-	int size = static_cast<int>(menuButtons_.size());
+	bool isUpPressed = InputManager::GetInstance()->IsActionDown(INPUT_INFO::ACTION::UI_MOVE_UP);
+	bool isDownPressed = InputManager::GetInstance()->IsActionDown(INPUT_INFO::ACTION::UI_MOVE_DOWN);
+
+	// 未選択のときは、キーを押したら初期位置を選ぶだけにする
+	if (selectIndex_ == NO_SELECT_INDEX)
+	{
+		if (!isUpPressed && !isDownPressed) return;
+
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT);
+		selectIndex_ = DEFAULT_SELECT_INDEX;
+		return;
+	}
+
+	int buttonCount = static_cast<int>(menuButtons_.size());
 
 	// 下へ
-	if (InputManager::GetInstance()->IsActionDown(INPUT_INFO::ACTION::UI_MOVE_DOWN) && selectIndex_ < size - 1)
+	if (isDownPressed && selectIndex_ < buttonCount - 1)
 	{
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT);
 		selectIndex_++;
 	}
 
 	// 上へ
-	if (InputManager::GetInstance()->IsActionDown(INPUT_INFO::ACTION::UI_MOVE_UP) && selectIndex_ > 0)
+	if (isUpPressed && selectIndex_ > 0)
 	{
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT);
 		selectIndex_--;
 	}
 }
@@ -162,27 +187,27 @@ void PauseScene::SelectByMouse(void)
 	int mouseX, mouseY;
 	GetMousePoint(&mouseX, &mouseY);
 
-	int size = static_cast<int>(menuButtons_.size());
-	int index = 0;
+	// マウスが乗っているボタンの添字（どこにも乗っていなければ NO_SELECT_INDEX）
+	int hoveredIndex = FindHoveredButtonIndex(mouseX, mouseY);
 
-	// カーソルが乗っているボタンを先頭から探す
-	while (index < size && !Collision2D::HitPointRect(mouseX, mouseY, menuButtons_[index].rect_))
+	// 別のボタンに乗ったときだけ音を鳴らす（外に出たときは鳴らさない）
+	if (hoveredIndex != selectIndex_ && hoveredIndex != NO_SELECT_INDEX)
 	{
-		index++;
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT);
 	}
 
-	// 最後まで見つからなかった
-	if (index >= size) return;
-
-	selectIndex_ = index;
+	selectIndex_ = hoveredIndex;
 }
 
 void PauseScene::Decide(void)
 {
 	if (menuButtons_.empty()) return;
 
+	if (selectIndex_ == NO_SELECT_INDEX) return;
+
 	if (!IsDecidedByAction() && !IsDecidedByMouse()) return;
 
+	AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON_DECIDE);
 	Execute(menuButtons_[selectIndex_].menuType_);
 }
 
@@ -194,6 +219,8 @@ bool PauseScene::IsDecidedByAction(void)
 bool PauseScene::IsDecidedByMouse(void)
 {
 	if (!InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::DECIDE)) return false;
+
+	if (selectIndex_ == NO_SELECT_INDEX) return false;
 
 	int mouseX, mouseY;
 	GetMousePoint(&mouseX, &mouseY);
@@ -228,4 +255,16 @@ bool PauseScene::IsMouseMoved(void)
 	if (move.y != 0.0f) return true;
 
 	return false;
+}
+
+int PauseScene::FindHoveredButtonIndex(int mouseX, int mouseY) const
+{
+	int buttonCount = static_cast<int>(menuButtons_.size());
+
+	for (int buttonIndex = 0; buttonIndex < buttonCount; buttonIndex++)
+	{
+		if (Collision2D::HitPointRect(mouseX, mouseY, menuButtons_[buttonIndex].rect_)) return buttonIndex;
+	}
+
+	return NO_SELECT_INDEX;
 }

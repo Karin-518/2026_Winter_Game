@@ -11,7 +11,6 @@ public:
 	enum class MENU_TYPE
 	{
 		NONE = -1,
-
 		YES,
 		NO,
 	};
@@ -82,4 +81,7 @@ private:
 
 	// マウスが動いたかどうか
 	bool IsMouseMoved(void);
+
+	// マウスが乗っているボタンの添え字を返す
+	int FindHoveredButtonIndex(int mouseX, int mouseY) const;
 };

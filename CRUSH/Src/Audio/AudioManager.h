@@ -14,8 +14,8 @@ private:
 	// 静的インスタンス
 	static AudioManager* instance_;
 
-	AudioManager();		// コンストラクタ
-	~AudioManager();	// デストラクタ
+	AudioManager(void);		// コンストラクタ
+	~AudioManager(void);	// デストラクタ
 
 	// コピー・ムーブ操作を禁止
 	AudioManager(const AudioManager&) = delete;

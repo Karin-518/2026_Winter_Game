@@ -53,7 +53,7 @@ void TitleScene::Update(void)
 	if(InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::DECIDE))
 	{
 		// ƒQ[ƒ€ƒV[ƒ“‚Ö
-		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON_DECIDE);
+		AudioManager::GetInstance()->PlaySE(SoundID::TITLE_PUSH_BUTTON);
 		SceneManager::GetInstance()->ChangeScene(std::make_shared<GameScene>());
 		return;
 	}
@@ -95,4 +95,6 @@ void TitleScene::Draw(void)
 void TitleScene::Release(void)
 {
 	DeleteGraph(handle_);
+
+	AudioManager::GetInstance()->DeleteSceneSound(LoadScene::TITLE);
 }

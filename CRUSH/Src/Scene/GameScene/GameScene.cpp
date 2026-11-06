@@ -89,12 +89,16 @@ void GameScene::LoadEnd(void)
 
 	// UŒ‚‚ÆH‚ç‚¢”»’è‚ğ“o˜^
 	RegisterCollision();
+
+	AudioManager::GetInstance()->PlayBGM(SoundID::BGM_BATTLE_1);
 }
 
 void GameScene::Update(void)
 {
 	if (InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::PAUSE))
 	{
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON_CANCEL);
+
 		// ƒ|[ƒYƒV[ƒ“‚Ö
 		SceneManager::GetInstance()->PushScene(std::make_shared<PauseScene>());
 		return;

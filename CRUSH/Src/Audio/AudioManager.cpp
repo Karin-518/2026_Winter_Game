@@ -14,7 +14,7 @@ AudioManager::AudioManager(void)
 	masterVolume_ = 255;
 }
 
-AudioManager::~AudioManager()
+AudioManager::~AudioManager(void)
 {
 	// ”O‚Ì‚½‚ßíœŠÖ”
 	DeleteAll();
