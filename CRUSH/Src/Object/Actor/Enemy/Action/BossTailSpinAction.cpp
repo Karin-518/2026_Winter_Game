@@ -9,7 +9,7 @@ namespace
 	constexpr float WINDUP_TWIST_RAD_PER_FRAME = -0.01f;
 
 	// 1回転にかけるフレーム数
-	constexpr float SPIN_FRAME = 45.0f;
+	constexpr float SPIN_FRAME = 30.0f;
 
 	// 1フレームで回る角度
 	constexpr float SPIN_RAD_PER_FRAME = DX_TWO_PI_F / SPIN_FRAME;

@@ -294,7 +294,7 @@ void Player::OnDead(void)
 void Player::InitAttackParam(void)
 {
 	AttackParam& slash1 = attackParams_[static_cast<int>(PLAYER_ATTACK_ID::SLASH_1)];
-	slash1.damage = 100;
+	slash1.damage = 50;
 	slash1.animType = static_cast<int>(ANIM_TYPE::ATTACK_1);
 
 	// ”»’è‚ªo‚é‹æŠÔ

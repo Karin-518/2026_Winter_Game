@@ -50,7 +50,6 @@ namespace
 	{
 		{ BOSS_PART::HEAD,   "Tongue02",   "Neck01",     70.0f, 1.0f },
 		{ BOSS_PART::BODY,   "Chest",  "joint19",     100.0f, 1.0f },
-		{ BOSS_PART::TAIL,   "joint20",  "joint23",  40.0f, 1.0f },
 	};
 
 	// 近距離とみなす半径
@@ -99,11 +98,11 @@ void Boss::Draw(void)
 {
 	ActorBase::Draw();
 
+	attackController_.DrawDebug(pos_, GetForward());
+
 #ifdef _DEBUG
 	// デバッグ表示
 	DrawFormatString(0, 130, 0xffffff, "ボスHP：%d / %d", health_.GetHp(), health_.GetMaxHp());
-
-	attackController_.DrawDebug(pos_, GetForward());
 
 	for (const auto& part : parts_)
 	{
@@ -332,7 +331,7 @@ void Boss::InitAttackParam(void)
 	tailSpin.halfAngleDeg = 180.0f;
 
 	// 溜めと隙
-	tailSpin.windupFrame = 50;
+	tailSpin.windupFrame = 80;
 	tailSpin.windupAnimRate = 1.0f;
 	tailSpin.recoveryFrame = 60;
 	tailSpin.isManualActive = true;

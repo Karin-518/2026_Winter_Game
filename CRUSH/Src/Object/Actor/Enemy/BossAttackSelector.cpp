@@ -7,7 +7,7 @@ namespace
 	// 選ばれたときに、今の重みにかける割合
 	constexpr float LOWER_WEIGHT_RATE = 0.5f;
 
-	// 重みの下限（絶対に来ない時間を作らないために下限を決める）
+	// 重みの下限
 	constexpr float MIN_WEIGHT = 0.0f;
 
 	// 1秒あたりに戻す重み

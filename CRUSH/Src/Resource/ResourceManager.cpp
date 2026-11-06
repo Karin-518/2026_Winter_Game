@@ -44,6 +44,7 @@ void ResourceManager::Init(void)
 	// ステージモデル
 	Register(SRC::STAGE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Stage/Stage.mv1");
 
+	// タイトルロゴ
 	Register(SRC::TITLE_LOGO, Resource::TYPE::IMG, Application::PATH_IMAGE + "CRUSHLOGO.png");
 }
 

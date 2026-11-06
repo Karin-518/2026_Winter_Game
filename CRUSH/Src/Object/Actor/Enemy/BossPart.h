@@ -6,7 +6,6 @@ enum class BOSS_PART
 {
 	HEAD,
 	BODY,
-	TAIL,
 };
 
 // ボスの部位種類のパラメータ
