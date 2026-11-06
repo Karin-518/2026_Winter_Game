@@ -48,3 +48,13 @@ bool BossTailSpinAction::UpdateActive(Boss& owner)
 
 	return false;
 }
+
+SoundID BossTailSpinAction::GetSignSoundID(void) const
+{
+	return SoundID::SE_BOSS_TAILSPIN_SIGN;
+}
+
+SoundID BossTailSpinAction::GetAttackSoundID(void) const
+{
+	return SoundID::SE_BOSS_TAILSPIN;
+}

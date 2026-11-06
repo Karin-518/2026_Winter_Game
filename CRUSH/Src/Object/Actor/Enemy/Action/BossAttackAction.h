@@ -1,4 +1,5 @@
 #pragma once
+#include "../../../../Audio/SoundInfo.h"
 
 class Boss;
 
@@ -27,4 +28,7 @@ public:
 	/// <param name="owner">攻撃しているボス</param>
 	/// <returns>trueなら攻撃本体を終えて、隙へ進む</returns>
 	virtual bool UpdateActive(Boss& owner) = 0;
+
+	virtual SoundID GetSignSoundID(void) const = 0;
+	virtual SoundID GetAttackSoundID(void) const = 0;
 };

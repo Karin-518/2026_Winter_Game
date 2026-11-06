@@ -1,3 +1,4 @@
+#include "../../../../Audio/AudioManager.h"
 #include "../../../Common/AnimationController/AnimationController.h"
 #include "../Action/BossAttackAction.h"
 #include "../Boss.h"
@@ -79,4 +80,17 @@ void BossAttackState::ChangePhase(ATTACK_PHASE nextPhase)
 {
 	phase_ = nextPhase;
 	phaseFrame_ = 0;
+
+	if (phase_ == ATTACK_PHASE::WINDUP)
+	{
+		AudioManager::GetInstance()->PlaySE(action_->GetSignSoundID());
+		return;
+	}
+
+	if (phase_ == ATTACK_PHASE::ACTIVE)
+	{
+		AudioManager::GetInstance()->PlaySE(action_->GetAttackSoundID());
+		return;
+	}
+
 }

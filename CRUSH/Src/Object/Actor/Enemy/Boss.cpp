@@ -39,6 +39,7 @@ namespace
 
 	// アニメーション速度
 	constexpr float ANIMATION_SPEED = 0.5f;
+	constexpr float BITE_ANIMATION_SPEED = 0.7f;
 
 	// 初期位置
 	constexpr VECTOR INIT_POS = { -138.0f, 0.0f, -830.0f };
@@ -98,11 +99,11 @@ void Boss::Draw(void)
 {
 	ActorBase::Draw();
 
-	attackController_.DrawDebug(pos_, GetForward());
-
 #ifdef _DEBUG
 	// デバッグ表示
 	DrawFormatString(0, 130, 0xffffff, "ボスHP：%d / %d", health_.GetHp(), health_.GetMaxHp());
+
+	attackController_.DrawDebug(pos_, GetForward());
 
 	for (const auto& part : parts_)
 	{
@@ -244,7 +245,7 @@ void Boss::InitAnimation(void)
 	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::IDLE), ANIMATION_SPEED, 10);
 	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::WALK), ANIMATION_SPEED, 17);
 	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::RUN), ANIMATION_SPEED, 13);
-	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::ATTACK_BITE), ANIMATION_SPEED, 0);
+	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::ATTACK_BITE), BITE_ANIMATION_SPEED, 0);
 	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::DEAD), ANIMATION_SPEED, 3);
 }
 
@@ -327,13 +328,13 @@ void Boss::InitAttackParam(void)
 	// 判定の形
 	tailSpin.shape = HIT_SHAPE::FAN;
 	tailSpin.offset = 0.0f;
-	tailSpin.length = 900.0f;
+	tailSpin.length = 800.0f;
 	tailSpin.halfAngleDeg = 180.0f;
 
 	// 溜めと隙
 	tailSpin.windupFrame = 80;
 	tailSpin.windupAnimRate = 1.0f;
-	tailSpin.recoveryFrame = 60;
+	tailSpin.recoveryFrame = 10;
 	tailSpin.isManualActive = true;
 
 	// 攻撃ごとの動き

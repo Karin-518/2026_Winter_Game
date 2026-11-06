@@ -1,3 +1,4 @@
+#include "../../../../Audio/AudioManager.h"
 #include "../../../Common/AnimationController/AnimationController.h"
 #include "../Boss.h"
 
@@ -5,6 +6,8 @@
 
 void BossDeadState::Enter(Boss& owner)
 {
+    AudioManager::GetInstance()->PlaySE(SoundID::SE_BOSS_DEAD);
+
     // 死亡アニメーションを再生
     owner.GetAnimationController()->Play(static_cast<int>(Boss::ANIM_TYPE::DEAD), false);
 }

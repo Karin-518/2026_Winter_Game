@@ -20,6 +20,9 @@ public:
 	// 攻撃本体の間
 	bool UpdateActive(Boss& owner) override;
 
+	SoundID GetSignSoundID(void) const override;
+	SoundID GetAttackSoundID(void) const override;
+
 private:
 
 	float spunRad_;

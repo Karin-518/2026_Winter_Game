@@ -68,3 +68,13 @@ bool BossRushAction::UpdateActive(Boss& owner)
 
 	return false;
 }
+
+SoundID BossRushAction::GetSignSoundID(void) const
+{
+	return SoundID::SE_BOSS_RUSH_SIGN;
+}
+
+SoundID BossRushAction::GetAttackSoundID(void) const
+{
+	return SoundID::SE_BOSS_RUSH;
+}
