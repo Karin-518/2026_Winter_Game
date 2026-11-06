@@ -1,4 +1,5 @@
 #include <algorithm>
+#include "../Audio/AudioManager.h"
 #include "../Common/Math/Math.h"
 #include "../Input/InputManager.h"
 #include "../Object/Actor/ActorBase.h"
@@ -384,6 +385,8 @@ void Camera::StartReset(void)
 	// リセット開始
 	resetFrame_ = 0;
 	isResetting_ = true;
+
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_CAMERA_RESET);
 }
 
 void Camera::UpdateReset(void)

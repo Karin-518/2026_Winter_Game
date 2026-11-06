@@ -35,9 +35,9 @@ namespace SoundTable_Game
 		{ SoundID::SE_PLAYER_SWING_1, { "Data/Audio/SE/Player/SE_PLAYER_SWING_1.mp3", 150} },
 		{ SoundID::SE_PLAYER_SWING_2, { "Data/Audio/SE/Player/SE_PLAYER_SWING_2.mp3", 150} },
 		{ SoundID::SE_PLAYER_DAMAGE, { "Data/Audio/SE/Player/SE_PLAYER_DAMAGE.mp3", 150} },
-		{ SoundID::SE_PLAYER_DODGE, { "Data/Audio/SE/Player/SE_PLAYER_DODGE.mp3", 150} },
+		{ SoundID::SE_PLAYER_DODGE, { "Data/Audio/SE/Player/SE_PLAYER_DODGE.mp3", 100} },
 		{ SoundID::SE_PLAYER_LOCK_ON, { "Data/Audio/SE/Player/SE_PLAYER_LOCK_ON.mp3", 150} },
-		{ SoundID::SE_PLAYER_CAMERA_RESET, { "Data/Audio/SE/Player/SE_PLAYER_CAMERA_RESET.mp3", 150} },
+		{ SoundID::SE_PLAYER_CAMERA_RESET, { "Data/Audio/SE/Player/SE_PLAYER_CAMERA_RESET.mp3", 100} },
 
 		// “G‰¹
 		{ SoundID::SE_BOSS_MOVE, { "Data/Audio/SE/Boss/SE_BOSS_MOVE.mp3", 150} },

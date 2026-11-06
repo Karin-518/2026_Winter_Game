@@ -377,6 +377,8 @@ void Player::OnAttackHit(void)
 
 void Player::StartDodge(int invincibleFrame)
 {
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_DODGE);
+
 	animationController_->Play(static_cast<int>(ANIM_TYPE::ROLL), false);
 
 	// 入力があれば、その方向へすぐ向く
@@ -393,6 +395,8 @@ const Hurtbox* Player::GetHurtbox(void) const
 
 void Player::StartHit(void)
 {
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_DAMAGE);
+
 	// のけぞりアニメーションを再生
 	AnimationController::PlayParam playParam;
 	playParam.isLoop = false;
