@@ -20,6 +20,12 @@ bool BoneSegment::Init(int modelId, const TCHAR* startFrameName, const TCHAR* en
 	startFrameIndex_ = MV1SearchFrame(modelId, startFrameName);
 	endFrameIndex_ = MV1SearchFrame(modelId, endFrameName);
 
+	// 見つからなければ名前の間違いを知らせる
+	if (!IsValid())
+	{
+		printfDx("ボーンが見つかりません：%s / %s\n", startFrameName, endFrameName);
+	}
+
 	return IsValid();
 }
 

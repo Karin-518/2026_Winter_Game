@@ -297,15 +297,17 @@ void Boss::InitAttackParam(void)
 	bite.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
 	bite.damage = 10;
 
-	// 判定が出る区間
-	bite.hitStart = 15.0f;
-	bite.hitEnd = 20.0f;
-
 	// 判定の形
-	bite.shape = HIT_SHAPE::RECT;
-	bite.offset = 500.0f;
-	bite.length = 300.0f;
-	bite.width = 100.0f;
+	bite.shape = HIT_SHAPE::CAPSULE;
+
+	// 頭のカプセル
+	AttackHitVolume headVolume;
+	headVolume.startFrameName = "Tongue01";
+	headVolume.endFrameName = "UpperMouth02";
+	headVolume.radius = 80.0f;
+	headVolume.activeStart = 15.0f;
+	headVolume.activeEnd = 20.0f;
+	bite.hitVolumes.push_back(headVolume);
 
 	// 溜めと隙
 	bite.windupFrame = 35;
@@ -339,7 +341,7 @@ void Boss::InitAttackParam(void)
 	AttackHitVolume tailVolume;
 	tailVolume.startFrameName = "joint19";
 	tailVolume.endFrameName = "joint23";
-	tailVolume.radius = 50.0f;
+	tailVolume.radius = 80.0f;
 	tailSpin.hitVolumes.push_back(tailVolume);
 
 	// 溜めと隙
@@ -377,13 +379,8 @@ void Boss::InitSegmentsOfAttack(int attackIndex)
 		// この判定のボーン名
 		const AttackHitVolume& volume = param.hitVolumes[volumeIndex];
 
-		// ボーンを探す。見つからなければ名前の間違いを知らせる
-		bool isFound = segments[volumeIndex].Init(modelId_, volume.startFrameName, volume.endFrameName);
-		if (!isFound)
-		{
-			printfDx("攻撃のボーンが見つかりません：%s / %s\n",
-				volume.startFrameName, volume.endFrameName);
-		}
+		// ボーンを探す
+		segments[volumeIndex].Init(modelId_, volume.startFrameName, volume.endFrameName);
 	}
 }
 

@@ -7,15 +7,7 @@ ColliderPart::ColliderPart(int modelId, const BossPartParam& param, ActorBase* o
 	boneSegment_(),
 	damageMultiplier_(param.damageMultiplier_)
 {
-	// ボーンを探す
-	bool isFound = boneSegment_.Init(modelId, param.startFrameName_, param.endFrameName_);
-	
-	// 見つからなければ名前の間違いを知らせる
-	if (!isFound)
-	{
-		printfDx("部位のボーンが見つかりません：%s / %s\n",
-			param.startFrameName_, param.endFrameName_);
-	}
+	boneSegment_.Init(modelId, param.startFrameName_, param.endFrameName_);
 }
 
 ColliderPart::~ColliderPart(void)
