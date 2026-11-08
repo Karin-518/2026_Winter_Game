@@ -1,8 +1,10 @@
 #pragma once
+#include <vector>
 #include <DxLib.h>
 
 struct AttackParam;
 class AnimationController;
+class Hurtbox;
 
 /// <summary>
 /// 攻撃の判定を管理する部品
@@ -32,10 +34,13 @@ public:
 	// このフレームで当てていいか
 	bool CanHit(void) const;
 
-	// 判定の形と相手の円が重なっているか
+	// 判定の形と食らい判定が重なっているか
 	bool IsHit(
 		const VECTOR& ownerPos, const VECTOR& forward,
-		const VECTOR& targetPos, float targetRadius) const;
+		const Hurtbox& hurtbox) const;
+
+	// カプセルの位置を外から渡す
+	void SetCapsulePos(int index, const VECTOR& startPos, const VECTOR& endPos);
 
 	// 当てたことを記録
 	void NotifyHit(void);
@@ -51,6 +56,14 @@ public:
 
 private:
 
+	// 実行中のカプセル1つ分
+	struct HitCapsule
+	{
+		VECTOR startPos;	// 始点
+		VECTOR endPos;		// 終点
+		bool isActive;		// このフレームで判定が出ているか
+	};
+
 	// 今の攻撃データ
 	const AttackParam* param_;
 
@@ -63,6 +76,18 @@ private:
 	// 外から指定された判定のオン・オフ
 	bool manualActive_;
 
+	// 今の攻撃カプセル
+	std::vector<HitCapsule> capsules_;
+
+	// カプセルごとに判定が出ているか決める
+	void UpdateCapsuleActive(const AnimationController& anim);
+
+	// XZ平面の形での判定
+	bool IsHitXZ(const VECTOR& ownerPos, const VECTOR& forward, const Hurtbox& hurtbox) const;
+
+	// カプセルでの判定
+	bool IsHitCapsule(const Hurtbox& hurtbox) const;
+
 	// 判定の根元
 	VECTOR CalcOrigin(const VECTOR& ownerPos, const VECTOR& forward) const;
 
@@ -74,4 +99,7 @@ private:
 
 	// 扇を描く
 	void DrawDebugFan(const VECTOR& origin, const VECTOR& forward, unsigned int color) const;
+
+	// カプセルを描く
+	void DrawDebugCapsules(void) const;
 };

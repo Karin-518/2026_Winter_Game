@@ -81,5 +81,5 @@ bool CollisionManager::IsOverlap(const AttackEntry& entry, const Hurtbox& hurtbo
 	// 食らい判定のうち、攻撃の真ん中に一番近い点を円として調べる
 	VECTOR closestPos = hurtbox.GetClosestPos(attackCenter);
 
-	return entry.attack_->IsHit(ownerPos, forward, closestPos, hurtbox.GetRadius());
+	return entry.attack_->IsHit(entry.owner_->GetPos(), entry.owner_->GetForward(), hurtbox);
 }

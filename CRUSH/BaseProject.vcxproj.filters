@@ -407,5 +407,8 @@
     <ClInclude Include="Src\Object\Common\Bone\BoneSegment.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Object\Common\Attack\AttackHitVolume.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

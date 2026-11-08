@@ -1,10 +1,13 @@
 #pragma once
+#include <vector>
+#include "AttackHitVolume.h"
 
 // 判定の形
 enum class HIT_SHAPE
 {
 	RECT,		// 四角：縦振り・突き
 	FAN,		// 扇　：横振り
+	CAPSULE,	// ボーンに付くカプセル
 };
 
 // 攻撃ごとのデータ
@@ -46,4 +49,7 @@ struct AttackParam
 
 	// 攻撃後の隙
 	int recoveryFrame = 0;
+
+	// CAPSULEの時の判定リスト
+	std::vector<AttackHitVolume> hitVolumes;
 };

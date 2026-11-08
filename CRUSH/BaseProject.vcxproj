@@ -75,6 +75,7 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Common\Attack\AttackHitVolume.h" />
     <ClInclude Include="Src\Object\Common\Bone\BoneSegment.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\Action\BossTailSpinAction.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\Action\BossRushAction.h" />

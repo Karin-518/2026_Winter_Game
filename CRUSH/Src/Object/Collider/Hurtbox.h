@@ -23,6 +23,12 @@ public:
 	// 半径
 	float GetRadius(void) const { return radius_; }
 
+	// 線分の始点
+	const VECTOR& GetStartPos(void) const { return startPos_; }
+
+	// 線分の終点
+	const VECTOR& GetEndPos(void) const { return endPos_; }
+
 	// 衝突種別
 	ColliderBase::TAG GetTag(void) const { return tag_; }
 

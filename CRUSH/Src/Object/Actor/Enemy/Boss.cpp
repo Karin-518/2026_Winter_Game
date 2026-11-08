@@ -326,10 +326,14 @@ void Boss::InitAttackParam(void)
 	tailSpin.damage = 20;
 
 	// 判定の形
-	tailSpin.shape = HIT_SHAPE::FAN;
-	tailSpin.offset = 0.0f;
-	tailSpin.length = 800.0f;
-	tailSpin.halfAngleDeg = 180.0f;
+	tailSpin.shape = HIT_SHAPE::CAPSULE;
+
+	// 尻尾全体のカプセル
+	AttackHitVolume tailVolume;
+	tailVolume.startFrameName = "joint19";
+	tailVolume.endFrameName = "joint23";
+	tailVolume.radius = 50.0f;
+	tailSpin.hitVolumes.push_back(tailVolume);
 
 	// 溜めと隙
 	tailSpin.windupFrame = 45;

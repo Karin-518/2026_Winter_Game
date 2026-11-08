@@ -1,5 +1,6 @@
 #include "../../../Common/Math/Math.h"
 #include "../../../Common/Collision/Collision.h"
+#include "../../Collider/Hurtbox.h"
 #include "../AnimationController/AnimationController.h"
 #include "AttackParam.h"
 
@@ -27,7 +28,8 @@ AttackController::AttackController(void)
     param_(nullptr),
     isActive_(false),
     hasHit_(false),
-    manualActive_(false)
+    manualActive_(false),
+    capsules_()
 {
 }
 
@@ -41,6 +43,9 @@ void AttackController::Start(const AttackParam& param)
     isActive_ = false;
     hasHit_ = false;
     manualActive_ = false;
+
+    // 判定の数だけカプセルを用意
+    capsules_.assign(param.hitVolumes.size(), HitCapsule{});
 }
 
 void AttackController::Stop(void)
@@ -48,6 +53,9 @@ void AttackController::Stop(void)
     param_ = nullptr;
     isActive_ = false;
     manualActive_ = false;
+
+    // 前の攻撃のカプセルを残さない
+    capsules_.clear();
 }
 
 void AttackController::Update(const AnimationController& anim)
@@ -56,6 +64,13 @@ void AttackController::Update(const AnimationController& anim)
 
     // 攻撃中でなければ何もしない
     if (param_ == nullptr) return;
+
+    // カプセルの攻撃は、カプセルごとに決める
+    if (param_->shape == HIT_SHAPE::CAPSULE)
+    {
+        UpdateCapsuleActive(anim);
+        return;
+    }
 
     // 手動の攻撃は、ステートが決めた値をそのまま使う
     if (param_->isManualActive)
@@ -73,23 +88,28 @@ bool AttackController::CanHit(void) const
     return isActive_ && !hasHit_;
 }
 
-bool AttackController::IsHit(const VECTOR& ownerPos, const VECTOR& forward, const VECTOR& targetPos, float targetRadius) const
+bool AttackController::IsHit(const VECTOR& ownerPos, const VECTOR& forward, const Hurtbox& hurtbox) const
 {
     if (param_ == nullptr) return false;
 
-    VECTOR origin = CalcOrigin(ownerPos, forward);
-
-    // 扇
-    if (param_->shape == HIT_SHAPE::FAN)
+    // カプセル
+    if (param_->shape == HIT_SHAPE::CAPSULE)
     {
-        float halfRad = Math::Deg2Rad(param_->halfAngleDeg);
-        return CollisionXZ::HitFanCircle(
-            origin, forward, param_->length, halfRad, targetPos, targetRadius);
+        return IsHitCapsule(hurtbox);
     }
 
-    // 四角
-    return CollisionXZ::HitRectCircle(
-        origin, forward, param_->length, param_->width, targetPos, targetRadius);
+    // 四角・扇
+    return IsHitXZ(ownerPos, forward, hurtbox);
+}
+
+void AttackController::SetCapsulePos(int index, const VECTOR& startPos, const VECTOR& endPos)
+{
+    // 範囲外の番号は無視
+    if (index < 0) return;
+    if (index >= static_cast<int>(capsules_.size())) return;
+
+    capsules_[index].startPos = startPos;
+    capsules_[index].endPos = endPos;
 }
 
 void AttackController::NotifyHit(void)
@@ -101,6 +121,13 @@ void AttackController::DrawDebug(const VECTOR& ownerPos, const VECTOR& forward) 
 {
     // 攻撃中でなければ描かない
     if (param_ == nullptr) return;
+
+    // カプセルの攻撃判定
+    if (param_->shape == HIT_SHAPE::CAPSULE)
+    {
+        DrawDebugCapsules();
+        return;
+    }
 
     VECTOR origin = CalcOrigin(ownerPos, forward);
     origin.y += DEBUG_DRAW_HEIGHT;
@@ -119,6 +146,73 @@ void AttackController::DrawDebug(const VECTOR& ownerPos, const VECTOR& forward) 
     }
 
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+void AttackController::UpdateCapsuleActive(const AnimationController& anim)
+{
+    for (int volumeIndex = 0; volumeIndex < static_cast<int>(capsules_.size()); volumeIndex++)
+    {
+        // カプセルのデータ
+        const AttackHitVolume& volume = param_->hitVolumes[volumeIndex];
+
+        // 手動の攻撃はステートが決めた値、それ以外はアニメの区間で決める
+        bool isVolumeActive = manualActive_;
+        if (!param_->isManualActive)
+        {
+            isVolumeActive = anim.IsInRange(volume.activeStart, volume.activeEnd);
+        }
+
+        capsules_[volumeIndex].isActive = isVolumeActive;
+
+        // どれか1つでも出ていれば、この攻撃は判定中
+        if (isVolumeActive) isActive_ = true;
+    }
+}
+
+bool AttackController::IsHitXZ(const VECTOR& ownerPos, const VECTOR& forward, const Hurtbox& hurtbox) const
+{
+    // 攻撃の形のおおよその真ん中
+    float distanceToCenter = param_->offset + param_->length * 0.5f;
+    VECTOR attackCenter = VAdd(ownerPos, VScale(forward, distanceToCenter));
+
+    // 食らい判定のうち、攻撃の真ん中に一番近い点を円として調べる
+    VECTOR targetPos = hurtbox.GetClosestPos(attackCenter);
+    float targetRadius = hurtbox.GetRadius();
+
+    VECTOR origin = CalcOrigin(ownerPos, forward);
+
+    // 扇
+    if (param_->shape == HIT_SHAPE::FAN)
+    {
+        float halfRad = Math::Deg2Rad(param_->halfAngleDeg);
+        return CollisionXZ::HitFanCircle(
+            origin, forward, param_->length, halfRad, targetPos, targetRadius);
+    }
+
+    // 四角
+    return CollisionXZ::HitRectCircle(
+        origin, forward, param_->length, param_->width, targetPos, targetRadius);
+}
+
+bool AttackController::IsHitCapsule(const Hurtbox& hurtbox) const
+{
+    for (int volumeIndex = 0; volumeIndex < static_cast<int>(capsules_.size()); volumeIndex++)
+    {
+        // カプセルの今の位置
+        const HitCapsule& capsule = capsules_[volumeIndex];
+
+        // 判定が出ていないカプセルは飛ばす
+        if (!capsule.isActive) continue;
+
+        // 攻撃のカプセルと食らい判定のカプセルが重なっているか
+        int hitResult = HitCheck_Capsule_Capsule(
+            capsule.startPos, capsule.endPos, param_->hitVolumes[volumeIndex].radius,
+            hurtbox.GetStartPos(), hurtbox.GetEndPos(), hurtbox.GetRadius());
+
+        if (hitResult == true) return true;
+    }
+
+    return false;
 }
 
 VECTOR AttackController::CalcOrigin(const VECTOR& ownerPos, const VECTOR& forward) const
@@ -170,5 +264,24 @@ void AttackController::DrawDebugFan(const VECTOR& origin, const VECTOR& forward,
         DrawTriangle3D(origin, prevPos, nextPos, color, true);
 
         prevPos = nextPos;
+    }
+}
+
+void AttackController::DrawDebugCapsules(void) const
+{
+    // カプセルの分割数
+    const int capsuleDivision = 8;
+    for (int volumeIndex = 0; volumeIndex < static_cast<int>(capsules_.size()); volumeIndex++)
+    {
+        // カプセルの今の位置
+        const HitCapsule& capsule = capsules_[volumeIndex];
+
+        // 区間外は灰色、判定中は赤、当てた後は黄色
+        unsigned int color = COLOR_WAIT;
+        if (capsule.isActive) color = COLOR_ACTIVE;
+        if (hasHit_) color = COLOR_HIT;
+
+        DrawCapsule3D(capsule.startPos, capsule.endPos,
+            param_->hitVolumes[volumeIndex].radius, capsuleDivision, color, color, false);
     }
 }
