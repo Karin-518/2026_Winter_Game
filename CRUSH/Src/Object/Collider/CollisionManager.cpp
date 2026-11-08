@@ -86,6 +86,8 @@ HitInfo CollisionManager::MakeHitInfo(const AttackEntry& entry) const
 	HitInfo hitInfo;
 	hitInfo.damage = param->damage;
 	hitInfo.attackerPos = entry.owner_->GetPos();
+	hitInfo.reaction = param->reaction;
+	hitInfo.knockbackSpeed = param->knockbackSpeed;
 
 	return hitInfo;
 }
