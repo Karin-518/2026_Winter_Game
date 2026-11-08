@@ -6,7 +6,7 @@
 namespace
 {
 	// 1フレームで進む距離
-	constexpr float CHARGE_SPEED = 15.0f;
+	constexpr float CHARGE_SPEED = 20.0f;
 
 	// プレイヤーの位置から走り抜ける距離
 	constexpr float OVERSHOOT_DISTANCE = 500.0f;

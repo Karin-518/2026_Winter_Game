@@ -324,26 +324,38 @@ void Boss::InitAttackParam(void)
 	rush.damage = 20;
 
 	// 判定の形
-	rush.shape = HIT_SHAPE::RECT;
-	rush.offset = -300.0f;
-	rush.length = 1000.0f;
-	rush.width = 300.0f;
+	rush.shape = HIT_SHAPE::CAPSULE;
+
+	// 頭のカプセル
+	AttackHitVolume rushHeadVolume;
+	rushHeadVolume.startFrameName = "Tongue01";
+	rushHeadVolume.endFrameName = "UpperMouth02";
+	rushHeadVolume.radius = 100.0f;
+	rush.hitVolumes.push_back(rushHeadVolume);
+
+	// 胴のカプセル
+	AttackHitVolume rushBodyVolume;
+	rushBodyVolume.startFrameName = "Chest";
+	rushBodyVolume.endFrameName = "joint19";
+	rushBodyVolume.radius = 150.0f;
+	rush.hitVolumes.push_back(rushBodyVolume);
 
 	// 溜めと隙
-	rush.windupFrame = 55;
+	rush.windupFrame = 60;
 	rush.windupAnimRate = 0.2f;
-	rush.recoveryFrame = 75;
+	rush.recoveryFrame = 100;
 	rush.isManualActive = true;
 
 	// 被弾リアクションと吹き飛ばし量
 	rush.reaction = HIT_REACTION::KNOCKBACK;
-	rush.knockbackSpeed = 25.0f;
+	rush.knockbackSpeed = 50.0f;
+	rush.knockbackSideRate = 1.5f;
 
 	// 尻尾回転
 	// ---------------------------------------
 	AttackParam& tailSpin = attackParams_[static_cast<int>(BOSS_ATTACK_ID::TAIL_SPIN)];
 	tailSpin.animType = static_cast<int>(ANIM_TYPE::IDLE);
-	tailSpin.damage = 20;
+	tailSpin.damage = 10;
 
 	// 判定の形
 	tailSpin.shape = HIT_SHAPE::CAPSULE;
@@ -358,12 +370,13 @@ void Boss::InitAttackParam(void)
 	// 溜めと隙
 	tailSpin.windupFrame = 45;
 	tailSpin.windupAnimRate = 1.0f;
-	tailSpin.recoveryFrame = 40;
+	tailSpin.recoveryFrame = 60;
 	tailSpin.isManualActive = true;
 
 	// 被弾リアクションと吹き飛ばし量
 	tailSpin.reaction = HIT_REACTION::KNOCKBACK;
-	tailSpin.knockbackSpeed = 20.0f;
+	tailSpin.knockbackSpeed = 30.0f;
+	tailSpin.knockbackSideRate = 0.7f;
 
 	// 攻撃ごとの動き
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::BITE)] = std::make_unique<BossBiteAction>();
@@ -453,4 +466,12 @@ void Boss::RotateMoveDir(float addRad)
 {
 	// 移動方向をY軸まわりに回す
 	moveDir_ = VTransform(moveDir_, MGetRotY(addRad));
+}
+
+bool Boss::IsPlayerKnockedDown(void) const
+{
+	// プレイヤーがいなければ、倒れていない
+	if (player_ == nullptr) return false;
+
+	return player_->IsPlayerKnockedDown();
 }

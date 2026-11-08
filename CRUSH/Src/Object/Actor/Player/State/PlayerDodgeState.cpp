@@ -5,10 +5,10 @@
 namespace
 {
     // 回避全体のフレーム
-    constexpr int DODGE_FRAME = 60;
+    constexpr int DODGE_FRAME = 40;
 
     // 無敵のフレーム
-    constexpr int INVINCIBLE_FRAME = 15;
+    constexpr int INVINCIBLE_FRAME = 20;
 
     // 回避の速さ
     constexpr float DODGE_SPEED = 8.0f;

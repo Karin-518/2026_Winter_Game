@@ -15,6 +15,7 @@
 #include "State/PlayerDeadState.h"
 #include "State/PlayerDodgeState.h"
 #include "State/PlayerHitState.h"
+#include "State/PlayerKnockbackState.h"
 #include "PlayerHurtbox.h"
 
 #include "Player.h"
@@ -46,7 +47,7 @@ namespace
 	constexpr float ATTACK_ANIMATION_SPEED = 0.8f;
 
 	// 回避時のアニメーションの速度
-	constexpr float ROLL_ANIMATION_SPEED = 1.0f;
+	constexpr float ROLL_ANIMATION_SPEED = 1.7f;
 
 	// 入力値の補間値（小さいほど慣性が強い）
 	constexpr float INPUT_SMOOTH = 0.25f;
@@ -77,6 +78,15 @@ namespace
 
 	// 腰のフレーム名
 	constexpr TCHAR ROOT_FRAME_NAME[] = "mixamorig:Hips";
+
+	// 吹き飛びのアニメーションの速度
+	constexpr float KNOCKBACK_ANIMATION_SPEED = 0.8f;
+
+	// 起き上がりのアニメーションの速度
+	constexpr float STANDING_ANIMATION_SPEED = 0.8f;
+
+	// 起き上がりアニメーションへのブレンドフレーム数
+	constexpr int STANDING_BLEND_FRAME = 8;
 }
 
 Player::Player(Camera* camera)
@@ -86,7 +96,9 @@ Player::Player(Camera* camera)
 	attackController_(),
 	state_(*this),
 	attackParams_(),
-	weapon_()
+	weapon_(),
+	knockbackDir_(),
+	knockbackSpeed_(0.0f)
 {
 }
 
@@ -171,7 +183,16 @@ bool Player::OnHit(const HitInfo& hitInfo)
 	// 無敵
 	health_.SetInvincible(HIT_INVINCIBLE_FRAME);
 	
-	// のけぞり
+	// 吹き飛び
+	if (hitInfo.reaction == HIT_REACTION::KNOCKBACK)
+	{
+		// ノックバック処理
+		PrepareKnockback(hitInfo);
+		state_.RequestState(PLAYER_STATE::KNOCKBACK);
+		return true;
+	}
+
+	// 怯み
 	state_.RequestState(PLAYER_STATE::HIT);
 	return true;
 }
@@ -183,6 +204,16 @@ bool Player::IsDead(void) const
 
 	// アニメーションが最後まで再生したか
 	return animationController_->IsEnd();
+}
+
+void Player::StartStanding(void)
+{
+	// 起き上がりアニメを再生
+	AnimationController::PlayParam playParam;
+	playParam.isLoop = false;
+	playParam.blendFrame = STANDING_BLEND_FRAME;
+	playParam.isForce = true;
+	animationController_->Play(static_cast<int>(ANIM_TYPE::STANDING), playParam);
 }
 
 void Player::InitLoad(void)
@@ -201,6 +232,8 @@ void Player::InitLoad(void)
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_ROLL);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_HIT);
 	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_DEATH);
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_KNOCKBACK);
+	ResourceManager::GetInstance()->Load(ResourceManager::SRC::PLAYER_ANIM_STANDING);
 }
 
 void Player::InitTransform(void)
@@ -257,10 +290,19 @@ void Player::InitAnimation(void)
 	AddAnimation(ANIM_TYPE::ROLL, ResourceManager::SRC::PLAYER_ANIM_ROLL, ROLL_ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::HIT, ResourceManager::SRC::PLAYER_ANIM_HIT, HIT_ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::DEAD, ResourceManager::SRC::PLAYER_ANIM_DEATH, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::KNOCKBACK, ResourceManager::SRC::PLAYER_ANIM_KNOCKBACK, KNOCKBACK_ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::STANDING, ResourceManager::SRC::PLAYER_ANIM_STANDING, STANDING_ANIMATION_SPEED);
 
-	// 回避アニメの前進を打ち消す
 	animationController_->SetRootFrame(MV1SearchFrame(modelId_, ROOT_FRAME_NAME));
+
+	// 回避アニメの腰のずれを打ち消す
 	animationController_->SetCancelRootMove(static_cast<int>(ANIM_TYPE::ROLL));
+	
+	// ノックバックアニメの腰のずれを打ち消す
+	animationController_->SetCancelRootMove(static_cast<int>(ANIM_TYPE::KNOCKBACK));
+
+	// 起き上がりアニメの腰のずれを打ち消す
+	animationController_->SetCancelRootMove(static_cast<int>(ANIM_TYPE::STANDING));
 }
 
 void Player::InitPost(void)
@@ -272,6 +314,7 @@ void Player::InitPost(void)
 	state_.Register(PLAYER_STATE::DEAD, std::make_unique<PlayerDeadState>());
 	state_.Register(PLAYER_STATE::DODGE, std::make_unique<PlayerDodgeState>());
 	state_.Register(PLAYER_STATE::HIT, std::make_unique<PlayerHitState>());
+	state_.Register(PLAYER_STATE::KNOCKBACK, std::make_unique<PlayerKnockbackState>());
 
 	state_.Start(PLAYER_STATE::IDLE);
 
@@ -345,6 +388,43 @@ void Player::FaceInputDir(void)
 	angle_.y = atan2f(moveDir_.x, moveDir_.z);
 }
 
+void Player::PrepareKnockback(const HitInfo& hitInfo)
+{
+	// 攻撃した側から自分へ向かう向き
+	VECTOR awayDir = VSub(pos_, hitInfo.attackerPos);
+	awayDir.y = 0.0f;
+
+	// 同じ位置なら、今の向きの後ろへ飛ばす
+	if (Math::EqualsVZero(awayDir))
+	{
+		awayDir = VScale(GetForward(), -1.0f);
+	}
+	awayDir = VNorm(awayDir);
+
+	// 横に吹き飛ばす向き
+	VECTOR sideDir = CalcKnockbackSideDir(hitInfo);
+
+	// 離れる向きに横向きを混ぜる
+	VECTOR mixedDir = VAdd(awayDir, VScale(sideDir, hitInfo.knockbackSideRate));
+
+	knockbackDir_ = VNorm(mixedDir);
+	knockbackSpeed_ = hitInfo.knockbackSpeed;
+}
+
+VECTOR Player::CalcKnockbackSideDir(const HitInfo& hitInfo) const
+{
+	// 攻撃した側の右方向
+	VECTOR attackerRight = { hitInfo.attackerForward.z, 0.0f, -hitInfo.attackerForward.x };
+
+	// 攻撃した側から自分への向き
+	VECTOR toSelf = VSub(pos_, hitInfo.attackerPos);
+
+	// 右側にいれば右へ、左側にいれば左へ飛ばす
+	if (VDot(toSelf, attackerRight) >= 0.0f) return attackerRight;
+
+	return VScale(attackerRight, -1.0f);
+}
+
 void Player::StartAttack(PLAYER_ATTACK_ID id)
 {
 	const AttackParam& param = attackParams_[static_cast<int>(id)];
@@ -396,17 +476,43 @@ const Hurtbox* Player::GetHurtbox(void) const
 
 void Player::StartHit(void)
 {
-	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_DAMAGE);
-
 	// のけぞりアニメーションを再生
 	AnimationController::PlayParam playParam;
 	playParam.isLoop = false;
 	playParam.blendFrame = HIT_BLEND_FRAME;
 	playParam.isForce = true;
 	animationController_->Play(static_cast<int>(ANIM_TYPE::HIT), playParam);
+
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_DAMAGE);
 }
 
 void Player::ExtendInvincible(int frame)
 {
 	health_.SetInvincible(frame);
+}
+
+void Player::StartKnockback(void)
+{
+	// 攻撃した側を向く
+	VECTOR faceDir = VScale(knockbackDir_, -1.0f);
+	angle_.y = atan2f(faceDir.x, faceDir.z);
+
+	moveDir_ = faceDir;
+
+	AnimationController::PlayParam playParam;
+	playParam.isLoop = false;
+	playParam.blendFrame = HIT_BLEND_FRAME;
+	playParam.isForce = true;
+	animationController_->Play(static_cast<int>(ANIM_TYPE::KNOCKBACK), playParam);
+
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_DAMAGE);
+}
+
+void Player::UpdateKnockbackMove(float decayRate)
+{
+	// 吹き飛ぶ向きへ進む
+	pos_ = VAdd(pos_, VScale(knockbackDir_, knockbackSpeed_));
+
+	// 少しずつ遅くする
+	knockbackSpeed_ *= decayRate;
 }

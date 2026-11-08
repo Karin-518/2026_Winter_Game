@@ -6,7 +6,7 @@
 namespace
 {
     // 待機時間
-    constexpr int WAIT_FRAME = 30;
+    constexpr int WAIT_FRAME = 20;
 }
 
 void BossIdleState::Enter(Boss& owner)
@@ -20,6 +20,13 @@ void BossIdleState::Enter(Boss& owner)
 
 BOSS_STATE BossIdleState::Update(Boss& owner)
 {
+    // プレイヤーが倒れている間は、待ち時間を数え始めない
+    if (owner.IsPlayerKnockedDown())
+    {
+        frame_ = 0;
+        return BOSS_STATE::NONE;
+    }
+
     frame_++;
 
     // 待機時間に達していなければ、待ち続ける

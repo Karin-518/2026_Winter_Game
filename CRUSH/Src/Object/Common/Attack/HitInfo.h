@@ -9,4 +9,6 @@ struct HitInfo
 	HIT_REACTION reaction = HIT_REACTION::FLINCH;	// 当たった側の反応
 	float knockbackSpeed = 0.0f;					// 吹き飛ばす速さ
 	VECTOR attackerPos = {};						// 攻撃した側の位置
+	VECTOR attackerForward = {};					// 攻撃した側の向き
+	float knockbackSideRate = 0.0f;					// 横に飛ばす割合
 };

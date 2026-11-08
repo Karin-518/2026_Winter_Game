@@ -8,5 +8,6 @@ enum class PLAYER_STATE
 	DODGE,
 	ATTACK,
 	HIT,
+	KNOCKBACK,
 	DEAD,
 };

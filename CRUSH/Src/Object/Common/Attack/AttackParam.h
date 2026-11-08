@@ -59,4 +59,7 @@ struct AttackParam
 
 	// ‚«”ò‚Î‚·‘¬‚³
 	float knockbackSpeed = 0.0f;
+
+	// ‰¡‚É”ò‚Î‚·Š„‡
+	float knockbackSideRate = 0.0f;
 };

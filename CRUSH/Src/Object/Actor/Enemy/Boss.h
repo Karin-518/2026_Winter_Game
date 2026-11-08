@@ -90,6 +90,9 @@ public:
 	// 回転
 	void RotateMoveDir(float addRad);
 
+	// プレイヤーが倒れているか
+	bool IsPlayerKnockedDown(void) const;
+
 protected:
 
 	// リソースロード

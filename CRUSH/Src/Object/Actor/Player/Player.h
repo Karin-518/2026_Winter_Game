@@ -27,6 +27,8 @@ public:
 		ROLL,
 		HIT,
 		DEAD,
+		KNOCKBACK,
+		STANDING,
 
 		MAX,
 	};
@@ -82,6 +84,21 @@ public:
 	// 無敵の残り香指定フレームより短ければ延ばす
 	void ExtendInvincible(int frame);
 
+	// 吹き飛び開始
+	void StartKnockback(void);
+
+	// 吹き飛ぶ向きへ進んで少しずつ遅くする
+	void UpdateKnockbackMove(float decayRate);
+
+	// 吹き飛びの速さ
+	float GetKnockbackSpeed(void) const { return knockbackSpeed_; }
+
+	// 起き上がり開始
+	void StartStanding(void);
+
+	// 吹き飛ばされて倒れているか
+	bool IsPlayerKnockedDown(void) const { return state_.GetStateId() == PLAYER_STATE::KNOCKBACK; }
+
 protected:
 
 	// リソースロード
@@ -122,6 +139,12 @@ private:
 	// 食らい判定
 	std::unique_ptr <PlayerHurtbox> hurtbox_;
 
+	// 吹き飛ぶ向き
+	VECTOR knockbackDir_;
+
+	// 吹き飛びの速さ
+	float knockbackSpeed_;
+
 	// HPが0になったときに呼ぶ
 	void OnDead(void);
 
@@ -136,4 +159,10 @@ private:
 
 	// 入力があれば、その方向へすぐ向く
 	void FaceInputDir(void);
+
+	// 当たった情報から吹き飛ぶ向きと速さを決める
+	void PrepareKnockback(const HitInfo& hitInfo);
+
+	// 吹き飛ばす横向き
+	VECTOR CalcKnockbackSideDir(const HitInfo& hitInfo) const;
 };
