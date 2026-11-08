@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Effect\EffectManager.cpp" />
+    <ClCompile Include="Src\Effect\EffectTable.cpp" />
     <ClCompile Include="Src\Object\Actor\Player\State\PlayerKnockbackState.cpp" />
     <ClCompile Include="Src\Object\Common\Bone\BoneSegment.cpp" />
     <ClCompile Include="Src\Object\Actor\Enemy\Action\BossTailSpinAction.cpp" />
@@ -76,6 +78,9 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Effect\EffectManager.h" />
+    <ClInclude Include="Src\Effect\EffectTable.h" />
+    <ClInclude Include="Src\Effect\EffectInfo.h" />
     <ClInclude Include="Src\Object\Actor\Player\State\PlayerKnockbackState.h" />
     <ClInclude Include="Src\Object\Common\Attack\AttackHitVolume.h" />
     <ClInclude Include="Src\Object\Common\Attack\HitInfo.h" />

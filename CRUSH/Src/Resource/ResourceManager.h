@@ -9,6 +9,7 @@ public:
 	// リソース名
 	enum class SRC
 	{
+		// モデル系
 		PLAYER,
 		PLAYER_SWORD,
 		PLAYER_ANIM_IDLE,
@@ -20,12 +21,16 @@ public:
 		PLAYER_ANIM_KNOCKBACK,
 		PLAYER_ANIM_STANDING,
 		PLAYER_ANIM_DEATH,
-
 		BOSS,
-
 		STAGE,
 
+		// 画像系
 		TITLE_LOGO,
+
+		// エフェクト系
+		EFFECT_HIT_SPARK,
+		EFFECT_RUSH_DUST,
+		EFFECT_WINDUP_GLOW,
 	};
 
 	// シングルトン（生成・取得・削除）

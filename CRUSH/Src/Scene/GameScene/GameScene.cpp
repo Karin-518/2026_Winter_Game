@@ -2,6 +2,7 @@
 #include "../../Application.h"
 #include "../../Audio/AudioManager.h"
 #include "../../Input/InputManager.h"
+#include "../../Effect/EffectManager.h"
 #include "../../Camera/Camera.h"
 #include "../../Object/Actor/Player/Player.h"
 #include "../../Object/Actor/Enemy/Boss.h"
@@ -91,6 +92,9 @@ void GameScene::LoadEnd(void)
 	RegisterCollision();
 
 	AudioManager::GetInstance()->PlayBGM(SoundID::BGM_BATTLE_1);
+
+	// エフェクトの読み込み
+	EffectManager::GetInstance()->Load();
 }
 
 void GameScene::Update(void)
@@ -119,6 +123,9 @@ void GameScene::Update(void)
 	// カメラの更新
 	camera_->Update();
 
+	// エフェクトの更新
+	EffectManager::GetInstance()->Update();
+
 	playerHpBar_.Update(player_->GetHealth().GetHp(), player_->GetHealth().GetMaxHp());
 
 	bossHpBar_.Update(boss_->GetHealth().GetHp(), boss_->GetHealth().GetMaxHp());
@@ -141,6 +148,9 @@ void GameScene::Draw(void)
 	// ボス描画
 	boss_->Draw();
 
+	// エフェクトの描画
+	EffectManager::GetInstance()->Draw();
+
 	// デバッグ描画
 	camera_->DrawDebug();
 
@@ -151,6 +161,9 @@ void GameScene::Draw(void)
 
 void GameScene::Release(void)
 {
+	// 再生中のエフェクトを止める
+	EffectManager::GetInstance()->StopAll();
+
 	// 登録を外してから、アクターを消す
 	collisionManager_.Clear();
 

@@ -1,9 +1,11 @@
 ﻿#include <DxLib.h>
+#include <EffekseerForDXLib.h>
 #include "Common/System/FpsControl.h"
 #include "Input/InputManager.h"
 #include "Scene/SceneManager.h"
 #include "Audio/AudioManager.h"
 #include "Resource/ResourceManager.h"
+#include "Effect/EffectManager.h"
 
 #include "Application.h"
 
@@ -37,12 +39,29 @@ void Application::Init(void)
 
 	// DxLibの初期化
 	SetUseDirect3DVersion(DX_DIRECT3D_11);
+
+	// 画面モードを変えても、エフェクシアの設定が消えないようにする
+	SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
+
 	isInitFail_ = false;
 	if (DxLib_Init() == -1)
 	{
 		isInitFail_ = true;
 		return;
 	}
+
+	// エフェクシアの初期化
+	if (Effekseer_Init(8000) == -1)
+	{
+		isInitFail_ = true;
+		return;
+	}
+
+	// デバイスが失われた時にエフェクシアを復元する
+	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
+
+	// エフェクト管理の初期化
+	EffectManager::CreateInstance();
 
 	// 描画先画面を裏にする
 	SetDrawScreen(DX_SCREEN_BACK);
@@ -108,6 +127,9 @@ void Application::Delete(void)
 	SceneManager::GetInstance()->Delete();
 	SceneManager::DeleteInstance();
 
+	// エフェクト管理削除
+	EffectManager::DeleteInstance();
+
 	// リソース管理削除
 	ResourceManager::DeleteInstance();
 
@@ -121,6 +143,9 @@ void Application::Delete(void)
 
 	// フレームレート解放
 	delete fps_;
+
+	// エフェクシアの終了
+	Effkseer_End();
 
 	// DxLib終了
 	if (DxLib_End() == -1)
