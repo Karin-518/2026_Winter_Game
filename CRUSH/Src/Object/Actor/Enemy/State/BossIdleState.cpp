@@ -6,7 +6,7 @@
 namespace
 {
     // ‘Ò‹@ŽžŠÔ
-    constexpr int WAIT_FRAME = 1*60;
+    constexpr int WAIT_FRAME = 30;
 }
 
 void BossIdleState::Enter(Boss& owner)

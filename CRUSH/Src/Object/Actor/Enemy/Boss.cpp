@@ -301,9 +301,9 @@ void Boss::InitAttackParam(void)
 	bite.width = 100.0f;
 
 	// ó≠ÇﬂÇ∆åÑ
-	bite.windupFrame = 80;
+	bite.windupFrame = 35;
 	bite.windupAnimRate = 0.2f;
-	bite.recoveryFrame = 30;
+	bite.recoveryFrame = 20;
 
 	AttackParam& rush = attackParams_[static_cast<int>(BOSS_ATTACK_ID::RUSH)];
 	rush.animType = static_cast<int>(ANIM_TYPE::RUN);
@@ -316,9 +316,9 @@ void Boss::InitAttackParam(void)
 	rush.width = 300.0f;
 
 	// ó≠ÇﬂÇ∆åÑ
-	rush.windupFrame = 80;
+	rush.windupFrame = 55;
 	rush.windupAnimRate = 0.2f;
-	rush.recoveryFrame = 50;
+	rush.recoveryFrame = 75;
 	rush.isManualActive = true;
 
 	AttackParam& tailSpin = attackParams_[static_cast<int>(BOSS_ATTACK_ID::TAIL_SPIN)];
@@ -332,9 +332,9 @@ void Boss::InitAttackParam(void)
 	tailSpin.halfAngleDeg = 180.0f;
 
 	// ó≠ÇﬂÇ∆åÑ
-	tailSpin.windupFrame = 80;
+	tailSpin.windupFrame = 45;
 	tailSpin.windupAnimRate = 1.0f;
-	tailSpin.recoveryFrame = 10;
+	tailSpin.recoveryFrame = 40;
 	tailSpin.isManualActive = true;
 
 	// çUåÇÇ≤Ç∆ÇÃìÆÇ´
