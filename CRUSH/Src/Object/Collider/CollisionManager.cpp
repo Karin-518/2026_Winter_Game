@@ -70,16 +70,6 @@ bool CollisionManager::IsTarget(const AttackEntry& entry, const Hurtbox& hurtbox
 
 bool CollisionManager::IsOverlap(const AttackEntry& entry, const Hurtbox& hurtbox) const
 {
-	const AttackParam* param = entry.attack_->GetParam();
-	const VECTOR& ownerPos = entry.owner_->GetPos();
-	VECTOR forward = entry.owner_->GetForward();
-
-	// 攻撃の形のおおよその真ん中
-	float distanceToCenter = param->offset + param->length * 0.5f;
-	VECTOR attackCenter = VAdd(ownerPos, VScale(forward, distanceToCenter));
-
-	// 食らい判定のうち、攻撃の真ん中に一番近い点を円として調べる
-	VECTOR closestPos = hurtbox.GetClosestPos(attackCenter);
-
+	// 形ごとの判定はAttackControllerに任せる
 	return entry.attack_->IsHit(entry.owner_->GetPos(), entry.owner_->GetForward(), hurtbox);
 }

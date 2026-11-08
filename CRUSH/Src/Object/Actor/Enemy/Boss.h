@@ -6,7 +6,7 @@
 #include "../../Common/Health/Health.h"
 #include "../../Common/Attack/AttackController.h"
 #include "../../Common/Attack/AttackParam.h"
-#include "../../Common/Bone/BOneSegment.h"
+#include "../../Common/Bone/BoneSegment.h"
 #include "BossAttackSelector.h"
 #include "State/BossState.h"
 #include "Action/BossAttackAction.h"

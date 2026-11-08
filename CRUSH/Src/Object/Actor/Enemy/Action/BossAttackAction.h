@@ -22,13 +22,12 @@ public:
 	// 攻撃本体に入った時
 	virtual void OnActiveStart(Boss& owner) {}
 
-	/// <summary>
-	/// 攻撃本体の間
-	/// </summary>
-	/// <param name="owner">攻撃しているボス</param>
-	/// <returns>trueなら攻撃本体を終えて、隙へ進む</returns>
+	// 攻撃本体の間
 	virtual bool UpdateActive(Boss& owner) = 0;
 
+	// 予備動作の音
 	virtual SoundID GetSignSoundID(void) const = 0;
+	
+	// 攻撃本体の音
 	virtual SoundID GetAttackSoundID(void) const = 0;
 };

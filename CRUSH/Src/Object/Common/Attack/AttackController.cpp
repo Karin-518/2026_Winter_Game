@@ -209,7 +209,7 @@ bool AttackController::IsHitCapsule(const Hurtbox& hurtbox) const
             capsule.startPos, capsule.endPos, param_->hitVolumes[volumeIndex].radius,
             hurtbox.GetStartPos(), hurtbox.GetEndPos(), hurtbox.GetRadius());
 
-        if (hitResult == true) return true;
+        if (hitResult == TRUE) return true;
     }
 
     return false;
