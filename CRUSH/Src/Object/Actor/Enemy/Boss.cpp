@@ -5,6 +5,7 @@
 #include "../../../Common/Math/MatrixUtility.h"
 #include "../../../Resource/ResourceManager.h"
 #include "../../Common/AnimationController/AnimationController.h"
+#include "../../Common/Attack/HitInfo.h"
 #include "../../Collider/Line/ColliderLine.h"
 #include "../../Collider/Capsule/ColliderCapsule.h"
 #include "../Player/Player.h"
@@ -121,9 +122,9 @@ void Boss::Draw(void)
 #endif //_DEBUG
 }
 
-bool Boss::OnHit(int damage)
+bool Boss::OnHit(const HitInfo& hitInfo)
 {
-	return health_.Damage(damage);
+	return health_.Damage(hitInfo.damage);
 }
 
 bool Boss::IsDead(void) const
@@ -293,6 +294,8 @@ void Boss::OnDead(void)
 
 void Boss::InitAttackParam(void)
 {
+	// Šš‚İ‚Â‚«
+	// ---------------------------------------
 	AttackParam& bite = attackParams_[static_cast<int>(BOSS_ATTACK_ID::BITE)];
 	bite.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
 	bite.damage = 10;
@@ -314,6 +317,8 @@ void Boss::InitAttackParam(void)
 	bite.windupAnimRate = 0.2f;
 	bite.recoveryFrame = 20;
 
+	// “Ëi
+	// ---------------------------------------
 	AttackParam& rush = attackParams_[static_cast<int>(BOSS_ATTACK_ID::RUSH)];
 	rush.animType = static_cast<int>(ANIM_TYPE::RUN);
 	rush.damage = 20;
@@ -330,6 +335,12 @@ void Boss::InitAttackParam(void)
 	rush.recoveryFrame = 75;
 	rush.isManualActive = true;
 
+	// ”í’eƒŠƒAƒNƒVƒ‡ƒ“‚Æ‚«”ò‚Î‚µ—Ê
+	rush.reaction = HIT_REACTION::KNOCKBACK;
+	rush.knockbackSpeed = 25.0f;
+
+	// K”ö‰ñ“]
+	// ---------------------------------------
 	AttackParam& tailSpin = attackParams_[static_cast<int>(BOSS_ATTACK_ID::TAIL_SPIN)];
 	tailSpin.animType = static_cast<int>(ANIM_TYPE::IDLE);
 	tailSpin.damage = 20;
@@ -349,6 +360,10 @@ void Boss::InitAttackParam(void)
 	tailSpin.windupAnimRate = 1.0f;
 	tailSpin.recoveryFrame = 40;
 	tailSpin.isManualActive = true;
+
+	// ”í’eƒŠƒAƒNƒVƒ‡ƒ“‚Æ‚«”ò‚Î‚µ—Ê
+	tailSpin.reaction = HIT_REACTION::KNOCKBACK;
+	tailSpin.knockbackSpeed = 20.0f;
 
 	// UŒ‚‚²‚Æ‚Ì“®‚«
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::BITE)] = std::make_unique<BossBiteAction>();

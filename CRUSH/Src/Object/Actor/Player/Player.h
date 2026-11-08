@@ -50,10 +50,10 @@ public:
 	void MoveByInput(float speed);
 
 	// ƒwƒ‹ƒX‚Ìæ“¾
-	const Health& GetHealth(void) { return health_; }
+	const Health& GetHealth(void) const { return health_; }
 
 	// UŒ‚‚ª“–‚½‚è‚»‚¤‚È‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
-	bool OnHit(int damage) override;
+	bool OnHit(const HitInfo& hitInfo) override;
 
 	// “|‚ê‚½‚©
 	bool IsDead(void) const;

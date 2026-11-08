@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "AttackHitVolume.h"
+#include "HitReaction.h"
 
 // ”»’è‚ÌŒ`
 enum class HIT_SHAPE
@@ -52,4 +53,10 @@ struct AttackParam
 
 	// CAPSULE‚Ì‚Ì”»’èƒŠƒXƒg
 	std::vector<AttackHitVolume> hitVolumes;
+
+	// “–‚½‚Á‚½‚Ì”½‰
+	HIT_REACTION reaction = HIT_REACTION::FLINCH;
+
+	// ‚«”ò‚Î‚·‘¬‚³
+	float knockbackSpeed = 0.0f;
 };

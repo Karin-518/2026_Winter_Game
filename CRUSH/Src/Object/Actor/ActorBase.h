@@ -7,6 +7,7 @@ class AnimationController;
 class ColliderLine;
 class ColliderCapsule;
 class ColliderModel;
+struct HitInfo;
 
 class ActorBase
 {
@@ -46,7 +47,7 @@ public:
 	void AddWallModel(const ColliderModel* model);
 
 	// UŒ‚‚ª“–‚½‚è‚»‚¤‚È‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
-	virtual bool OnHit(int damage) { return false; }
+	virtual bool OnHit(const HitInfo& hitInfo) { return false; }
 
 	// ©•ª‚ÌUŒ‚‚ª“–‚½‚Á‚½‚ÉŒÄ‚Î‚ê‚é
 	virtual void OnAttackHit(void) {}

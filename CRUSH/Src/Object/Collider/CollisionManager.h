@@ -5,6 +5,7 @@
 class ActorBase;
 class AttackController;
 class Hurtbox;
+struct HitInfo;
 
 class CollisionManager
 {
@@ -52,4 +53,7 @@ private:
 
 	// 攻撃の形と食らい判定が重なっているか
 	bool IsOverlap(const AttackEntry& entry, const Hurtbox& hurtbox) const;
+
+	// 攻撃の情報から当たった側へ渡す情報を作る
+	HitInfo MakeHitInfo(const AttackEntry& entry) const;
 };

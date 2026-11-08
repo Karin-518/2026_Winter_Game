@@ -1,6 +1,7 @@
 #include "../Actor/ActorBase.h"
 #include "../Common/Attack/AttackController.h"
 #include "../Common/Attack/AttackParam.h"
+#include "../Common/Attack/HitInfo.h"
 #include "Hurtbox.h"
 
 #include "CollisionManager.h"
@@ -51,8 +52,11 @@ void CollisionManager::CheckAttack(const AttackEntry& entry)
 		if (!IsTarget(entry, *hurtbox)) continue;
 		if (!IsOverlap(entry, *hurtbox)) continue;
 
+		// 当たった側へ渡す情報
+		HitInfo hitInfo = MakeHitInfo(entry);
+
 		// 当たった側に知らせる
-		bool isDamaged = hurtbox->GetOwner()->OnHit(entry.attack_->GetParam()->damage);
+		bool isDamaged = hurtbox->GetOwner()->OnHit(hitInfo);
 		if (!isDamaged) continue;
 
 		// 攻撃した側に知らせる
@@ -72,4 +76,16 @@ bool CollisionManager::IsOverlap(const AttackEntry& entry, const Hurtbox& hurtbo
 {
 	// 形ごとの判定はAttackControllerに任せる
 	return entry.attack_->IsHit(entry.owner_->GetPos(), entry.owner_->GetForward(), hurtbox);
+}
+
+HitInfo CollisionManager::MakeHitInfo(const AttackEntry& entry) const
+{
+	// 攻撃のデータ
+	const AttackParam* param = entry.attack_->GetParam();
+
+	HitInfo hitInfo;
+	hitInfo.damage = param->damage;
+	hitInfo.attackerPos = entry.owner_->GetPos();
+
+	return hitInfo;
 }

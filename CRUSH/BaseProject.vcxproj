@@ -76,6 +76,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Object\Common\Attack\AttackHitVolume.h" />
+    <ClInclude Include="Src\Object\Common\Attack\HitInfo.h" />
+    <ClInclude Include="Src\Object\Common\Attack\HitReaction.h" />
     <ClInclude Include="Src\Object\Common\Bone\BoneSegment.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\Action\BossTailSpinAction.h" />
     <ClInclude Include="Src\Object\Actor\Enemy\Action\BossRushAction.h" />

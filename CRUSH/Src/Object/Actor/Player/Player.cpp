@@ -6,6 +6,7 @@
 #include "../../../Camera/Camera.h"
 #include "../../../Resource/ResourceManager.h"
 #include "../../Common/AnimationController/AnimationController.h"
+#include "../../Common/Attack/HitInfo.h"
 #include "../../Collider/Line/ColliderLine.h"
 #include "../../Collider/Capsule/ColliderCapsule.h"
 #include "State/PlayerIdleState.h"
@@ -159,10 +160,10 @@ void Player::MoveByInput(float speed)
 	pos_ = VAdd(pos_, VScale(moveDir_, speed));
 }
 
-bool Player::OnHit(int damage)
+bool Player::OnHit(const HitInfo& hitInfo)
 {
 	// ダメージが通らなかったら何もしない
-	if (!health_.Damage(damage)) return false;
+	if (!health_.Damage(hitInfo.damage)) return false;
 
 	// 倒れたら、のけぞらない
 	if (health_.IsDead()) return true;
