@@ -81,12 +81,16 @@ void Boss::Update(void)
 	// ステートの更新
 	state_.Update();
 
+	// アニメ・回転・位置の更新
 	ActorBase::Update();
 
 	for (auto& part : parts_)
 	{
 		part->Update();
 	}
+
+	// 攻撃のボーンの位置をとる
+	UpdateAttackCapsules();
 
 	// 重みの回復
 	attackSelector_.Update();
@@ -265,6 +269,9 @@ void Boss::InitPost(void)
 	// 攻撃パラメータの設定
 	InitAttackParam();
 
+	// 攻撃の判定のボーンを準備
+	InitAttackSegments();
+
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 50.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_SPIN, 0.0f, NEAR_RADIUS, 30.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 40.0f);
@@ -346,6 +353,56 @@ void Boss::InitAttackParam(void)
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::RUSH)] = std::make_unique<BossRushAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::TAIL_SPIN)] = std::make_unique<BossTailSpinAction>();
 
+}
+
+void Boss::InitAttackSegments(void)
+{
+	for (int attackIndex = 0; attackIndex < static_cast<int>(BOSS_ATTACK_ID::MAX); attackIndex++)
+	{
+		InitSegmentsOfAttack(attackIndex);
+	}
+}
+
+void Boss::InitSegmentsOfAttack(int attackIndex)
+{
+	// この攻撃のデータ
+	const AttackParam& param = attackParams_[attackIndex];
+
+	// この攻撃の判定のボーン（判定の数だけ用意する）
+	std::vector<BoneSegment>& segments = attackSegments_[attackIndex];
+	segments.resize(param.hitVolumes.size());
+
+	for (int volumeIndex = 0; volumeIndex < static_cast<int>(param.hitVolumes.size()); volumeIndex++)
+	{
+		// この判定のボーン名
+		const AttackHitVolume& volume = param.hitVolumes[volumeIndex];
+
+		// ボーンを探す。見つからなければ名前の間違いを知らせる
+		bool isFound = segments[volumeIndex].Init(modelId_, volume.startFrameName, volume.endFrameName);
+		if (!isFound)
+		{
+			printfDx("攻撃のボーンが見つかりません：%s / %s\n",
+				volume.startFrameName, volume.endFrameName);
+		}
+	}
+}
+
+void Boss::UpdateAttackCapsules(void)
+{
+	// 攻撃中でなければ何もしない
+	if (!attackController_.IsAttacking()) return;
+	if (nextAttackId_ == BOSS_ATTACK_ID::NONE) return;
+
+	// 今の攻撃の判定のボーン
+	std::vector<BoneSegment>& segments = attackSegments_[static_cast<int>(nextAttackId_)];
+
+	for (int volumeIndex = 0; volumeIndex < static_cast<int>(segments.size()); volumeIndex++)
+	{
+		// 今のアニメのボーン位置を取って、カプセルに渡す
+		segments[volumeIndex].Update();
+		attackController_.SetCapsulePos(
+			volumeIndex, segments[volumeIndex].GetStartPos(), segments[volumeIndex].GetEndPos());
+	}
 }
 
 void Boss::FacePlayer(void)

@@ -6,6 +6,7 @@
 #include "../../Common/Health/Health.h"
 #include "../../Common/Attack/AttackController.h"
 #include "../../Common/Attack/AttackParam.h"
+#include "../../Common/Bone/BOneSegment.h"
 #include "BossAttackSelector.h"
 #include "State/BossState.h"
 #include "Action/BossAttackAction.h"
@@ -135,6 +136,9 @@ private:
 	// 部位の当たり判定
 	std::vector<std::unique_ptr<ColliderPart>> parts_;
 
+	// 攻撃ごとの判定ボーン
+	std::vector<BoneSegment> attackSegments_[static_cast<int>(BOSS_ATTACK_ID::MAX)];
+
 	// 部位の初期化
 	void InitParts(void);
 
@@ -143,4 +147,13 @@ private:
 
 	// 攻撃データの初期化
 	void InitAttackParam(void);
+
+	// 攻撃の判定のボーンを全部の攻撃分準備
+	void InitAttackSegments(void);
+
+	// 1つの攻撃の判定のボーンを準備
+	void InitSegmentsOfAttack(int attackIndex);
+
+	// 今の攻撃のカプセルをボーンの位置に合わせる
+	void UpdateAttackCapsules(void);
 };
