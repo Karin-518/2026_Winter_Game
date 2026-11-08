@@ -1,6 +1,6 @@
 #pragma once
-#include <DxLib.h>
 #include "../../Collider/Hurtbox.h"
+#include "../../Common/Bone/BoneSegment.h"
 #include "BossPart.h"
 
 class ActorBase;
@@ -26,17 +26,11 @@ public:
 
 private:
 
-	// モデルのハンドル
-	int modelId_;
-
-	// 開始フレームの番号
-	int startFrameIndex_;
-
-	// 終了フレームの番号
-	int endFrameIndex_;
-
 	// 部位
 	BOSS_PART part_;
+
+	// 部位のカプセルの芯になるボーン
+	BoneSegment boneSegment_;
 
 	// ダメージ倍率
 	float damageMultiplier_;

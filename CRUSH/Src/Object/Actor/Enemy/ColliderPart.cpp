@@ -3,12 +3,19 @@
 ColliderPart::ColliderPart(int modelId, const BossPartParam& param, ActorBase* owner)
 	:
 	Hurtbox(ColliderBase::TAG::ENEMY, owner, param.radius_),
-	modelId_(modelId),
-	startFrameIndex_(MV1SearchFrame(modelId, param.startFrameName_)),
-	endFrameIndex_(MV1SearchFrame(modelId, param.endFrameName_)),
 	part_(param.part_),
+	boneSegment_(),
 	damageMultiplier_(param.damageMultiplier_)
 {
+	// ボーンを探す
+	bool isFound = boneSegment_.Init(modelId, param.startFrameName_, param.endFrameName_);
+	
+	// 見つからなければ名前の間違いを知らせる
+	if (!isFound)
+	{
+		printfDx("部位のボーンが見つかりません：%s / %s\n",
+			param.startFrameName_, param.endFrameName_);
+	}
 }
 
 ColliderPart::~ColliderPart(void)
@@ -17,11 +24,10 @@ ColliderPart::~ColliderPart(void)
 
 void ColliderPart::Update(void)
 {
+	boneSegment_.Update();
+
 	// フレームが見つかっていない
-	if (startFrameIndex_ == -1 || endFrameIndex_ == -1) return;
+	if (!boneSegment_.IsValid()) return;
 
-	VECTOR startFramePos = MV1GetFramePosition(modelId_, startFrameIndex_);
-	VECTOR endFramePos = MV1GetFramePosition(modelId_, endFrameIndex_);
-
-	SetSegment(startFramePos, endFramePos);
+	SetSegment(boneSegment_.GetStartPos(), boneSegment_.GetEndPos());
 }
