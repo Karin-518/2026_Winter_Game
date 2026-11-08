@@ -55,5 +55,8 @@ private:
 	bool IsOverlap(const AttackEntry& entry, const Hurtbox& hurtbox) const;
 
 	// 攻撃の情報から当たった側へ渡す情報を作る
-	HitInfo MakeHitInfo(const AttackEntry& entry) const;
+	HitInfo MakeHitInfo(const AttackEntry& entry, const Hurtbox& hurtbox) const;
+
+	// 食らい判定の表面で攻撃した側に一番近い位置
+	VECTOR CalcHitSurfacePos(const Hurtbox& hurtbox, const VECTOR& attackerPos) const;
 };

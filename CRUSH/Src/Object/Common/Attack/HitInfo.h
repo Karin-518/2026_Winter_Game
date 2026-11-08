@@ -11,4 +11,5 @@ struct HitInfo
 	VECTOR attackerPos = {};						// 攻撃した側の位置
 	VECTOR attackerForward = {};					// 攻撃した側の向き
 	float knockbackSideRate = 0.0f;					// 横に飛ばす割合
+	VECTOR hitPos = {};								// 当たった位置
 };

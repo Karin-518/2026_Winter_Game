@@ -4,6 +4,7 @@
 #include "../../../Common/Math/Math.h"
 #include "../../../Common/Math/MatrixUtility.h"
 #include "../../../Resource/ResourceManager.h"
+#include "../../../Effect/EffectManager.h"
 #include "../../Common/AnimationController/AnimationController.h"
 #include "../../Common/Attack/HitInfo.h"
 #include "../../Collider/Line/ColliderLine.h"
@@ -124,6 +125,8 @@ void Boss::Draw(void)
 
 bool Boss::OnHit(const HitInfo& hitInfo)
 {
+	EffectManager::GetInstance()->Play(EFFECT_ID::HIT_SPARK, hitInfo.hitPos);
+
 	return health_.Damage(hitInfo.damage);
 }
 

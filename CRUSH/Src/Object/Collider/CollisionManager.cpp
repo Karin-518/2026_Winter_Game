@@ -53,7 +53,7 @@ void CollisionManager::CheckAttack(const AttackEntry& entry)
 		if (!IsOverlap(entry, *hurtbox)) continue;
 
 		// 当たった側へ渡す情報
-		HitInfo hitInfo = MakeHitInfo(entry);
+		HitInfo hitInfo = MakeHitInfo(entry, *hurtbox);
 
 		// 当たった側に知らせる
 		bool isDamaged = hurtbox->GetOwner()->OnHit(hitInfo);
@@ -78,10 +78,13 @@ bool CollisionManager::IsOverlap(const AttackEntry& entry, const Hurtbox& hurtbo
 	return entry.attack_->IsHit(entry.owner_->GetPos(), entry.owner_->GetForward(), hurtbox);
 }
 
-HitInfo CollisionManager::MakeHitInfo(const AttackEntry& entry) const
+HitInfo CollisionManager::MakeHitInfo(const AttackEntry& entry, const Hurtbox& hurtbox) const
 {
 	// 攻撃のデータ
 	const AttackParam* param = entry.attack_->GetParam();
+
+	// 攻撃した側の位置
+	const VECTOR& attackerPos = entry.owner_->GetPos();
 
 	HitInfo hitInfo;
 	hitInfo.damage = param->damage;
@@ -90,6 +93,25 @@ HitInfo CollisionManager::MakeHitInfo(const AttackEntry& entry) const
 	hitInfo.knockbackSpeed = param->knockbackSpeed;
 	hitInfo.attackerForward = entry.owner_->GetForward();
 	hitInfo.knockbackSideRate = param->knockbackSideRate;
+	hitInfo.hitPos = CalcHitSurfacePos(hurtbox, attackerPos);
 
 	return hitInfo;
+}
+
+VECTOR CollisionManager::CalcHitSurfacePos(const Hurtbox& hurtbox, const VECTOR& attackerPos) const
+{
+	// 食らい判定の芯の上で、攻撃した側に一番近い点
+	VECTOR closestPos = hurtbox.GetClosestPos(attackerPos);
+
+	// 芯から攻撃した側への向き（上下は見ない）
+	VECTOR toAttacker = VSub(attackerPos, closestPos);
+	toAttacker.y = 0.0f;
+
+	// 向きが分からないときは、芯の上の点をそのまま使う
+	if (VSize(toAttacker) <= 0.0f) return closestPos;
+
+	// 半径の分だけ外へ出して、カプセルの表面にする
+	VECTOR surfaceOffset = VScale(VNorm(toAttacker), hurtbox.GetRadius());
+
+	return VAdd(closestPos, surfaceOffset);
 }
