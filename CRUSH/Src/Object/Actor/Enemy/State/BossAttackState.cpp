@@ -64,7 +64,13 @@ void BossAttackState::UpdateActive(Boss& owner)
 	// 隙へ
 	owner.SetAttackActive(false);
 	owner.EndAttack();
-	owner.GetAnimationController()->Play(static_cast<int>(Boss::ANIM_TYPE::IDLE));
+
+	// 待機アニメをループで再生し直す
+	AnimationController::PlayParam playParam;
+	playParam.isLoop = true;
+	playParam.isForce = true;
+	owner.GetAnimationController()->Play(static_cast<int>(Boss::ANIM_TYPE::IDLE), playParam);
+
 	ChangePhase(ATTACK_PHASE::RECOVERY);
 }
 
