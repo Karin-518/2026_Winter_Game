@@ -51,7 +51,7 @@ void ResourceManager::Init(void)
 
 	// エフェクト
 	Register(SRC::EFFECT_HIT_SPARK, Resource::TYPE::EFFEKSEER, Application::PATH_EFFECT + "HitSpark.efkefc");
-	Register(SRC::EFFECT_RUSH_DUST, Resource::TYPE::EFFEKSEER, Application::PATH_EFFECT + "RushDust.efkefc");
+	Register(SRC::EFFECT_RUSH_DUST, Resource::TYPE::EFFEKSEER, Application::PATH_EFFECT + "Dust.efkefc");
 	Register(SRC::EFFECT_WINDUP_GLOW, Resource::TYPE::EFFEKSEER, Application::PATH_EFFECT + "WindupGlow.efkefc");
 }
 
