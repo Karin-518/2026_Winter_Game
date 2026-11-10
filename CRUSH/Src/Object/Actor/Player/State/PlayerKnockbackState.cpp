@@ -38,6 +38,11 @@ PLAYER_STATE PlayerKnockbackState::Update(Player& owner)
 	return UpdateStanding(owner);
 }
 
+void PlayerKnockbackState::Exit(Player& owner)
+{
+	owner.EndDamageVignette();
+}
+
 void PlayerKnockbackState::UpdateFly(Player& owner)
 {
 	// 後ろへ滑って、少しずつ遅くする
