@@ -8,7 +8,7 @@ AudioManager* AudioManager::instance_ = nullptr;
 
 AudioManager::AudioManager(void)
 {
-	currentBgm_ = SoundID::NON;
+	currentBgm_ = SOUND_ID::NON;
 	bgmVolume_ = 255;	
 	seVolume_ = 255;
 	masterVolume_ = 255;
@@ -23,7 +23,7 @@ AudioManager::~AudioManager(void)
 void AudioManager::Init(void)
 {
 	// 現在再生されているBGM
-	currentBgm_ = SoundID::NON;
+	currentBgm_ = SOUND_ID::NON;
 
 	bgmVolume_ = 255;		// bgm音量
 	seVolume_ = 255;		// se音量
@@ -33,7 +33,7 @@ void AudioManager::Init(void)
 void AudioManager::LoadSceneSound(LoadScene scene)
 {
 	// 空のテーブルを用意
-	const std::unordered_map<SoundID, SoundData>* table = nullptr;
+	const std::unordered_map<SOUND_ID, SoundData>* table = nullptr;
 
 	// シーンで読み込みたいテーブルを切り替える
 	switch (scene)
@@ -73,7 +73,7 @@ void AudioManager::LoadSceneSound(LoadScene scene)
 void AudioManager::DeleteSceneSound(LoadScene scene)
 {
 	// 空のテーブルを用意
-	const std::unordered_map<SoundID, SoundData>* table = nullptr;
+	const std::unordered_map<SOUND_ID, SoundData>* table = nullptr;
 
 	// シーンで削除したいテーブルを切り替える
 	switch (scene)
@@ -103,7 +103,7 @@ void AudioManager::DeleteSceneSound(LoadScene scene)
 	}
 }
 
-void AudioManager::PlayBGM(SoundID id)
+void AudioManager::PlayBGM(SOUND_ID id)
 {
 	// IDからサウンドハンドルを抽出
 	auto it = handles_.find(id);
@@ -118,7 +118,7 @@ void AudioManager::PlayBGM(SoundID id)
 		return;
 
 	// 別のBGMが再生中なら停止
-	if (currentBgm_ != SoundID::NON)
+	if (currentBgm_ != SOUND_ID::NON)
 		StopBGM();
 
 	// BGMを更新
@@ -138,7 +138,7 @@ void AudioManager::PlayBGM(SoundID id)
 void AudioManager::StopBGM()
 {
 	// 何も再生されていないなら何もしない
-	if (currentBgm_ == SoundID::NON)
+	if (currentBgm_ == SOUND_ID::NON)
 		return;
 
 	// IDからサウンドハンドルを抽出
@@ -150,10 +150,10 @@ void AudioManager::StopBGM()
 		StopSoundMem(it->second.handle);
 
 	// 現在のBGMを再生していない状態に更新
-	currentBgm_ = SoundID::NON;
+	currentBgm_ = SOUND_ID::NON;
 }
 
-void AudioManager::PlaySE(SoundID id)
+void AudioManager::PlaySE(SOUND_ID id)
 {
 	// IDからサウンドハンドルを抽出
 	auto it = handles_.find(id);
@@ -201,7 +201,7 @@ void AudioManager::SetBgmVolume(int volume)
 	bgmVolume_ = std::clamp(volume, 0, 255);
 
 	// 別のBGMが再生中
-	if (currentBgm_ != SoundID::NON)
+	if (currentBgm_ != SOUND_ID::NON)
 	{
 		// IDからサウンドハンドルを抽出
 		auto it = handles_.find(currentBgm_);
@@ -231,7 +231,7 @@ void AudioManager::SetMasterVolume(int volume)
 	masterVolume_ = std::clamp(volume, 0, 255);
 
 	// 再生中のBGMに即時反映
-	if (currentBgm_ != SoundID::NON)
+	if (currentBgm_ != SOUND_ID::NON)
 	{
 		// IDからサウンドハンドルを抽出
 		auto it = handles_.find(currentBgm_);

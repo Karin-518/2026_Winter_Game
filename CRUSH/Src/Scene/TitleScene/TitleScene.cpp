@@ -36,7 +36,7 @@ void TitleScene::Load(void)
 void TitleScene::LoadEnd(void)
 {
 	Init();
-	AudioManager::GetInstance()->PlayBGM(SoundID::BGM_TITLE);
+	AudioManager::GetInstance()->PlayBGM(SOUND_ID::BGM_TITLE);
 }
 
 void TitleScene::Update(void)
@@ -44,7 +44,7 @@ void TitleScene::Update(void)
 	// Esc を押したら終了確認へ
 	if (InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::CANCEL))
 	{
-		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON_CANCEL);
+		AudioManager::GetInstance()->PlaySE(SOUND_ID::SYS_BUTTON_CANCEL);
 		SceneManager::GetInstance()->PushScene(std::make_shared<ConfirmScene>());
 		return;
 	}
@@ -53,7 +53,7 @@ void TitleScene::Update(void)
 	if(InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::DECIDE))
 	{
 		// ゲームシーンへ
-		AudioManager::GetInstance()->PlaySE(SoundID::TITLE_PUSH_BUTTON);
+		AudioManager::GetInstance()->PlaySE(SOUND_ID::TITLE_PUSH_BUTTON);
 		SceneManager::GetInstance()->ChangeScene(std::make_shared<GameScene>());
 		return;
 	}

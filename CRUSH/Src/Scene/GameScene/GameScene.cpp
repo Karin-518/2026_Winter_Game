@@ -91,7 +91,7 @@ void GameScene::LoadEnd(void)
 	// 攻撃と食らい判定を登録
 	RegisterCollision();
 
-	AudioManager::GetInstance()->PlayBGM(SoundID::BGM_BATTLE_1);
+	AudioManager::GetInstance()->PlayBGM(SOUND_ID::BGM_BATTLE_1);
 
 	// エフェクトの読み込み
 	EffectManager::GetInstance()->Load();
@@ -101,7 +101,7 @@ void GameScene::Update(void)
 {
 	if (InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::PAUSE))
 	{
-		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON_CANCEL);
+		AudioManager::GetInstance()->PlaySE(SOUND_ID::SYS_BUTTON_CANCEL);
 
 		// ポーズシーンへ
 		SceneManager::GetInstance()->PushScene(std::make_shared<PauseScene>());

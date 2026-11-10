@@ -9,12 +9,12 @@ bool BossBiteAction::UpdateActive(Boss& owner)
     return owner.GetAnimationController()->IsEnd();
 }
 
-SoundID BossBiteAction::GetSignSoundID(void) const
+SOUND_ID BossBiteAction::GetSignSoundID(void) const
 {
-    return SoundID::SE_BOSS_BITE_SIGN;
+    return SOUND_ID::SE_BOSS_BITE_SIGN;
 }
 
-SoundID BossBiteAction::GetAttackSoundID(void) const
+SOUND_ID BossBiteAction::GetAttackSoundID(void) const
 {
-    return SoundID::SE_BOSS_BITE;
+    return SOUND_ID::SE_BOSS_BITE;
 }

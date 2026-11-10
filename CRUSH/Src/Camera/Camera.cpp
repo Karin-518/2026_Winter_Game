@@ -26,7 +26,7 @@ namespace
 
 	// カメラのクリップ範囲
 	constexpr float VIEW_NEAR = 20.0f;
-	constexpr float VIEW_FAR = 5000.0f;
+	constexpr float VIEW_FAR = 8000.0f;
 
 	// マウスの感度
 	constexpr float MOUSE_SENSITIVITY_DEG = 0.1f;
@@ -386,7 +386,7 @@ void Camera::StartReset(void)
 	resetFrame_ = 0;
 	isResetting_ = true;
 
-	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_CAMERA_RESET);
+	AudioManager::GetInstance()->PlaySE(SOUND_ID::SE_PLAYER_CAMERA_RESET);
 }
 
 void Camera::UpdateReset(void)

@@ -34,9 +34,9 @@ public:
 	// 指定したシーンのサウンドテーブルを削除する
 	void DeleteSceneSound(LoadScene scene);
 
-	void PlayBGM(SoundID id);		// BGMを再生
+	void PlayBGM(SOUND_ID id);		// BGMを再生
 	void StopBGM(void);				// BGMを止める
-	void PlaySE(SoundID id);		// SEを再生
+	void PlaySE(SOUND_ID id);		// SEを再生
 	void DeleteAll(void);			// 全てのサウンド削除
 
 	// 音量設定
@@ -49,10 +49,10 @@ public:
 	int GetMasterVolume(int volume) const { return masterVolume_; }
 
 private:
-	std::unordered_map<SoundID, SoundResource> handles_;	// ハンドル管理用
+	std::unordered_map<SOUND_ID, SoundResource> handles_;	// ハンドル管理用
 
 	// 現在再生されているBGM
-	SoundID currentBgm_;
+	SOUND_ID currentBgm_;
 
 	int bgmVolume_;		// bgm音量
 	int seVolume_;		// se音量

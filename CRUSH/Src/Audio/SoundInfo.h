@@ -2,7 +2,7 @@
 #include <string>
 
 // ƒTƒEƒ“ƒhID
-enum class SoundID
+enum class SOUND_ID
 {
 	NON = -1,
 

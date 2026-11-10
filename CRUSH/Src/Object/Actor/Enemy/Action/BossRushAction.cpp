@@ -1,3 +1,4 @@
+#include "../../../../Effect/EffectManager.h"
 #include "../../../Common/AnimationController/AnimationController.h"
 #include "../Boss.h"
 
@@ -28,6 +29,11 @@ BossRushAction::BossRushAction(void)
 
 BossRushAction::~BossRushAction(void)
 {
+}
+
+void BossRushAction::OnWindupStart(Boss& owner)
+{
+	EffectManager::GetInstance()->Play(EFFECT_ID::RUSH_DUST, owner.GetPos());
 }
 
 void BossRushAction::UpdateWindup(Boss& owner)
@@ -69,12 +75,12 @@ bool BossRushAction::UpdateActive(Boss& owner)
 	return false;
 }
 
-SoundID BossRushAction::GetSignSoundID(void) const
+SOUND_ID BossRushAction::GetSignSoundID(void) const
 {
-	return SoundID::SE_BOSS_RUSH_SIGN;
+	return SOUND_ID::SE_BOSS_RUSH_SIGN;
 }
 
-SoundID BossRushAction::GetAttackSoundID(void) const
+SOUND_ID BossRushAction::GetAttackSoundID(void) const
 {
-	return SoundID::SE_BOSS_RUSH;
+	return SOUND_ID::SE_BOSS_RUSH;
 }

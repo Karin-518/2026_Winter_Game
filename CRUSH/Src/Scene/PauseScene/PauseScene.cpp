@@ -86,7 +86,7 @@ void PauseScene::Update(void)
 	// ポーズ中にポーズボタンを押したら
 	if (InputManager::GetInstance()->IsActionUp(INPUT_INFO::ACTION::PAUSE))
 	{
-		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON_CANCEL);
+		AudioManager::GetInstance()->PlaySE(SOUND_ID::SYS_BUTTON_CANCEL);
 		// ゲームシーンへ
 		Execute(MENU_TYPE::CONTINUE);
 		return;
@@ -157,7 +157,7 @@ void PauseScene::SelectByAction(void)
 	{
 		if (!isUpPressed && !isDownPressed) return;
 
-		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT);
+		AudioManager::GetInstance()->PlaySE(SOUND_ID::SYS_SELECT);
 		selectIndex_ = DEFAULT_SELECT_INDEX;
 		return;
 	}
@@ -167,14 +167,14 @@ void PauseScene::SelectByAction(void)
 	// 下へ
 	if (isDownPressed && selectIndex_ < buttonCount - 1)
 	{
-		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT);
+		AudioManager::GetInstance()->PlaySE(SOUND_ID::SYS_SELECT);
 		selectIndex_++;
 	}
 
 	// 上へ
 	if (isUpPressed && selectIndex_ > 0)
 	{
-		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT);
+		AudioManager::GetInstance()->PlaySE(SOUND_ID::SYS_SELECT);
 		selectIndex_--;
 	}
 }
@@ -193,7 +193,7 @@ void PauseScene::SelectByMouse(void)
 	// 別のボタンに乗ったときだけ音を鳴らす（外に出たときは鳴らさない）
 	if (hoveredIndex != selectIndex_ && hoveredIndex != NO_SELECT_INDEX)
 	{
-		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT);
+		AudioManager::GetInstance()->PlaySE(SOUND_ID::SYS_SELECT);
 	}
 
 	selectIndex_ = hoveredIndex;
@@ -207,7 +207,7 @@ void PauseScene::Decide(void)
 
 	if (!IsDecidedByAction() && !IsDecidedByMouse()) return;
 
-	AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON_DECIDE);
+	AudioManager::GetInstance()->PlaySE(SOUND_ID::SYS_BUTTON_DECIDE);
 	Execute(menuButtons_[selectIndex_].menuType_);
 }
 

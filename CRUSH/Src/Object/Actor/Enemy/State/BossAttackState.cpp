@@ -1,4 +1,5 @@
 #include "../../../../Audio/AudioManager.h"
+#include "../../../../Effect/EffectManager.h"
 #include "../../../Common/AnimationController/AnimationController.h"
 #include "../Action/BossAttackAction.h"
 #include "../Boss.h"
@@ -98,5 +99,4 @@ void BossAttackState::ChangePhase(ATTACK_PHASE nextPhase)
 		AudioManager::GetInstance()->PlaySE(action_->GetAttackSoundID());
 		return;
 	}
-
 }

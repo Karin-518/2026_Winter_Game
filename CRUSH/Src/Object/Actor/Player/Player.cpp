@@ -440,7 +440,7 @@ void Player::StartAttack(PLAYER_ATTACK_ID id)
 	animationController_->Play(param.animType, playParam);
 
 	// SE‚ðÄ¶
-	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_SWING_1);
+	AudioManager::GetInstance()->PlaySE(SOUND_ID::SE_PLAYER_SWING_1);
 
 	// ”»’è‚Ì€”õ
 	attackController_.Start(param);
@@ -458,7 +458,7 @@ void Player::OnAttackHit(void)
 
 void Player::StartDodge(int invincibleFrame)
 {
-	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_DODGE);
+	AudioManager::GetInstance()->PlaySE(SOUND_ID::SE_PLAYER_DODGE);
 
 	animationController_->Play(static_cast<int>(ANIM_TYPE::ROLL), false);
 
@@ -483,7 +483,7 @@ void Player::StartHit(void)
 	playParam.isForce = true;
 	animationController_->Play(static_cast<int>(ANIM_TYPE::HIT), playParam);
 
-	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_DAMAGE);
+	AudioManager::GetInstance()->PlaySE(SOUND_ID::SE_PLAYER_DAMAGE);
 }
 
 void Player::ExtendInvincible(int frame)
@@ -505,7 +505,7 @@ void Player::StartKnockback(void)
 	playParam.isForce = true;
 	animationController_->Play(static_cast<int>(ANIM_TYPE::KNOCKBACK), playParam);
 
-	AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_DAMAGE);
+	AudioManager::GetInstance()->PlaySE(SOUND_ID::SE_PLAYER_DAMAGE);
 }
 
 void Player::UpdateKnockbackMove(float decayRate)

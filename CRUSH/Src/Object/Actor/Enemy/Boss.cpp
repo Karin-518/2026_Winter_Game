@@ -41,6 +41,8 @@ namespace
 
 	// アニメーション速度
 	constexpr float ANIMATION_SPEED = 0.5f;
+
+	// 噛みつきアニメーション速度
 	constexpr float BITE_ANIMATION_SPEED = 0.7f;
 
 	// 初期位置
@@ -59,7 +61,7 @@ namespace
 	constexpr float NEAR_RADIUS = 900.0f;
 
 	// 長距離とみなす半径
-	constexpr float FAR_RADIUS = 2000.0f;
+	constexpr float FAR_RADIUS = 3000.0f;
 }
 
 Boss::Boss(Player* player)

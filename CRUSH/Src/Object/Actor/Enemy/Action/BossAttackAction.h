@@ -1,4 +1,5 @@
 #pragma once
+#include <DxLib.h>
 #include "../../../../Audio/SoundInfo.h"
 
 class Boss;
@@ -26,8 +27,8 @@ public:
 	virtual bool UpdateActive(Boss& owner) = 0;
 
 	// 予備動作の音
-	virtual SoundID GetSignSoundID(void) const = 0;
+	virtual SOUND_ID GetSignSoundID(void) const = 0;
 	
 	// 攻撃本体の音
-	virtual SoundID GetAttackSoundID(void) const = 0;
+	virtual SOUND_ID GetAttackSoundID(void) const = 0;
 };
