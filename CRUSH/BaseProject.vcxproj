@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Common\HitStop\HitStop.cpp" />
     <ClCompile Include="Src\Effect\EffectManager.cpp" />
     <ClCompile Include="Src\Effect\EffectTable.cpp" />
     <ClCompile Include="Src\Object\Actor\Player\State\PlayerKnockbackState.cpp" />
@@ -79,6 +80,7 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Common\HitStop\HitStop.h" />
     <ClInclude Include="Src\Effect\EffectManager.h" />
     <ClInclude Include="Src\Effect\EffectTable.h" />
     <ClInclude Include="Src\Effect\EffectInfo.h" />
@@ -169,6 +171,9 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\Shader\vignette.pso" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

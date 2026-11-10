@@ -100,7 +100,8 @@ Player::Player(Camera* camera)
 	attackParams_(),
 	weapon_(),
 	knockbackDir_(),
-	knockbackSpeed_(0.0f)
+	knockbackSpeed_(0.0f),
+	hitStop_()
 {
 }
 
@@ -110,6 +111,13 @@ Player::~Player(void)
 
 void Player::Update(void)
 {
+	// ヒットストップ
+	if (hitStop_.IsStopping())
+	{
+		hitStop_.Update();
+		return;
+	}
+
 	// 無敵の残りを減らす
 	health_.Update();
 
@@ -194,11 +202,13 @@ bool Player::OnHit(const HitInfo& hitInfo)
 		// ノックバック処理
 		PrepareKnockback(hitInfo);
 		state_.RequestState(PLAYER_STATE::KNOCKBACK);
+		hitStop_.Start(15);
 		return true;
 	}
 
 	// 怯み
 	state_.RequestState(PLAYER_STATE::HIT);
+	hitStop_.Start(15);
 	return true;
 }
 

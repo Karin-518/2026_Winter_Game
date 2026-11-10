@@ -4,6 +4,7 @@
 #include "../../Common/Health/Health.h"
 #include "../../Common/Attack/AttackController.h"
 #include "../../Common/Attack/AttackParam.h"
+#include "../../Common/HitStop/HitStop.h"
 #include "../ActorBase.h"
 #include "State/PlayerState.h"
 #include "PlayerAttackType.h"
@@ -12,6 +13,7 @@
 class Camera;
 class PlayerHurtbox;
 class Hurtbox;
+
 
 class Player : public ActorBase
 {
@@ -147,6 +149,9 @@ private:
 
 	// 吹き飛びの速さ
 	float knockbackSpeed_;
+
+	// ヒットストップ
+	HitStop hitStop_;
 
 	// HPが0になったときに呼ぶ
 	void OnDead(void);
