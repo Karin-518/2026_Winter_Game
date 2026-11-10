@@ -1,7 +1,9 @@
 #include <DxLib.h>
+#include "../Application.h"
 #include "Loading/Loading.h"
 #include "TitleScene/TitleScene.h"
 #include "../Resource/ResourceManager.h"
+#include "../Shader/Shader.h"
 
 #include "SceneManager.h"
 
@@ -13,7 +15,9 @@ SceneManager::SceneManager(void)
 	load_(nullptr),
 	isGameEnd_(false),
 	request_(REQUEST::NONE),
-	nextScene_(nullptr)
+	nextScene_(nullptr),
+	shader_(nullptr),
+	mainScreen_(-1)
 {
 }
 
@@ -30,6 +34,11 @@ void SceneManager::Init(void)
 
 	// 3D情報の初期化
 	Init3D();
+
+	mainScreen_ = MakeScreen(Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, true);
+
+	shader_ = new Shader();
+	shader_->Init();
 
 	// 最初はタイトル画面から
 	ChangeScene(std::make_shared<TitleScene>());
@@ -76,7 +85,6 @@ void SceneManager::Update(void)
 			// ロード後の初期化
 			scenes_.back()->LoadEnd();
 		}
-
 		return;
 	}
 
@@ -94,12 +102,20 @@ void SceneManager::Draw(void)
 		return;
 	}
 
+	SetDrawScreen(mainScreen_);
+	ClearDrawScreen();
+
 	// 積まれているもの全てを描画する
 	for (auto& scene : scenes_)
 	{
 		// シーンの描画
 		scene->Draw();
 	}
+
+	SetDrawScreen(DX_SCREEN_BACK);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+
+	shader_->Draw(mainScreen_);
 }
 
 void SceneManager::Delete(void)
@@ -116,6 +132,10 @@ void SceneManager::Delete(void)
 	load_->Release();
 	delete load_;
 	load_ = nullptr;
+
+	shader_->Release();
+	delete shader_;
+	DeleteGraph(mainScreen_);
 }
 
 void SceneManager::ChangeScene(std::shared_ptr<SceneBase> scene)

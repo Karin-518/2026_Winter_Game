@@ -99,6 +99,9 @@ public:
 	// 吹き飛ばされて倒れているか
 	bool IsPlayerKnockedDown(void) const { return state_.GetStateId() == PLAYER_STATE::KNOCKBACK; }
 
+	// 被弾のビネットを通常に戻す
+	void EndDamageVignette(void);
+
 protected:
 
 	// リソースロード

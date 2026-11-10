@@ -28,3 +28,8 @@ PLAYER_STATE PlayerHitState::Update(Player& owner)
 	// のけぞり中は入力を受け付けない
 	return PLAYER_STATE::NONE;
 }
+
+void PlayerHitState::Exit(Player& owner)
+{
+	owner.EndDamageVignette();
+}

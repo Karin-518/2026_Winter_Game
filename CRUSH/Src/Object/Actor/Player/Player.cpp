@@ -5,6 +5,8 @@
 #include "../../../Common/Math/MatrixUtility.h"
 #include "../../../Camera/Camera.h"
 #include "../../../Resource/ResourceManager.h"
+#include "../../../Scene/SceneManager.h"
+#include "../../../Shader/Shader.h"
 #include "../../Common/AnimationController/AnimationController.h"
 #include "../../Common/Attack/HitInfo.h"
 #include "../../Collider/Line/ColliderLine.h"
@@ -177,6 +179,9 @@ bool Player::OnHit(const HitInfo& hitInfo)
 	// ダメージが通らなかったら何もしない
 	if (!health_.Damage(hitInfo.damage)) return false;
 
+	SceneManager::GetInstance()->GetShader()->
+		SetVignettePower(Shader::DAMAGE_VIGNETTE_POWER);
+
 	// 倒れたら、のけぞらない
 	if (health_.IsDead()) return true;
 
@@ -214,6 +219,12 @@ void Player::StartStanding(void)
 	playParam.blendFrame = STANDING_BLEND_FRAME;
 	playParam.isForce = true;
 	animationController_->Play(static_cast<int>(ANIM_TYPE::STANDING), playParam);
+}
+
+void Player::EndDamageVignette(void)
+{
+	SceneManager::GetInstance()->GetShader()->
+		SetVignettePower(Shader::DEFAULT_VIGNETTE_POWER);
 }
 
 void Player::InitLoad(void)

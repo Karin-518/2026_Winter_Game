@@ -10,6 +10,8 @@ class PlayerKnockbackState : public StateBase<Player, PLAYER_STATE>
 
 	PLAYER_STATE Update(Player& owner) override;
 
+	void Exit(Player& owner) override;
+
 private:
 
 	// 吹き飛びの段階

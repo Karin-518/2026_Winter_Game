@@ -4,6 +4,7 @@
 
 class SceneBase;
 class Loading;
+class Shader;
 
 class SceneManager
 {
@@ -71,6 +72,9 @@ public:
 	// ゲーム終了取得
 	bool GetGameEnd(void) { return isGameEnd_; }
 
+	// シェーダの取得
+	Shader* GetShader(void) { return shader_; }
+
 private:
 
 	// 予約の種類
@@ -94,6 +98,10 @@ private:
 
 	// 予約の種類
 	REQUEST request_;
+
+	Shader* shader_;
+
+	int mainScreen_;
 
 	// 予約されたシーン（POP のときは使わない）
 	std::shared_ptr<SceneBase> nextScene_;
