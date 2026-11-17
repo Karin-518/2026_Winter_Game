@@ -7,6 +7,7 @@ class Camera;
 class Stage;
 class Player;
 class Boss;
+class HitStop;
 
 class GameScene : public SceneBase
 {
@@ -55,6 +56,8 @@ private:
 
 	// ボスのHPバー
 	HpBar bossHpBar_;
+
+	HitStop* hitStop_;
 
 	// 攻撃と食らい判定の当たり
 	CollisionManager collisionManager_;

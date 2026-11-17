@@ -7,17 +7,17 @@ class PlayerHurtbox : public Hurtbox
 {
 public:
 
-	// 繧ｳ繝ｳ繧ｹ繝医Λ繧ｯ繧ｿ
+	// コンストラクタ
 	PlayerHurtbox(ActorBase* owner, const ColliderCapsule* bodyCapsule);
 
-	// 繝?せ繝医Λ繧ｯ繧ｿ
+	// デストラクタ
 	~PlayerHurtbox(void) override;
 
-	// 譖ｴ譁ｰ
+	// 更新
 	void Update(void) override;
 
 private:
 
-	// 菴咲ｽｮ繧貞粋繧上○繧?
+	// 体のカプセル
 	const ColliderCapsule* bodyCapsule_;
 };

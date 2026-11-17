@@ -7,6 +7,7 @@
 #include "../../Object/Actor/Player/Player.h"
 #include "../../Object/Actor/Enemy/Boss.h"
 #include "../../Object/Actor/Stage/Stage.h"
+#include "../../Object/Common/HitStop/HitStop.h"
 #include "../SceneManager.h"
 #include "../PauseScene/PauseScene.h"
 #include "../TitleScene/TitleScene.h"
@@ -52,9 +53,10 @@ void GameScene::Load(void)
 
 	// 生成処理
 	camera_ = new Camera();				// カメラの生成
+	hitStop_ = new HitStop();
 	stage_ = new Stage();				// ステージの生成
-	player_ = new Player(camera_);		// プレイヤーの生成
-	boss_ = new Boss(player_);			// 敵の生成
+	player_ = new Player(camera_, hitStop_);		// プレイヤーの生成
+	boss_ = new Boss(player_, hitStop_);			// 敵の生成
 
 	// カメラモード変更
 	camera_->SetFollow(player_);
@@ -111,6 +113,15 @@ void GameScene::Update(void)
 	// ステージ更新
 	stage_->Update();
 
+	// エフェクトの更新
+	EffectManager::GetInstance()->Update();
+
+	playerHpBar_.Update(player_->GetHealth().GetHp(), player_->GetHealth().GetMaxHp());
+
+	bossHpBar_.Update(boss_->GetHealth().GetHp(), boss_->GetHealth().GetMaxHp());
+
+	hitStop_->Update();
+
 	// プレイヤー更新
 	player_->Update();
 
@@ -122,13 +133,6 @@ void GameScene::Update(void)
 
 	// カメラの更新
 	camera_->Update();
-
-	// エフェクトの更新
-	EffectManager::GetInstance()->Update();
-
-	playerHpBar_.Update(player_->GetHealth().GetHp(), player_->GetHealth().GetMaxHp());
-
-	bossHpBar_.Update(boss_->GetHealth().GetHp(), boss_->GetHealth().GetMaxHp());
 
 	// 勝敗がついていたら、何もしない
 	if (CheckBattleEnd()) return;

@@ -9,6 +9,7 @@
 #include "../../../Shader/Shader.h"
 #include "../../Common/AnimationController/AnimationController.h"
 #include "../../Common/Attack/HitInfo.h"
+#include "../../Common/HitStop/HitStop.h"
 #include "../../Collider/Line/ColliderLine.h"
 #include "../../Collider/Capsule/ColliderCapsule.h"
 #include "State/PlayerIdleState.h"
@@ -91,17 +92,17 @@ namespace
 	constexpr int STANDING_BLEND_FRAME = 8;
 }
 
-Player::Player(Camera* camera)
+Player::Player(Camera* camera, HitStop* hitStop)
 	:
 	camera_(camera),
+	hitStop_(hitStop),
 	health_(),
 	attackController_(),
 	state_(*this),
 	attackParams_(),
 	weapon_(),
 	knockbackDir_(),
-	knockbackSpeed_(0.0f),
-	hitStop_()
+	knockbackSpeed_(0.0f)
 {
 }
 
@@ -111,12 +112,7 @@ Player::~Player(void)
 
 void Player::Update(void)
 {
-	// ヒットストップ
-	if (hitStop_.IsStopping())
-	{
-		hitStop_.Update();
-		return;
-	}
+	if (hitStop_->IsStopping()) return;
 
 	// 無敵の残りを減らす
 	health_.Update();
@@ -202,13 +198,11 @@ bool Player::OnHit(const HitInfo& hitInfo)
 		// ノックバック処理
 		PrepareKnockback(hitInfo);
 		state_.RequestState(PLAYER_STATE::KNOCKBACK);
-		hitStop_.Start(15);
 		return true;
 	}
 
 	// 怯み
 	state_.RequestState(PLAYER_STATE::HIT);
-	hitStop_.Start(15);
 	return true;
 }
 
@@ -459,9 +453,6 @@ void Player::StartAttack(PLAYER_ATTACK_ID id)
 	playParam.blendFrame = ATTACK_BLEND_FRAME;
 	playParam.isForce = true;
 	animationController_->Play(param.animType, playParam);
-
-	// SEを再生
-	AudioManager::GetInstance()->PlaySE(SOUND_ID::SE_PLAYER_SWING_1);
 
 	// 判定の準備
 	attackController_.Start(param);

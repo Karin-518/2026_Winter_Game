@@ -4,7 +4,6 @@
 #include "../../Common/Health/Health.h"
 #include "../../Common/Attack/AttackController.h"
 #include "../../Common/Attack/AttackParam.h"
-#include "../../Common/HitStop/HitStop.h"
 #include "../ActorBase.h"
 #include "State/PlayerState.h"
 #include "PlayerAttackType.h"
@@ -13,7 +12,7 @@
 class Camera;
 class PlayerHurtbox;
 class Hurtbox;
-
+class HitStop;
 
 class Player : public ActorBase
 {
@@ -36,7 +35,7 @@ public:
 	};
 
 	// コンストラクタ
-	Player(Camera* camera);
+	Player(Camera* camera, HitStop* hitStop);
 
 	// デストラクタ
 	~Player(void) override;
@@ -83,7 +82,7 @@ public:
 	// のけぞり開始
 	void StartHit(void);
 
-	// 無敵の残り香指定フレームより短ければ延ばす
+	// 無敵の残りフレームより短ければ延ばす
 	void ExtendInvincible(int frame);
 
 	// 吹き飛び開始
@@ -126,6 +125,9 @@ private:
 	// カメラ
 	Camera* camera_;
 
+	// ヒットストップ
+	HitStop* hitStop_;
+
 	// ヘルス
 	Health health_;
 
@@ -149,9 +151,6 @@ private:
 
 	// 吹き飛びの速さ
 	float knockbackSpeed_;
-
-	// ヒットストップ
-	HitStop hitStop_;
 
 	// HPが0になったときに呼ぶ
 	void OnDead(void);

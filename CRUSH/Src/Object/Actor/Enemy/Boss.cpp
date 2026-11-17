@@ -1,12 +1,14 @@
 #include <memory>
 #include <cmath>
 #include <limits>
-#include "../../../Common/Math/Math.h"
-#include "../../../Common/Math/MatrixUtility.h"
+#include "../../../Audio/AudioManager.h"
 #include "../../../Resource/ResourceManager.h"
 #include "../../../Effect/EffectManager.h"
+#include "../../../Common/Math/Math.h"
+#include "../../../Common/Math/MatrixUtility.h"
 #include "../../Common/AnimationController/AnimationController.h"
 #include "../../Common/Attack/HitInfo.h"
+#include "../../Common/HitStop/HitStop.h"
 #include "../../Collider/Line/ColliderLine.h"
 #include "../../Collider/Capsule/ColliderCapsule.h"
 #include "../Player/Player.h"
@@ -64,9 +66,10 @@ namespace
 	constexpr float FAR_RADIUS = 3000.0f;
 }
 
-Boss::Boss(Player* player)
+Boss::Boss(Player* player, HitStop* hitStop)
 	:
 	player_(player),
+	hitStop_(hitStop),
 	health_(),
 	state_(*this),
 	attackController_(),
@@ -82,6 +85,8 @@ Boss::~Boss(void)
 
 void Boss::Update(void)
 {
+	if (hitStop_->IsStopping()) return;
+
 	// ステートの更新
 	state_.Update();
 
@@ -128,6 +133,11 @@ void Boss::Draw(void)
 bool Boss::OnHit(const HitInfo& hitInfo)
 {
 	EffectManager::GetInstance()->Play(EFFECT_ID::HIT_SPARK, hitInfo.hitPos);
+	
+	// SEを再生
+	AudioManager::GetInstance()->PlaySE(SOUND_ID::SE_PLAYER_SWING_1);
+	
+	hitStop_->Start(4);
 
 	return health_.Damage(hitInfo.damage);
 }
@@ -437,10 +447,10 @@ void Boss::UpdateAttackCapsules(void)
 
 void Boss::FacePlayer(void)
 {
-	// 追従対象か向き先がなければ何もしない
+	// プレイヤーがいなければ何もしない
 	if (player_ == nullptr) return;
 
-	// 追従対象から向き先へのベクトル
+	// ボスからプレイヤーへのベクトル
 	VECTOR dir = VSub(player_->GetPos(), pos_);
 
 	// 左右の角度だけ扱うため、上下の成分を0にする

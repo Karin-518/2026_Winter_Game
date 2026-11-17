@@ -13,6 +13,7 @@
 #include "ColliderPart.h"
 
 class Player;
+class HitStop;
 
 class Boss : public ActorBase
 {
@@ -31,7 +32,7 @@ public:
 	};
 
 	// コンストラクタ
-	Boss(Player* player);
+	Boss(Player* player, HitStop* hitStop);
 
 	// デストラクタ
 	~Boss(void) override;
@@ -114,6 +115,9 @@ private:
 
 	// プレイヤー
 	Player* player_;
+
+	// ヒットストップ
+	HitStop* hitStop_;
 
 	// ヘルス
 	Health health_;
