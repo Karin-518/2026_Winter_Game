@@ -35,7 +35,7 @@ void SceneManager::Init(void)
 	// 3Dî•ñ‚Ì‰Šú‰»
 	Init3D();
 
-	mainScreen_ = MakeScreen(Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, true);
+	mainScreen_ = MakeScreen(Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, false);
 
 	shader_ = new Shader();
 	shader_->Init();

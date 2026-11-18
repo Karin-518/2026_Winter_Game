@@ -12,7 +12,7 @@ namespace
 	constexpr int SRC_TEXTURE_SLOT = 0;
 
 	// 定数バッファのスロット番号
-	constexpr int CRT_CBUFFER_SLOT = 1;
+	constexpr int CRT_CBUFFER_SLOT = 4;
 
 	// 四角形を構成する三角形ポリゴンの数
 	constexpr int SQUARE_POLYGON_NUM = 2;

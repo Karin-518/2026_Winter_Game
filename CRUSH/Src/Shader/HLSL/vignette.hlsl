@@ -1,14 +1,11 @@
 // ピクセルシェーダーの入力
 struct PS_INPUT
 {
-    // 座標( プロジェクション空間 )
     float4 Position : SV_POSITION;
-    
-    // ディフューズカラー
     float4 Diffuse : COLOR0;
-	
-    // テクスチャ座標
+    float4 Specular : COLOR1;
     float2 TexCoords0 : TEXCOORD0;
+    float2 TexCoords1 : TEXCOORD1;
 };
 
 // UVを中央にするための位置
@@ -19,7 +16,7 @@ static const float CENTER_DIST_SCALE = 2.0f;
 
 static const float EDGE_EXPONENT = 5.0f;
 
-cbuffer cbParam : register(b1)
+cbuffer cbParam : register(b4)
 {
     float g_vignettePower;          // ビネットの鋭さ
     float3 g_padding;
