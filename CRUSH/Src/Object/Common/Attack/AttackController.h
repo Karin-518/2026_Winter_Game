@@ -34,10 +34,8 @@ public:
 	// このフレームで当てていいか
 	bool CanHit(void) const;
 
-	// 判定の形と食らい判定が重なっているか
-	bool IsHit(
-		const VECTOR& ownerPos, const VECTOR& forward,
-		const Hurtbox& hurtbox) const;
+	// 攻撃のカプセルと食らい判定が重なっているか
+	bool IsHit(const Hurtbox& hurtbox) const;
 
 	// カプセルの位置を外から渡す
 	void SetCapsulePos(int index, const VECTOR& startPos, const VECTOR& endPos);
@@ -52,7 +50,7 @@ public:
 	const AttackParam* GetParam(void) const { return param_; }
 
 	// デバッグ表示
-	void DrawDebug(const VECTOR& ownerPos, const VECTOR& forward) const;
+	void DrawDebug(void) const;
 
 private:
 
@@ -82,24 +80,9 @@ private:
 	// カプセルごとに判定が出ているか決める
 	void UpdateCapsuleActive(const AnimationController& anim);
 
-	// XZ平面の形での判定
-	bool IsHitXZ(const VECTOR& ownerPos, const VECTOR& forward, const Hurtbox& hurtbox) const;
+	// カプセル1つ分の判定が出ているか
+	bool IsVolumeActive(int volumeIndex, const AnimationController& anim) const;
 
-	// カプセルでの判定
-	bool IsHitCapsule(const Hurtbox& hurtbox) const;
-
-	// 判定の根元
-	VECTOR CalcOrigin(const VECTOR& ownerPos, const VECTOR& forward) const;
-
-	// デバッグ描画の色
-	unsigned int GetDebugColor(void) const;
-
-	// 四角形を描く
-	void DrawDebugRect(const VECTOR& origin, const VECTOR& forward, unsigned int color) const;
-
-	// 扇を描く
-	void DrawDebugFan(const VECTOR& origin, const VECTOR& forward, unsigned int color) const;
-
-	// カプセルを描く
-	void DrawDebugCapsules(void) const;
+	// カプセル1つ分のデバッグ描画の色
+	unsigned int GetDebugColor(const HitCapsule& capsule) const;
 };

@@ -116,7 +116,7 @@ void Boss::Draw(void)
 	// デバッグ表示
 	DrawFormatString(0, 130, 0xffffff, "ボスHP：%d / %d", health_.GetHp(), health_.GetMaxHp());
 
-	attackController_.DrawDebug(pos_, GetForward());
+	attackController_.DrawDebug();
 
 	for (const auto& part : parts_)
 	{
@@ -315,9 +315,6 @@ void Boss::InitAttackParam(void)
 	bite.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
 	bite.damage = 10;
 
-	// 判定の形
-	bite.shape = HIT_SHAPE::CAPSULE;
-
 	// 頭のカプセル
 	AttackHitVolume headVolume;
 	headVolume.startFrameName = "Tongue01";
@@ -337,9 +334,6 @@ void Boss::InitAttackParam(void)
 	AttackParam& rush = attackParams_[static_cast<int>(BOSS_ATTACK_ID::RUSH)];
 	rush.animType = static_cast<int>(ANIM_TYPE::RUN);
 	rush.damage = 20;
-
-	// 判定の形
-	rush.shape = HIT_SHAPE::CAPSULE;
 
 	// 頭のカプセル
 	AttackHitVolume rushHeadVolume;
@@ -371,9 +365,6 @@ void Boss::InitAttackParam(void)
 	AttackParam& tailSpin = attackParams_[static_cast<int>(BOSS_ATTACK_ID::TAIL_SPIN)];
 	tailSpin.animType = static_cast<int>(ANIM_TYPE::IDLE);
 	tailSpin.damage = 10;
-
-	// 判定の形
-	tailSpin.shape = HIT_SHAPE::CAPSULE;
 
 	// 尻尾全体のカプセル
 	AttackHitVolume tailVolume;

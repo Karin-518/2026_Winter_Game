@@ -90,6 +90,12 @@ namespace
 
 	// 起き上がりアニメーションへのブレンドフレーム数
 	constexpr int STANDING_BLEND_FRAME = 8;
+
+	// 剣のカプセルの半径
+	constexpr float SWORD_RADIUS = 15.0f;
+
+	// 攻撃の判定リストの中で、剣のカプセルの番号
+	constexpr int SWORD_VOLUME_INDEX = 0;
 }
 
 Player::Player(Camera* camera, HitStop* hitStop)
@@ -128,6 +134,10 @@ void Player::Update(void)
 	// 反映された手の位置に合わせる
 	weapon_.Update();
 
+	// 剣の刃の位置を、攻撃のカプセルに渡す
+	attackController_.SetCapsulePos(
+		SWORD_VOLUME_INDEX, weapon_.GetBladeRootPos(), weapon_.GetBladeTipPos());
+
 	// 攻撃の更新
 	attackController_.Update(*animationController_);
 }
@@ -141,7 +151,9 @@ void Player::Draw(void)
 
 #ifdef _DEBUG
 
-	//attackController_.DrawDebug(pos_, GetForward());
+	// 攻撃のカプセルと刃の芯
+	attackController_.DrawDebug();
+	weapon_.DrawDebug();
 
 	hurtbox_->DrawDebug();
 
@@ -356,15 +368,12 @@ void Player::InitAttackParam(void)
 	slash1.damage = 50;
 	slash1.animType = static_cast<int>(ANIM_TYPE::ATTACK_1);
 
-	// 判定が出る区間
-	slash1.hitStart = 18.0f;
-	slash1.hitEnd = 25.0f;
-
-	// 判定の形（縦振りなら RECT、横振りなら FAN にする）
-	slash1.shape = HIT_SHAPE::RECT;
-	slash1.offset = 30.0f;
-	slash1.length = 250.0f;
-	slash1.width = 180.0f;
+	// 剣のカプセル
+	AttackHitVolume swordVolume;
+	swordVolume.radius = SWORD_RADIUS;
+	swordVolume.activeStart = 18.0f;
+	swordVolume.activeEnd = 25.0f;
+	slash1.hitVolumes.push_back(swordVolume);
 }
 
 VECTOR Player::CalcInputDir(void) const

@@ -74,8 +74,8 @@ bool CollisionManager::IsTarget(const AttackEntry& entry, const Hurtbox& hurtbox
 
 bool CollisionManager::IsOverlap(const AttackEntry& entry, const Hurtbox& hurtbox) const
 {
-	// 形ごとの判定はAttackControllerに任せる
-	return entry.attack_->IsHit(entry.owner_->GetPos(), entry.owner_->GetForward(), hurtbox);
+	// カプセル同士の判定はAttackControllerに任せる
+	return entry.attack_->IsHit(hurtbox);
 }
 
 HitInfo CollisionManager::MakeHitInfo(const AttackEntry& entry, const Hurtbox& hurtbox) const
