@@ -93,6 +93,9 @@ void GameScene::LoadEnd(void)
 	// 攻撃と食らい判定を登録
 	RegisterCollision();
 
+	// 体同士の押し出しの相手を登録
+	RegisterPushTargets();
+
 	AudioManager::GetInstance()->PlayBGM(SOUND_ID::BGM_BATTLE_1);
 
 	// エフェクトの読み込み
@@ -239,5 +242,14 @@ void GameScene::RegisterCollision(void)
 	for (const Hurtbox* hurtbox : boss_->GetHurtboxes())
 	{
 		collisionManager_.AddHurtbox(hurtbox);
+	}
+}
+
+void GameScene::RegisterPushTargets(void)
+{
+	// プレイヤーだけをボスの体から押し出す（ボスは重いので押されない）
+	for (const Pushbox* pushbox : boss_->GetPushboxes())
+	{
+		player_->AddPushTarget(pushbox);
 	}
 }

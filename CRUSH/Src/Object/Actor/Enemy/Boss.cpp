@@ -59,6 +59,13 @@ namespace
 		{ BOSS_PART::BODY,   "Chest",  "joint19",     100.0f, 1.0f },
 	};
 
+	// 押し出し用のカプセル
+	constexpr PushboxParam PUSHBOX_PARAMS[] =
+	{
+		{ "Tongue02", "Neck01",  60.0f },	// 頭
+		{ "Chest",    "joint19", 90.0f },	// 胴
+	};
+
 	// 近距離とみなす半径
 	constexpr float NEAR_RADIUS = 900.0f;
 
@@ -98,6 +105,11 @@ void Boss::Update(void)
 		part->Update();
 	}
 
+	for (auto& pushbox : pushboxes_)
+	{
+		pushbox->Update();
+	}
+
 	// 攻撃のボーンの位置をとる
 	UpdateAttackCapsules();
 
@@ -121,6 +133,11 @@ void Boss::Draw(void)
 	for (const auto& part : parts_)
 	{
 		part->DrawDebug();
+	}
+
+	for (const auto& pushbox : pushboxes_)
+	{
+		pushbox->DrawDebug();
 	}
 
 	attackSelector_.DrawDebug();
@@ -194,6 +211,18 @@ std::vector<const Hurtbox*> Boss::GetHurtboxes(void) const
 	return hurtboxes;
 }
 
+std::vector<const Pushbox*> Boss::GetPushboxes(void) const
+{
+	std::vector<const Pushbox*> pushboxes;
+
+	for (const auto& pushbox : pushboxes_)
+	{
+		pushboxes.push_back(pushbox.get());
+	}
+
+	return pushboxes;
+}
+
 bool Boss::SelectAttack(void)
 {
 	// 距離を測る
@@ -255,6 +284,9 @@ void Boss::InitCollider(void)
 
 	// 部位ごとの当たり判定
 	InitParts();
+
+	// 押し出し用のカプセル
+	InitPushboxes();
 }
 
 void Boss::InitAnimation(void)
@@ -298,6 +330,14 @@ void Boss::InitParts(void)
 	for (const auto& param : PART_PARAMS)
 	{
 		parts_.push_back(std::make_unique<ColliderPart>(modelId_, param,this));
+	}
+}
+
+void Boss::InitPushboxes(void)
+{
+	for (const auto& param : PUSHBOX_PARAMS)
+	{
+		pushboxes_.push_back(std::make_unique<Pushbox>(modelId_, param));
 	}
 }
 

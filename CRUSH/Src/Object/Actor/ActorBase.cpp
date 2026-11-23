@@ -1,3 +1,4 @@
+#include <cmath>
 #include "../../Application.h"
 #include "../../Common/Math/Math.h"
 #include "../../Common/Math/MatrixUtility.h"
@@ -5,6 +6,7 @@
 #include "../Collider/Line/ColliderLine.h"
 #include "../Collider/Capsule/ColliderCapsule.h"
 #include "../Collider/Model/ColliderModel.h"
+#include "../Collider/Pushbox.h"
 
 #include "ActorBase.h"
 
@@ -12,6 +14,9 @@ namespace
 {
 	// 重力
 	constexpr float GRAVITY = 0.8f;
+
+	// これより横のずれが小さいときは、押し出す向きが決められないとみなす
+	constexpr float PUSH_DIR_MIN_DIST = 0.001f;
 }
 
 ActorBase::ActorBase(void)
@@ -83,6 +88,10 @@ void ActorBase::Update(void)
 	// プレイヤーの座標に移動量(速度、ジャンプ力)を加算する
 	pos_.y += jumpPow_;
 
+	// 相手の体から押し出す
+	// 壁判定より先に行うので、押し出された先が壁の中でも壁判定で戻される
+	CollisionPush();
+
 	// ステージとの当たり判定(壁 → 地面の順)
 	// モデルに座標を渡す前に行うので、押し戻した位置がそのフレームで反映される
 	CollisionWall();
@@ -142,6 +151,14 @@ void ActorBase::AddWallModel(const ColliderModel* model)
 	wallModels_.push_back(model);
 }
 
+void ActorBase::AddPushTarget(const Pushbox* pushbox)
+{
+	// nullptr は登録しない
+	if (pushbox == nullptr) return;
+
+	pushTargets_.push_back(pushbox);
+}
+
 float ActorBase::GetBodyRadius(void) const
 {
 	// カプセルがなければ0
@@ -169,6 +186,66 @@ void ActorBase::AddAnimation(int type, ResourceManager::SRC src, float speed)
 {
 	int handle = ResourceManager::GetInstance()->Load(src).GetHandleId();
 	animationController_->Add(type, speed, handle);
+}
+
+void ActorBase::CollisionPush(void)
+{
+	if (bodyCapsule_ == nullptr) return;
+
+	for (const Pushbox* pushbox : pushTargets_)
+	{
+		PushOutFrom(*pushbox);
+	}
+}
+
+void ActorBase::PushOutFrom(const Pushbox& pushbox)
+{
+	// 相手のボーンの位置がまだ取れていない
+	if (!pushbox.IsReady()) return;
+
+	// 自分の体の線分の両端（pos_ に追従するので、押し出した後の位置で計算される）
+	VECTOR bodyDownPos = bodyCapsule_->GetPosDown();
+	VECTOR bodyTopPos = bodyCapsule_->GetPosTop();
+
+	// 相手の線分の両端
+	VECTOR targetStartPos = pushbox.GetStartPos();
+	VECTOR targetEndPos = pushbox.GetEndPos();
+
+	// 2本の線分が一番近づく点と、その距離の2乗を調べる
+	SEGMENT_SEGMENT_RESULT segmentResult;
+	Segment_Segment_Analyse(&bodyDownPos, &bodyTopPos, &targetStartPos, &targetEndPos, &segmentResult);
+
+	// 離れていないといけない距離（半径の合計）
+	float needDist = bodyCapsule_->GetRadius() + pushbox.GetRadius();
+
+	// 重なっていなければ押し出さない
+	if (segmentResult.SegA_SegB_MinDist_Square >= needDist * needDist) return;
+
+	// 相手の一番近い点から、自分の一番近い点へのベクトル
+	VECTOR diff = VSub(segmentResult.SegA_MinDist_Pos, segmentResult.SegB_MinDist_Pos);
+
+	// 上下の差は押し出しでは動かさない（浮いたり沈んだりしないように）
+	float diffY = diff.y;
+	diff.y = 0.0f;
+
+	// 今の横のずれ
+	float distXZ = VSize(diff);
+
+	// 上下の差を含めて needDist 離れるために必要な、横のずれ
+	float needDistXZ = sqrtf(needDist * needDist - diffY * diffY);
+
+	// 足りない分だけ横へ押し出す
+	VECTOR pushDir = CalcPushDir(diff, distXZ);
+	pos_ = VAdd(pos_, VScale(pushDir, needDistXZ - distXZ));
+}
+
+VECTOR ActorBase::CalcPushDir(const VECTOR& diffXZ, float distXZ) const
+{
+	// 横にずれていれば、相手から離れる向きへ押し出す
+	if (distXZ > PUSH_DIR_MIN_DIST) return VScale(diffXZ, 1.0f / distXZ);
+
+	// 真上・真下に重なって向きが決まらないときは、自分の後ろへ押し出す
+	return VScale(GetForward(), -1.0f);
 }
 
 void ActorBase::CollisionWall(void)
@@ -205,6 +282,7 @@ void ActorBase::ReleaseCollider(void)
 
 	groundModels_.clear();
 	wallModels_.clear();
+	pushTargets_.clear();
 }
 
 void ActorBase::ApplyModelPos(void)

@@ -70,4 +70,7 @@ private:
 
 	// UŒ‚‚ÆH‚ç‚¢”»’è‚ğ“o˜^
 	void RegisterCollision(void);
+
+	// ‘Ì“¯m‚Ì‰Ÿ‚µo‚µ‚Ì‘Šè‚ğ“o˜^
+	void RegisterPushTargets(void);
 };

@@ -7,6 +7,7 @@ class AnimationController;
 class ColliderLine;
 class ColliderCapsule;
 class ColliderModel;
+class Pushbox;
 struct HitInfo;
 
 class ActorBase
@@ -45,6 +46,9 @@ public:
 
 	// 壁判定の相手を登録
 	void AddWallModel(const ColliderModel* model);
+
+	// 押し出し判定の相手を登録
+	void AddPushTarget(const Pushbox* pushbox);
 
 	// 攻撃が当たりそうなときに呼ばれる
 	virtual bool OnHit(const HitInfo& hitInfo) { return false; }
@@ -97,6 +101,9 @@ protected:
 	// 壁判定の相手
 	std::vector<const ColliderModel*> wallModels_;
 
+	// 押し出し判定の相手
+	std::vector<const Pushbox*> pushTargets_;
+
 	// パッド入力値の補間
 	VECTOR preInputDir_;
 
@@ -135,6 +142,15 @@ protected:
 	}
 
 private:
+	
+	// 押し出し判定の相手から押し出される
+	void CollisionPush(void);
+
+	// 相手のカプセル1つから押し出される
+	void PushOutFrom(const Pushbox& pushbox);
+
+	// 押し出す向き（XZ平面）
+	VECTOR CalcPushDir(const VECTOR& diffXZ, float distXZ) const;
 
 	// 壁から押し出す
 	void CollisionWall(void);

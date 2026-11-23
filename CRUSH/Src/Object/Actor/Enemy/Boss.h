@@ -6,6 +6,7 @@
 #include "../../Common/Attack/AttackController.h"
 #include "../../Common/Attack/AttackParam.h"
 #include "../../Common/Bone/BoneSegment.h"
+#include "../../Collider/Pushbox.h"
 #include "../ActorBase.h"
 #include "State/BossState.h"
 #include "Action/BossAttackAction.h"
@@ -69,6 +70,9 @@ public:
 
 	// 部位の食らい判定をまとめて取得
 	std::vector<const Hurtbox*> GetHurtboxes(void) const;
+
+	// 押し出し用のカプセルをまとめて取得
+	std::vector<const Pushbox*> GetPushboxes(void) const;
 
 	// 攻撃を選ぶ
 	bool SelectAttack(void);
@@ -143,11 +147,17 @@ private:
 	// 部位の当たり判定
 	std::vector<std::unique_ptr<ColliderPart>> parts_;
 
+	// 押し出し用のカプセル
+	std::vector<std::unique_ptr<Pushbox>> pushboxes_;
+
 	// 攻撃ごとの判定ボーン
 	std::vector<BoneSegment> attackSegments_[static_cast<int>(BOSS_ATTACK_ID::MAX)];
 
 	// 部位の初期化
 	void InitParts(void);
+
+	// 押し出し用のカプセルの初期化
+	void InitPushboxes(void);
 
 	// HPが0になったときに呼ぶ
 	void OnDead(void);
