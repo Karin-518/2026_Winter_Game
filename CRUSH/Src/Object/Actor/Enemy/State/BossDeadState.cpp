@@ -9,7 +9,7 @@ void BossDeadState::Enter(Boss& owner)
     AudioManager::GetInstance()->PlaySE(SOUND_ID::SE_BOSS_DEAD);
 
     // 死亡アニメーションを再生
-    owner.GetAnimationController()->Play(static_cast<int>(Boss::ANIM_TYPE::DEAD), false);
+    owner.GetAnimationController()->Play(static_cast<int>(Boss::ANIM_TYPE::DEATH), false);
 }
 
 BOSS_STATE BossDeadState::Update(Boss& owner)

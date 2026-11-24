@@ -3,21 +3,7 @@
 
 #include "BossTailSpinAction.h"
 
-namespace
-{
-	// 溜め中に1フレームでひねる角度(回転と逆向き)
-	constexpr float WINDUP_TWIST_RAD_PER_FRAME = -0.01f;
-
-	// 1回転にかけるフレーム数
-	constexpr float SPIN_FRAME = 30.0f;
-
-	// 1フレームで回る角度
-	constexpr float SPIN_RAD_PER_FRAME = DX_TWO_PI_F / SPIN_FRAME;
-}
-
 BossTailSpinAction::BossTailSpinAction(void)
-	:
-	spunRad_(0.0f)
 {
 }
 
@@ -25,28 +11,10 @@ BossTailSpinAction::~BossTailSpinAction(void)
 {
 }
 
-void BossTailSpinAction::UpdateWindup(Boss& owner)
-{
-	// 回る方向と逆に少しずつひねって、溜める
-	owner.RotateMoveDir(WINDUP_TWIST_RAD_PER_FRAME);
-}
-
-void BossTailSpinAction::OnActiveStart(Boss& owner)
-{
-	// 回った角度をリセット
-	spunRad_ = 0.0f;
-}
-
 bool BossTailSpinAction::UpdateActive(Boss& owner)
 {
-	// 1フレーム分回す
-	owner.RotateMoveDir(SPIN_RAD_PER_FRAME);
-	spunRad_ += SPIN_RAD_PER_FRAME;
-
-	// 1回転したら終わり
-	if (spunRad_ >= DX_TWO_PI_F) return true;
-
-	return false;
+	// アニメが最後まで再生されたら、攻撃本体を終える
+	return owner.GetAnimationController()->IsEnd();
 }
 
 SOUND_ID BossTailSpinAction::GetSignSoundID(void) const

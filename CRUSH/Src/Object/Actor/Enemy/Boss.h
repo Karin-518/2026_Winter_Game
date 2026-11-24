@@ -23,11 +23,25 @@ public:
 	// アニメーション種別
 	enum class ANIM_TYPE
 	{
+		BITE_1,
+		BITE_2,
+		BITE_3,
+		DEATH,
+		FIRE_BALL,
+		FLY_FIRE,
 		IDLE,
-		WALK,
+		IMPACT_STRONG,
+		IMPACT_WEAK,
+		REPOSE,
 		RUN,
-		ATTACK_BITE,	// 噛みつき
-		DEAD,
+		TAIL_1,
+		TAIL_2,
+		TAKEOFF,
+		TORAND,
+		TURNBACK,
+		TURNLEFT,
+		TURNRIGHT,
+		WALK,
 
 		MAX,
 	};

@@ -55,15 +55,15 @@ namespace
 
 	constexpr BossPartParam PART_PARAMS[] =
 	{
-		{ BOSS_PART::HEAD,   "Tongue02",   "Neck01",     70.0f, 1.0f },
-		{ BOSS_PART::BODY,   "Chest",  "joint19",     100.0f, 1.0f },
+		{ BOSS_PART::HEAD,   "Tongue_3",   "Neck_3",     70.0f, 1.0f },
+		{ BOSS_PART::BODY,   "Chest",  "Tail_01",     100.0f, 1.0f },
 	};
 
 	// 押し出し用のカプセル
 	constexpr PushboxParam PUSHBOX_PARAMS[] =
 	{
-		{ "Tongue02", "Neck01",  60.0f },	// 頭
-		{ "Chest",    "joint19", 90.0f },	// 胴
+		{ "Tongue_3", "Neck_3",  60.0f },	// 頭
+		{ "Chest",    "Tail_01", 90.0f },	// 胴
 	};
 
 	// 近距離とみなす半径
@@ -270,6 +270,8 @@ void Boss::InitTransform(void)
 	// モデルの位置設定
 	pos_ = INIT_POS;
 	MV1SetPosition(modelId_, pos_);
+
+	MV1SetScale(modelId_, VGet(1.5f, 1.5f, 1.5f));
 }
 
 void Boss::InitCollider(void)
@@ -294,11 +296,29 @@ void Boss::InitAnimation(void)
 	// モデルアニメーション制御の初期化
 	animationController_ = new AnimationController(modelId_);
 
-	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::IDLE), ANIMATION_SPEED, 10);
-	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::WALK), ANIMATION_SPEED, 17);
-	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::RUN), ANIMATION_SPEED, 13);
-	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::ATTACK_BITE), BITE_ANIMATION_SPEED, 0);
-	animationController_->AddInFbx(static_cast<int>(ANIM_TYPE::DEAD), ANIMATION_SPEED, 3);
+	AddAnimation(ANIM_TYPE::BITE_1, ResourceManager::SRC::BOSS_ANIM_BITE_1, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::BITE_2, ResourceManager::SRC::BOSS_ANIM_BITE_2, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::BITE_3, ResourceManager::SRC::BOSS_ANIM_BITE_3, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::DEATH, ResourceManager::SRC::BOSS_ANIM_DEATH, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::FIRE_BALL, ResourceManager::SRC::BOSS_ANIM_FIRE_BALL, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::FLY_FIRE, ResourceManager::SRC::BOSS_ANIM_FLY_FIRE, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::IDLE, ResourceManager::SRC::BOSS_ANIM_IDLE, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::IMPACT_STRONG, ResourceManager::SRC::BOSS_ANIM_IMPACT_STRONG, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::IMPACT_WEAK, ResourceManager::SRC::BOSS_ANIM_IMPACT_WEAK, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::REPOSE, ResourceManager::SRC::BOSS_ANIM_REPOSE, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::RUN, ResourceManager::SRC::BOSS_ANIM_RUN, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::TAIL_1, ResourceManager::SRC::BOSS_ANIM_TAIL_1, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::TAIL_2, ResourceManager::SRC::BOSS_ANIM_TAIL_2, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::TAKEOFF, ResourceManager::SRC::BOSS_ANIM_TAKEOFF, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::TORAND, ResourceManager::SRC::BOSS_ANIM_TORAND, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::TURNBACK, ResourceManager::SRC::BOSS_ANIM_TURNBACK, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::TURNLEFT, ResourceManager::SRC::BOSS_ANIM_TURNLEFT, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::TURNRIGHT, ResourceManager::SRC::BOSS_ANIM_TURNRIGHT, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::WALK, ResourceManager::SRC::BOSS_ANIM_WALK, ANIMATION_SPEED);
+
+	animationController_->SetRootFrame(MV1SearchFrame(modelId_, "Root"));
+	animationController_->SetCancelRootMove(static_cast<int>(ANIM_TYPE::RUN));
+	animationController_->SetCancelRootMove(static_cast<int>(ANIM_TYPE::WALK));
 }
 
 void Boss::InitPost(void)
@@ -352,16 +372,16 @@ void Boss::InitAttackParam(void)
 	// 噛みつき
 	// ---------------------------------------
 	AttackParam& bite = attackParams_[static_cast<int>(BOSS_ATTACK_ID::BITE)];
-	bite.animType = static_cast<int>(ANIM_TYPE::ATTACK_BITE);
+	bite.animType = static_cast<int>(ANIM_TYPE::BITE_1);
 	bite.damage = 10;
 
 	// 頭のカプセル
 	AttackHitVolume headVolume;
-	headVolume.startFrameName = "Tongue01";
-	headVolume.endFrameName = "UpperMouth02";
+	headVolume.startFrameName = "Jaw";
+	headVolume.endFrameName = "Tongue_3";
 	headVolume.radius = 80.0f;
-	headVolume.activeStart = 15.0f;
-	headVolume.activeEnd = 20.0f;
+	headVolume.activeStart = 20.0f;
+	headVolume.activeEnd = 30.0f;
 	bite.hitVolumes.push_back(headVolume);
 
 	// 溜めと隙
@@ -377,15 +397,15 @@ void Boss::InitAttackParam(void)
 
 	// 頭のカプセル
 	AttackHitVolume rushHeadVolume;
-	rushHeadVolume.startFrameName = "Tongue01";
-	rushHeadVolume.endFrameName = "UpperMouth02";
+	rushHeadVolume.startFrameName = "Jaw";
+	rushHeadVolume.endFrameName = "Tongue_3";
 	rushHeadVolume.radius = 100.0f;
 	rush.hitVolumes.push_back(rushHeadVolume);
 
 	// 胴のカプセル
 	AttackHitVolume rushBodyVolume;
 	rushBodyVolume.startFrameName = "Chest";
-	rushBodyVolume.endFrameName = "joint19";
+	rushBodyVolume.endFrameName = "Tail_01";
 	rushBodyVolume.radius = 150.0f;
 	rush.hitVolumes.push_back(rushBodyVolume);
 
@@ -403,13 +423,13 @@ void Boss::InitAttackParam(void)
 	// 尻尾回転
 	// ---------------------------------------
 	AttackParam& tailSpin = attackParams_[static_cast<int>(BOSS_ATTACK_ID::TAIL_SPIN)];
-	tailSpin.animType = static_cast<int>(ANIM_TYPE::IDLE);
+	tailSpin.animType = static_cast<int>(ANIM_TYPE::TAIL_1);
 	tailSpin.damage = 10;
 
 	// 尻尾全体のカプセル
 	AttackHitVolume tailVolume;
-	tailVolume.startFrameName = "joint19";
-	tailVolume.endFrameName = "joint23";
+	tailVolume.startFrameName = "Tail_01";
+	tailVolume.endFrameName = "Tail_09";
 	tailVolume.radius = 80.0f;
 	tailSpin.hitVolumes.push_back(tailVolume);
 
