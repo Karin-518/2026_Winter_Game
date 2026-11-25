@@ -38,7 +38,7 @@ public:
 		TAIL_1,
 		TAIL_2,
 		TAKEOFF,
-		TORAND,
+		TOLAND,
 		TURNBACK,
 		TURNLEFT,
 		TURNRIGHT,

@@ -39,6 +39,7 @@ namespace
 		case BOSS_ATTACK_ID::TAIL_RIGHT: return "右尻尾打ち付け";
 		case BOSS_ATTACK_ID::TAIL_LEFT: return "左尻尾打ち付け";
 		case BOSS_ATTACK_ID::FIRE_BALL: return "単発ブレス";
+		case BOSS_ATTACK_ID::FLY_FIRE: return "空中ブレス";
 		case BOSS_ATTACK_ID::NONE:		return "なし";
 		default:						return "不明";
 		}

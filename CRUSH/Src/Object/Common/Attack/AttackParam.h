@@ -3,14 +3,23 @@
 #include "AttackHitVolume.h"
 #include "HitReaction.h"
 
+// アニメーションを指定しないときの値
+constexpr int NO_ANIM = -1;
+
 // 攻撃ごとのデータ
 struct AttackParam
 {
 	// ダメージ量
 	int damage = 0;
 
-	// 再生するアニメーション
+	// 攻撃本体のアニメーション
 	int animType = 0;
+
+	// 溜めアニメーション
+	int windupAnimType = NO_ANIM;
+
+	// 隙アニメーション
+	int recoveryAnimType = NO_ANIM;
 
 	// trueなら、アニメの区間を見ずにSetActiveで判定を出す
 	bool isManualActive = false;

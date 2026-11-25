@@ -45,4 +45,10 @@ private:
 
 	// 段階を切り替える
 	void ChangePhase(ATTACK_PHASE nextPhase);
+
+	// 溜め専用のアニメがあったときだけ、本体のアニメに切り替える
+	void PlayActiveAnim(Boss& owner);
+
+	// 隙のアニメを再生する
+	void PlayRecoveryAnim(Boss& owner);
 };

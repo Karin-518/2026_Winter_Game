@@ -10,6 +10,7 @@ enum class BOSS_ATTACK_ID
 	TAIL_RIGHT,	// 右尻尾なぎ倒し
 	TAIL_LEFT,	// 左尻尾なぎ倒し
 	FIRE_BALL,	// 単発ブレス
+	FLY_FIRE,	// 空中ブレス
 
 	MAX
 };

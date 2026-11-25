@@ -18,6 +18,9 @@ namespace
 
 	// デバッグ表示の色
 	constexpr unsigned int DEBUG_COLOR = 0xff8000;
+
+	// 地面の高さ
+	constexpr float GROUND_HEIGHT = 0.0f;
 }
 
 BossFireball::BossFireball(const VECTOR& startPos, const VECTOR& moveDir, int damage)
@@ -51,6 +54,13 @@ void BossFireball::Update(void)
 	// 移動させる
 	VECTOR moveAmount = VScale(moveDir_, speed_);
 	pos_ = VAdd(pos_, moveAmount);
+
+	// 地面より下に行ったら消える
+	if (pos_.y < GROUND_HEIGHT)
+	{
+		isAlive_ = false;
+		return;
+	}
 
 	// 寿命を減らす
 	lifeFrame_--;

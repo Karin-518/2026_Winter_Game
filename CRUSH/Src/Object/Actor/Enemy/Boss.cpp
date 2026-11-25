@@ -20,6 +20,7 @@
 #include "Action/BossRushAction.h"
 #include "Action/BossTailSpinAction.h"
 #include "Action/BossFireballAction.h"
+#include "Action/BossFlyFireAction.h"
 
 #include "Boss.h"
 
@@ -198,12 +199,19 @@ void Boss::StartAttack(void)
 	// プレイヤーの方向
 	FacePlayer();
 
+	// 溜めで流すアニメ（溜め専用がなければ、本体のアニメを溜めから流す）
+	int windupAnim = param.animType;
+	if (param.windupAnimType != NO_ANIM)
+	{
+		windupAnim = param.windupAnimType;
+	}
+
 	// 攻撃アニメーションを再生
 	AnimationController::PlayParam playParam;
 	playParam.isLoop = false;
 	playParam.blendFrame = 10;
 	playParam.isForce = true;
-	animationController_->Play(param.animType, playParam);
+	animationController_->Play(windupAnim, playParam);
 
 	attackController_.Start(param);
 }
@@ -329,7 +337,7 @@ void Boss::InitAnimation(void)
 	AddAnimation(ANIM_TYPE::TAIL_1, ResourceManager::SRC::BOSS_ANIM_TAIL_1, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::TAIL_2, ResourceManager::SRC::BOSS_ANIM_TAIL_2, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::TAKEOFF, ResourceManager::SRC::BOSS_ANIM_TAKEOFF, ANIMATION_SPEED);
-	AddAnimation(ANIM_TYPE::TORAND, ResourceManager::SRC::BOSS_ANIM_TORAND, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::TOLAND, ResourceManager::SRC::BOSS_ANIM_TORAND, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::TURNBACK, ResourceManager::SRC::BOSS_ANIM_TURNBACK, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::TURNLEFT, ResourceManager::SRC::BOSS_ANIM_TURNLEFT, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::TURNRIGHT, ResourceManager::SRC::BOSS_ANIM_TURNRIGHT, ANIMATION_SPEED);
@@ -364,6 +372,7 @@ void Boss::InitPost(void)
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_LEFT, 0.0f, NEAR_RADIUS, 30.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 40.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::FIRE_BALL, NEAR_RADIUS, FAR_RADIUS, 50.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::FLY_FIRE, NEAR_RADIUS, FAR_RADIUS, 20.0f);
 
 	mouthFrameIndex_ = MV1SearchFrame(modelId_, MOUTH_FRAME_NAME);
 }
@@ -495,12 +504,27 @@ void Boss::InitAttackParam(void)
 	fireball.recoveryFrame = 100;
 	fireball.isManualActive = true;
 
+	// 空中ブレス
+	// ---------------------------------------
+	AttackParam& flyFire = attackParams_[static_cast<int>(BOSS_ATTACK_ID::FLY_FIRE)];
+	flyFire.windupAnimType = static_cast<int>(ANIM_TYPE::TAKEOFF);
+	flyFire.animType = static_cast<int>(ANIM_TYPE::FLY_FIRE);
+	flyFire.recoveryAnimType = static_cast<int>(ANIM_TYPE::TOLAND);
+	flyFire.damage = 20;
+
+	// 溜めと隙
+	flyFire.windupFrame = 70;
+	flyFire.windupAnimRate = 1.0f;
+	flyFire.recoveryFrame = 60;
+	flyFire.isManualActive = true;
+
 	// 攻撃ごとの動き
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::BITE)] = std::make_unique<BossBiteAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::RUSH)] = std::make_unique<BossRushAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::TAIL_RIGHT)] = std::make_unique<BossTailSpinAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::TAIL_LEFT)] = std::make_unique<BossTailSpinAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::FIRE_BALL)] = std::make_unique<BossFireballAction>();
+	attackActions_[static_cast<int>(BOSS_ATTACK_ID::FLY_FIRE)] = std::make_unique<BossFlyFireAction>();
 
 }
 

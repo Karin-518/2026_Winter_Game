@@ -53,6 +53,7 @@ void BossAttackState::UpdateWindup(Boss& owner)
 
 	// 攻撃本体へ
 	owner.SetAttackActive(true);
+	PlayActiveAnim(owner);
 	action_->OnActiveStart(owner);
 	ChangePhase(ATTACK_PHASE::ACTIVE);
 }
@@ -65,6 +66,9 @@ void BossAttackState::UpdateActive(Boss& owner)
 	// 隙へ
 	owner.SetAttackActive(false);
 	owner.EndAttack();
+
+	// 隙のアニメを再生する
+	PlayRecoveryAnim(owner);
 
 	// 待機アニメをループで再生し直す
 	AnimationController::PlayParam playParam;
@@ -99,4 +103,40 @@ void BossAttackState::ChangePhase(ATTACK_PHASE nextPhase)
 		AudioManager::GetInstance()->PlaySE(action_->GetAttackSoundID());
 		return;
 	}
+}
+
+void BossAttackState::PlayActiveAnim(Boss& owner)
+{
+	const AttackParam& param = owner.GetCurrentAttackParam();
+
+	// 溜め専用のアニメがなければ、本体のアニメが溜めから流れているので何もしない
+	if (param.windupAnimType == NO_ANIM) return;
+
+	// 本体のアニメに切り替える
+	AnimationController::PlayParam playParam;
+	playParam.isLoop = false;
+	playParam.blendFrame = 10;
+	playParam.isForce = true;
+	owner.GetAnimationController()->Play(param.animType, playParam);
+}
+
+void BossAttackState::PlayRecoveryAnim(Boss& owner)
+{
+	const AttackParam& param = owner.GetCurrentAttackParam();
+
+	// 隙専用のアニメがなければ、待機アニメをループで流す
+	int recoveryAnim = static_cast<int>(Boss::ANIM_TYPE::IDLE);
+	bool isLoop = true;
+
+	// 隙専用のアニメがあれば、それを1回だけ流す
+	if (param.recoveryAnimType != NO_ANIM)
+	{
+		recoveryAnim = param.recoveryAnimType;
+		isLoop = false;
+	}
+
+	AnimationController::PlayParam playParam;
+	playParam.isLoop = isLoop;
+	playParam.isForce = true;
+	owner.GetAnimationController()->Play(recoveryAnim, playParam);
 }
