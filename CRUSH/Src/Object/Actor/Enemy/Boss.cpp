@@ -341,7 +341,8 @@ void Boss::InitPost(void)
 	InitAttackSegments();
 
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 50.0f);
-	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_SPIN, 0.0f, NEAR_RADIUS, 30.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_RIGHT, 0.0f, NEAR_RADIUS, 30.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_LEFT, 0.0f, NEAR_RADIUS, 30.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 40.0f);
 }
 
@@ -420,34 +421,51 @@ void Boss::InitAttackParam(void)
 	rush.knockbackSpeed = 50.0f;
 	rush.knockbackSideRate = 1.5f;
 
-	// 尻尾回転
+	// 尻尾打ち付け（左右）
 	// ---------------------------------------
-	AttackParam& tailSpin = attackParams_[static_cast<int>(BOSS_ATTACK_ID::TAIL_SPIN)];
-	tailSpin.animType = static_cast<int>(ANIM_TYPE::TAIL_1);
-	tailSpin.damage = 10;
+	AttackParam& tailRight = attackParams_[static_cast<int>(BOSS_ATTACK_ID::TAIL_RIGHT)];
+	tailRight.animType = static_cast<int>(ANIM_TYPE::TAIL_1);
+	tailRight.damage = 10;
 
 	// 尻尾全体のカプセル
 	AttackHitVolume tailVolume;
 	tailVolume.startFrameName = "Tail_01";
 	tailVolume.endFrameName = "Tail_09";
 	tailVolume.radius = 80.0f;
-	tailSpin.hitVolumes.push_back(tailVolume);
+	tailRight.hitVolumes.push_back(tailVolume);
 
 	// 溜めと隙
-	tailSpin.windupFrame = 45;
-	tailSpin.windupAnimRate = 1.0f;
-	tailSpin.recoveryFrame = 60;
-	tailSpin.isManualActive = true;
+	tailRight.windupFrame = 45;
+	tailRight.windupAnimRate = 1.0f;
+	tailRight.recoveryFrame = 60;
+	tailRight.isManualActive = true;
 
 	// 被弾リアクションと吹き飛ばし量
-	tailSpin.reaction = HIT_REACTION::KNOCKBACK;
-	tailSpin.knockbackSpeed = 30.0f;
-	tailSpin.knockbackSideRate = 0.7f;
+	tailRight.reaction = HIT_REACTION::KNOCKBACK;
+	tailRight.knockbackSpeed = 30.0f;
+	tailRight.knockbackSideRate = 0.7f;
+
+	AttackParam& tailLeft = attackParams_[static_cast<int>(BOSS_ATTACK_ID::TAIL_LEFT)];
+	tailLeft.animType = static_cast<int>(ANIM_TYPE::TAIL_2);
+	tailLeft.damage = 10;
+	tailLeft.hitVolumes.push_back(tailVolume);
+
+	// 溜めと隙
+	tailLeft.windupFrame = 45;
+	tailLeft.windupAnimRate = 1.0f;
+	tailLeft.recoveryFrame = 60;
+	tailLeft.isManualActive = true;
+
+	// 被弾リアクションと吹き飛ばし量
+	tailLeft.reaction = HIT_REACTION::KNOCKBACK;
+	tailLeft.knockbackSpeed = 30.0f;
+	tailLeft.knockbackSideRate = 0.7f;
 
 	// 攻撃ごとの動き
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::BITE)] = std::make_unique<BossBiteAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::RUSH)] = std::make_unique<BossRushAction>();
-	attackActions_[static_cast<int>(BOSS_ATTACK_ID::TAIL_SPIN)] = std::make_unique<BossTailSpinAction>();
+	attackActions_[static_cast<int>(BOSS_ATTACK_ID::TAIL_RIGHT)] = std::make_unique<BossTailSpinAction>();
+	attackActions_[static_cast<int>(BOSS_ATTACK_ID::TAIL_LEFT)] = std::make_unique<BossTailSpinAction>();
 
 }
 
