@@ -1,4 +1,5 @@
 #include "../Actor/ActorBase.h"
+#include "../Actor/Enemy/BossFireball.h"
 #include "../Common/Attack/AttackController.h"
 #include "../Common/Attack/AttackParam.h"
 #include "../Common/Attack/HitInfo.h"
@@ -7,6 +8,10 @@
 #include "CollisionManager.h"
 
 CollisionManager::CollisionManager(void)
+	:
+	attacks_(),
+	hurtboxes_(),
+	fireballs_(nullptr)
 {
 }
 
@@ -20,11 +25,19 @@ void CollisionManager::Update(void)
 	{
 		CheckAttack(entry);
 	}
+
+	// ボスの火の玉
+	CheckFireballs();
 }
 
 void CollisionManager::AddAttack(const AttackController* attack, ActorBase* owner, ColliderBase::TAG tag)
 {
 	attacks_.push_back({ attack, owner, tag });
+}
+
+void CollisionManager::AddFireballs(std::vector<std::unique_ptr<BossFireball>>* fireballs)
+{
+	fireballs_ = fireballs;
 }
 
 void CollisionManager::AddHurtbox(const Hurtbox* hurtbox)
@@ -39,6 +52,7 @@ void CollisionManager::Clear(void)
 {
 	attacks_.clear();
 	hurtboxes_.clear();
+	fireballs_ = nullptr;
 }
 
 void CollisionManager::CheckAttack(const AttackEntry& entry)
@@ -114,4 +128,65 @@ VECTOR CollisionManager::CalcHitSurfacePos(const Hurtbox& hurtbox, const VECTOR&
 	VECTOR surfaceOffset = VScale(VNorm(toAttacker), hurtbox.GetRadius());
 
 	return VAdd(closestPos, surfaceOffset);
+}
+
+void CollisionManager::CheckFireballs(void)
+{
+	// 登録されていなければ何もしない
+	if (fireballs_ == nullptr) return;
+
+	for (auto& fireball : *fireballs_)
+	{
+		// もう消えている火の玉は調べない
+		if (!fireball->IsAlive()) continue;
+
+		CheckFireball(*fireball);
+	}
+}
+
+void CollisionManager::CheckFireball(BossFireball& fireball)
+{
+	for (const Hurtbox* hurtbox : hurtboxes_)
+	{
+		// ボスの火の玉なので、ボス自身には当てない
+		if (hurtbox->GetTag() == ColliderBase::TAG::ENEMY) continue;
+		if (!IsFireballOverlap(fireball, *hurtbox)) continue;
+
+		// 当たった側へ渡す情報
+		HitInfo hitInfo = MakeFireballHitInfo(fireball, *hurtbox);
+
+		// 当たった側に知らせる（無敵中ならダメージを受けない）
+		bool isDamaged = hurtbox->GetOwner()->OnHit(hitInfo);
+
+		// ダメージを受けなかったら、火の玉はすり抜けて飛び続ける
+		if (!isDamaged) continue;
+
+		// 当たった火の玉は消える
+		fireball.OnHit();
+		return;
+	}
+}
+
+bool CollisionManager::IsFireballOverlap(const BossFireball& fireball, const Hurtbox& hurtbox) const
+{
+	// 火の玉の球と、食らい判定のカプセルが重なっているか
+	int hitResult = HitCheck_Sphere_Capsule(
+		fireball.GetPos(), fireball.GetRadius(),
+		hurtbox.GetStartPos(), hurtbox.GetEndPos(), hurtbox.GetRadius());
+
+	return hitResult == TRUE;
+}
+
+HitInfo CollisionManager::MakeFireballHitInfo(const BossFireball& fireball, const Hurtbox& hurtbox) const
+{	
+	// 火の玉の位置（のけぞる向きを、火の玉が飛んできた側にするため）
+	const VECTOR& fireballPos = fireball.GetPos();
+
+	HitInfo hitInfo;
+	hitInfo.damage = fireball.GetDamage();
+	hitInfo.attackerPos = fireballPos;
+	hitInfo.attackerForward = fireball.GetMoveDir();
+	hitInfo.hitPos = CalcHitSurfacePos(hurtbox, fireballPos);
+
+	return hitInfo;
 }

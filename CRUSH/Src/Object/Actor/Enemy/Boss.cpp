@@ -1,6 +1,7 @@
 #include <memory>
 #include <cmath>
 #include <limits>
+#include <algorithm>
 #include "../../../Audio/AudioManager.h"
 #include "../../../Resource/ResourceManager.h"
 #include "../../../Effect/EffectManager.h"
@@ -18,6 +19,7 @@
 #include "Action/BossBiteAction.h"
 #include "Action/BossRushAction.h"
 #include "Action/BossTailSpinAction.h"
+#include "Action/BossFireballAction.h"
 
 #include "Boss.h"
 
@@ -71,6 +73,12 @@ namespace
 
 	// 長距離とみなす半径
 	constexpr float FAR_RADIUS = 3000.0f;
+
+	// 火の玉を出す口のフレーム名
+	constexpr const char* MOUTH_FRAME_NAME = "Jaw";
+
+	// 火の玉が狙う高さ
+	constexpr float FIREBALL_AIM_HEIGHT = 100.0f;
 }
 
 Boss::Boss(Player* player, HitStop* hitStop)
@@ -82,7 +90,9 @@ Boss::Boss(Player* player, HitStop* hitStop)
 	attackController_(),
 	attackParams_(),
 	attackSelector_(),
-	nextAttackId_(BOSS_ATTACK_ID::NONE)
+	nextAttackId_(BOSS_ATTACK_ID::NONE),
+	fireballs_(),
+	mouthFrameIndex_(-1)
 {
 }
 
@@ -116,6 +126,9 @@ void Boss::Update(void)
 	// 重みの回復
 	attackSelector_.Update();
 
+	// 火の玉の更新
+	UpdateFireballs();
+
 	// 攻撃の更新
 	attackController_.Update(*animationController_);
 }
@@ -123,6 +136,12 @@ void Boss::Update(void)
 void Boss::Draw(void)
 {
 	ActorBase::Draw();
+
+	// 火の玉の描画
+	for (const auto& fireball : fireballs_)
+	{
+		fireball->Draw();
+	}
 
 #ifdef _DEBUG
 	// デバッグ表示
@@ -344,6 +363,9 @@ void Boss::InitPost(void)
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_RIGHT, 0.0f, NEAR_RADIUS, 30.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_LEFT, 0.0f, NEAR_RADIUS, 30.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 40.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::FIRE_BALL, NEAR_RADIUS, FAR_RADIUS, 50.0f);
+
+	mouthFrameIndex_ = MV1SearchFrame(modelId_, MOUTH_FRAME_NAME);
 }
 
 void Boss::InitParts(void)
@@ -461,11 +483,24 @@ void Boss::InitAttackParam(void)
 	tailLeft.knockbackSpeed = 30.0f;
 	tailLeft.knockbackSideRate = 0.7f;
 
+	// 単発ブレス
+	// ---------------------------------------
+	AttackParam& fireball = attackParams_[static_cast<int>(BOSS_ATTACK_ID::FIRE_BALL)];
+	fireball.animType = static_cast<int>(ANIM_TYPE::FIRE_BALL);
+	fireball.damage = 20;
+
+	// 溜めと隙
+	fireball.windupFrame = 60;
+	fireball.windupAnimRate = 1.0f;
+	fireball.recoveryFrame = 100;
+	fireball.isManualActive = true;
+
 	// 攻撃ごとの動き
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::BITE)] = std::make_unique<BossBiteAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::RUSH)] = std::make_unique<BossRushAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::TAIL_RIGHT)] = std::make_unique<BossTailSpinAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::TAIL_LEFT)] = std::make_unique<BossTailSpinAction>();
+	attackActions_[static_cast<int>(BOSS_ATTACK_ID::FIRE_BALL)] = std::make_unique<BossFireballAction>();
 
 }
 
@@ -514,6 +549,25 @@ void Boss::UpdateAttackCapsules(void)
 	}
 }
 
+void Boss::UpdateFireballs(void)
+{
+	// 全部の火の玉を進める
+	for (auto& fireball : fireballs_)
+	{
+		fireball->Update();
+	}
+
+	// 消えた火の玉を後ろに寄せて、その先頭の位置を受け取る
+	auto removeBegin = std::remove_if(fireballs_.begin(), fireballs_.end(),
+		[](const std::unique_ptr<BossFireball>& fireball)
+		{
+			return !fireball->IsAlive();
+		});
+
+	// 後ろに寄せた分を一覧から消す
+	fireballs_.erase(removeBegin, fireballs_.end());
+}
+
 void Boss::FacePlayer(void)
 {
 	// プレイヤーがいなければ何もしない
@@ -558,4 +612,28 @@ bool Boss::IsPlayerKnockedDown(void) const
 	if (player_ == nullptr) return false;
 
 	return player_->IsPlayerKnockedDown();
+}
+
+void Boss::ShootFireball(void)
+{
+	// プレイヤーがいなければ撃たない
+	if (player_ == nullptr) return;
+
+	// 口のフレームが見つかっていなければ撃たない
+	if (mouthFrameIndex_ == -1) return;
+
+	// 口の位置（ワールド座標）
+	VECTOR mouthPos = MV1GetFramePosition(modelId_, mouthFrameIndex_);
+
+	// 狙う位置（プレイヤーの足元から少し上）
+	VECTOR aimPos = player_->GetPos();
+	aimPos.y += FIREBALL_AIM_HEIGHT;
+
+	// 口から狙う位置への向き（長さはBossFireballの中でそろえる）
+	VECTOR shootDir = VSub(aimPos, mouthPos);
+
+	// ダメージは攻撃データから取る
+	int damage = GetCurrentAttackParam().damage;
+
+	fireballs_.push_back(std::make_unique<BossFireball>(mouthPos, shootDir, damage));
 }

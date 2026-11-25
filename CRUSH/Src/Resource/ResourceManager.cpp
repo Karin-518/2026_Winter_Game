@@ -65,7 +65,7 @@ void ResourceManager::Init(void)
 	Register(SRC::BOSS_ANIM_WALK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Walk.mv1");
 
 	// ステージモデル
-	Register(SRC::STAGE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Stage/StageGround.mv1");
+	Register(SRC::STAGE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Stage/Stage.mv1");
 
 	// タイトルロゴ
 	Register(SRC::TITLE_LOGO, Resource::TYPE::IMG, Application::PATH_IMAGE + "CRUSHLOGO.png");

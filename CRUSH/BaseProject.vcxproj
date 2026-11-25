@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Actor\Enemy\BossFireball.cpp" />
+    <ClCompile Include="Src\Object\Actor\Enemy\Action\BossFireballAction.cpp" />
     <ClCompile Include="Src\Object\Collider\Pushbox.cpp" />
     <ClCompile Include="Src\Object\Common\HitStop\HitStop.cpp" />
     <ClCompile Include="Src\Effect\EffectManager.cpp" />
@@ -81,6 +83,8 @@
     <ClCompile Include="Src\Scene\TitleScene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Actor\Enemy\BossFireball.h" />
+    <ClInclude Include="Src\Object\Actor\Enemy\Action\BossFireballAction.h" />
     <ClInclude Include="Src\Object\Collider\Pushbox.h" />
     <ClInclude Include="Src\Object\Common\HitStop\HitStop.h" />
     <ClInclude Include="Src\Effect\EffectManager.h" />

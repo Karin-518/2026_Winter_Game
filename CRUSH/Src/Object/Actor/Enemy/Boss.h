@@ -12,6 +12,7 @@
 #include "Action/BossAttackAction.h"
 #include "BossAttackSelector.h"
 #include "ColliderPart.h"
+#include "BossFireball.h"
 
 class Player;
 class HitStop;
@@ -112,6 +113,12 @@ public:
 	// プレイヤーが倒れているか
 	bool IsPlayerKnockedDown(void) const;
 
+	// 火の玉を撃つ
+	void ShootFireball(void);
+
+	// 火の玉を取得
+	std::vector<std::unique_ptr<BossFireball>>& GetFireballs(void) { return fireballs_; }
+
 protected:
 
 	// リソースロード
@@ -167,6 +174,12 @@ private:
 	// 攻撃ごとの判定ボーン
 	std::vector<BoneSegment> attackSegments_[static_cast<int>(BOSS_ATTACK_ID::MAX)];
 
+	// 火の玉
+	std::vector<std::unique_ptr<BossFireball>> fireballs_;
+
+	// 火の玉を出す口のフレーム番号
+	int mouthFrameIndex_;
+
 	// 部位の初期化
 	void InitParts(void);
 
@@ -187,4 +200,7 @@ private:
 
 	// 今の攻撃のカプセルをボーンの位置に合わせる
 	void UpdateAttackCapsules(void);
+
+	// 火の玉の更新
+	void UpdateFireballs(void);
 };

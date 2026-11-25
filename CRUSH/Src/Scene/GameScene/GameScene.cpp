@@ -236,6 +236,9 @@ void GameScene::RegisterCollision(void)
 	collisionManager_.AddAttack(&player_->GetAttackController(), player_, ColliderBase::TAG::PLAYER);
 	collisionManager_.AddAttack(&boss_->GetAttackController(), boss_, ColliderBase::TAG::ENEMY);
 
+	// ƒ{ƒX‚Ì‰Î‚Ì‹Ê
+	collisionManager_.AddFireballs(&boss_->GetFireballs());
+
 	// H‚ç‚¢”»’è
 	collisionManager_.AddHurtbox(player_->GetHurtbox());
 
