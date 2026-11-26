@@ -24,9 +24,9 @@ public:
 	// アニメーション種別
 	enum class ANIM_TYPE
 	{
-		BITE_1,
-		BITE_2,
-		BITE_3,
+		BITE,
+		BITE_TRIPLE,
+		BITE_LEAP,
 		DEATH,
 		FIRE_BALL,
 		FLY_FIRE,

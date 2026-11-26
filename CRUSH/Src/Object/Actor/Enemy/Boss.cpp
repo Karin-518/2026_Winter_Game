@@ -21,6 +21,7 @@
 #include "Action/BossTailSpinAction.h"
 #include "Action/BossFireballAction.h"
 #include "Action/BossFlyFireAction.h"
+#include "Action/BossLeapBiteAction.h"
 
 #include "Boss.h"
 
@@ -323,9 +324,9 @@ void Boss::InitAnimation(void)
 	// モデルアニメーション制御の初期化
 	animationController_ = new AnimationController(modelId_);
 
-	AddAnimation(ANIM_TYPE::BITE_1, ResourceManager::SRC::BOSS_ANIM_BITE_1, ANIMATION_SPEED);
-	AddAnimation(ANIM_TYPE::BITE_2, ResourceManager::SRC::BOSS_ANIM_BITE_2, ANIMATION_SPEED);
-	AddAnimation(ANIM_TYPE::BITE_3, ResourceManager::SRC::BOSS_ANIM_BITE_3, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::BITE, ResourceManager::SRC::BOSS_ANIM_BITE_1, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::BITE_TRIPLE, ResourceManager::SRC::BOSS_ANIM_BITE_2, ANIMATION_SPEED);
+	AddAnimation(ANIM_TYPE::BITE_LEAP, ResourceManager::SRC::BOSS_ANIM_BITE_3, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::DEATH, ResourceManager::SRC::BOSS_ANIM_DEATH, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::FIRE_BALL, ResourceManager::SRC::BOSS_ANIM_FIRE_BALL, ANIMATION_SPEED);
 	AddAnimation(ANIM_TYPE::FLY_FIRE, ResourceManager::SRC::BOSS_ANIM_FLY_FIRE, ANIMATION_SPEED);
@@ -346,6 +347,7 @@ void Boss::InitAnimation(void)
 	animationController_->SetRootFrame(MV1SearchFrame(modelId_, "Root"));
 	animationController_->SetCancelRootMove(static_cast<int>(ANIM_TYPE::RUN));
 	animationController_->SetCancelRootMove(static_cast<int>(ANIM_TYPE::WALK));
+	animationController_->SetCancelRootMove(static_cast<int>(ANIM_TYPE::BITE_LEAP));
 }
 
 void Boss::InitPost(void)
@@ -373,6 +375,7 @@ void Boss::InitPost(void)
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 40.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::FIRE_BALL, NEAR_RADIUS, FAR_RADIUS, 50.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::FLY_FIRE, NEAR_RADIUS, FAR_RADIUS, 20.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::LEAP_BITE, NEAR_RADIUS, FAR_RADIUS, 10.0f);
 
 	mouthFrameIndex_ = MV1SearchFrame(modelId_, MOUTH_FRAME_NAME);
 }
@@ -404,7 +407,7 @@ void Boss::InitAttackParam(void)
 	// 噛みつき
 	// ---------------------------------------
 	AttackParam& bite = attackParams_[static_cast<int>(BOSS_ATTACK_ID::BITE)];
-	bite.animType = static_cast<int>(ANIM_TYPE::BITE_1);
+	bite.animType = static_cast<int>(ANIM_TYPE::BITE);
 	bite.damage = 10;
 
 	// 頭のカプセル
@@ -518,6 +521,20 @@ void Boss::InitAttackParam(void)
 	flyFire.recoveryFrame = 60;
 	flyFire.isManualActive = true;
 
+	// 飛びつき噛みつき
+// ---------------------------------------
+	AttackParam& leapBite = attackParams_[static_cast<int>(BOSS_ATTACK_ID::LEAP_BITE)];
+	leapBite.animType = static_cast<int>(ANIM_TYPE::BITE_LEAP);
+	leapBite.damage = 10;
+
+	// 頭のカプセル
+	leapBite.hitVolumes.push_back(headVolume);
+
+	// 溜めと隙
+	leapBite.windupFrame = 35;
+	leapBite.windupAnimRate = 0.2f;
+	leapBite.recoveryFrame = 20;
+
 	// 攻撃ごとの動き
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::BITE)] = std::make_unique<BossBiteAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::RUSH)] = std::make_unique<BossRushAction>();
@@ -525,7 +542,7 @@ void Boss::InitAttackParam(void)
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::TAIL_LEFT)] = std::make_unique<BossTailSpinAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::FIRE_BALL)] = std::make_unique<BossFireballAction>();
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::FLY_FIRE)] = std::make_unique<BossFlyFireAction>();
-
+	attackActions_[static_cast<int>(BOSS_ATTACK_ID::LEAP_BITE)] = std::make_unique<BossLeapBiteAction>();
 }
 
 void Boss::InitAttackSegments(void)
