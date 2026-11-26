@@ -30,39 +30,41 @@ void ResourceManager::Init(void)
 	Register(SRC::PLAYER_SWORD, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/sword.mv1");
 
 	// プレイヤーのアニメーション
-	Register(SRC::PLAYER_ANIM_IDLE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Idle.mv1");
-	Register(SRC::PLAYER_ANIM_WALK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Walk.mv1");
-	Register(SRC::PLAYER_ANIM_RUN, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Run.mv1");
-	Register(SRC::PLAYER_ANIM_ATTACK_1, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Attack1.mv1");
-	Register(SRC::PLAYER_ANIM_ROLL, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Roll.mv1");
-	Register(SRC::PLAYER_ANIM_HIT, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Hit.mv1");
-	Register(SRC::PLAYER_ANIM_DEATH, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Death.mv1");
-	Register(SRC::PLAYER_ANIM_KNOCKBACK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Knockback.mv1");
-	Register(SRC::PLAYER_ANIM_STANDING, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Standing.mv1");
+	Register(SRC::PLAYER_ANIM_IDLE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Animations/Idle.mv1");
+	Register(SRC::PLAYER_ANIM_WALK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Animations/Walk.mv1");
+	Register(SRC::PLAYER_ANIM_RUN, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Animations/Run.mv1");
+	Register(SRC::PLAYER_ANIM_ATTACK_1, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Animations/Attack1.mv1");
+	Register(SRC::PLAYER_ANIM_ROLL, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Animations/Roll.mv1");
+	Register(SRC::PLAYER_ANIM_HIT, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Animations/Hit.mv1");
+	Register(SRC::PLAYER_ANIM_DEATH, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Animations/Death.mv1");
+	Register(SRC::PLAYER_ANIM_KNOCKBACK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Animations/Knockback.mv1");
+	Register(SRC::PLAYER_ANIM_STANDING, Resource::TYPE::MODEL, Application::PATH_MODEL + "Player/Animations/Standing.mv1");
 
 	// ボスモデル
 	Register(SRC::BOSS, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Wyvern.mv1");
 
 	// ボスのアニメーション
-	Register(SRC::BOSS_ANIM_BITE_1, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Bite01.mv1");
-	Register(SRC::BOSS_ANIM_BITE_2, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Bite02.mv1");
-	Register(SRC::BOSS_ANIM_BITE_3, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Bite03.mv1");
-	Register(SRC::BOSS_ANIM_DEATH, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Death.mv1");
-	Register(SRC::BOSS_ANIM_FIRE_BALL, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/FireBall.mv1");
-	Register(SRC::BOSS_ANIM_FLY_FIRE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/FlyFire.mv1");
-	Register(SRC::BOSS_ANIM_IDLE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Idle.mv1");
-	Register(SRC::BOSS_ANIM_IMPACT_STRONG, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/ImpactStrong.mv1");
-	Register(SRC::BOSS_ANIM_IMPACT_WEAK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/ImpactWeak.mv1");
-	Register(SRC::BOSS_ANIM_REPOSE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Repose.mv1");
-	Register(SRC::BOSS_ANIM_RUN, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Run.mv1");
-	Register(SRC::BOSS_ANIM_TAIL_1, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Tail01.mv1");
-	Register(SRC::BOSS_ANIM_TAIL_2, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Tail02.mv1");
-	Register(SRC::BOSS_ANIM_TAKEOFF, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Takeoff.mv1");
-	Register(SRC::BOSS_ANIM_TORAND, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/ToLand.mv1");
-	Register(SRC::BOSS_ANIM_TURNBACK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/TurnBack.mv1");
-	Register(SRC::BOSS_ANIM_TURNLEFT, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/TurnLeft.mv1");
-	Register(SRC::BOSS_ANIM_TURNRIGHT, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/TurnRight.mv1");
-	Register(SRC::BOSS_ANIM_WALK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Walk.mv1");
+	Register(SRC::BOSS_ANIM_BITE_1, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Bite01.mv1");
+	Register(SRC::BOSS_ANIM_BITE_2, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Bite02.mv1");
+	Register(SRC::BOSS_ANIM_BITE_3, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Bite03.mv1");
+	Register(SRC::BOSS_ANIM_DEATH, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Death.mv1");
+	Register(SRC::BOSS_ANIM_FIRE_BALL, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/FireBall.mv1");
+	Register(SRC::BOSS_ANIM_FLY_FIRE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/FlyFire.mv1");
+	Register(SRC::BOSS_ANIM_IDLE_1, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Idle01.mv1");
+	Register(SRC::BOSS_ANIM_IDLE_2, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Idle02.mv1");
+	Register(SRC::BOSS_ANIM_IDLE_3, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Idle03.mv1");
+	Register(SRC::BOSS_ANIM_IMPACT_STRONG, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/ImpactStrong.mv1");
+	Register(SRC::BOSS_ANIM_IMPACT_WEAK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/ImpactWeak.mv1");
+	Register(SRC::BOSS_ANIM_REPOSE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Repose.mv1");
+	Register(SRC::BOSS_ANIM_RUN, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Run.mv1");
+	Register(SRC::BOSS_ANIM_TAIL_1, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Tail01.mv1");
+	Register(SRC::BOSS_ANIM_TAIL_2, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Tail02.mv1");
+	Register(SRC::BOSS_ANIM_TAKEOFF, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Takeoff.mv1");
+	Register(SRC::BOSS_ANIM_TORAND, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/ToLand.mv1");
+	Register(SRC::BOSS_ANIM_TURNBACK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/TurnBack.mv1");
+	Register(SRC::BOSS_ANIM_TURNLEFT, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/TurnLeft.mv1");
+	Register(SRC::BOSS_ANIM_TURNRIGHT, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/TurnRight.mv1");
+	Register(SRC::BOSS_ANIM_WALK, Resource::TYPE::MODEL, Application::PATH_MODEL + "Boss/Animations/Walk.mv1");
 
 	// ステージモデル
 	Register(SRC::STAGE, Resource::TYPE::MODEL, Application::PATH_MODEL + "Stage/Stage.mv1");
