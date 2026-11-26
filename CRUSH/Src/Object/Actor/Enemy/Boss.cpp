@@ -369,7 +369,7 @@ void Boss::InitPost(void)
 	// çUåÇÇÃîªíËÇÃÉ{Å[ÉìÇèÄîı
 	InitAttackSegments();
 
-	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 50.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 80.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_RIGHT, 0.0f, NEAR_RADIUS, 30.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_LEFT, 0.0f, NEAR_RADIUS, 30.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 40.0f);
@@ -415,13 +415,12 @@ void Boss::InitAttackParam(void)
 	headVolume.startFrameName = "Jaw";
 	headVolume.endFrameName = "Tongue_3";
 	headVolume.radius = 80.0f;
-	headVolume.activeStart = 20.0f;
-	headVolume.activeEnd = 30.0f;
+	headVolume.activeStart = 40.0f;
+	headVolume.activeEnd = 50.0f;
 	bite.hitVolumes.push_back(headVolume);
 
 	// ó≠ÇﬂÇ∆åÑ
 	bite.windupFrame = 35;
-	bite.windupAnimRate = 0.2f;
 	bite.recoveryFrame = 20;
 
 	// ìÀêi
@@ -470,7 +469,6 @@ void Boss::InitAttackParam(void)
 
 	// ó≠ÇﬂÇ∆åÑ
 	tailRight.windupFrame = 45;
-	tailRight.windupAnimRate = 1.0f;
 	tailRight.recoveryFrame = 60;
 	tailRight.isManualActive = true;
 
@@ -486,7 +484,6 @@ void Boss::InitAttackParam(void)
 
 	// ó≠ÇﬂÇ∆åÑ
 	tailLeft.windupFrame = 45;
-	tailLeft.windupAnimRate = 1.0f;
 	tailLeft.recoveryFrame = 60;
 	tailLeft.isManualActive = true;
 
@@ -503,7 +500,6 @@ void Boss::InitAttackParam(void)
 
 	// ó≠ÇﬂÇ∆åÑ
 	fireball.windupFrame = 60;
-	fireball.windupAnimRate = 1.0f;
 	fireball.recoveryFrame = 100;
 	fireball.isManualActive = true;
 
@@ -517,7 +513,6 @@ void Boss::InitAttackParam(void)
 
 	// ó≠ÇﬂÇ∆åÑ
 	flyFire.windupFrame = 70;
-	flyFire.windupAnimRate = 1.0f;
 	flyFire.recoveryFrame = 60;
 	flyFire.isManualActive = true;
 
