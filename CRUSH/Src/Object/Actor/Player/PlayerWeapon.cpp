@@ -14,17 +14,17 @@ namespace
 	// 手から見た、武器の位置のずれ
 	constexpr VECTOR OFFSET_POS = { -15.0f, 10.0f, -5.0f };
 
-	// 剣のモデルの中での、刃の根元の位置（仮の値。デバッグ描画を見て合わせる）
+	// 剣のモデルの中での、刃の根元の位置
 	constexpr VECTOR BLADE_ROOT_LOCAL_POS = { 0.0f, 10.0f, 0.0f };
 
-	// 剣のモデルの中での、刃の先端の位置（仮の値。デバッグ描画を見て合わせる）
-	constexpr VECTOR BLADE_TIP_LOCAL_POS = { 0.0f, 90.0f, 0.0f };
+	// 剣のモデルの中での、刃の先端の位置
+	constexpr VECTOR BLADE_TIP_LOCAL_POS = { 0.0f, 95.0f, 0.0f };
 
 	// 刃のデバッグ描画の色
 	constexpr unsigned int BLADE_DEBUG_COLOR = 0x00ffff;
 
 	// 刃の両端に描く球の半径
-	constexpr float BLADE_DEBUG_SPHERE_RADIUS = 3.0f;
+	constexpr float BLADE_DEBUG_SPHERE_RADIUS = 5.0f;
 
 	// 刃の両端に描く球の分割数
 	constexpr int BLADE_DEBUG_SPHERE_DIV_NUM = 8;
