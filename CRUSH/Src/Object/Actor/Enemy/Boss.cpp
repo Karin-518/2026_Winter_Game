@@ -370,8 +370,8 @@ void Boss::InitPost(void)
 	InitAttackSegments();
 
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 80.0f);
-	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_RIGHT, 0.0f, NEAR_RADIUS, 30.0f);
-	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_LEFT, 0.0f, NEAR_RADIUS, 30.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_RIGHT, 0.0f, NEAR_RADIUS, 10.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_LEFT, 0.0f, NEAR_RADIUS, 10.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 40.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::FIRE_BALL, NEAR_RADIUS, FAR_RADIUS, 50.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::FLY_FIRE, NEAR_RADIUS, FAR_RADIUS, 20.0f);
@@ -465,12 +465,13 @@ void Boss::InitAttackParam(void)
 	tailVolume.startFrameName = "Tail_01";
 	tailVolume.endFrameName = "Tail_09";
 	tailVolume.radius = 80.0f;
+	tailVolume.activeStart = 24.0f;
+	tailVolume.activeEnd = 31.0f;
 	tailRight.hitVolumes.push_back(tailVolume);
 
 	// 溜めと隙
-	tailRight.windupFrame = 45;
-	tailRight.recoveryFrame = 60;
-	tailRight.isManualActive = true;
+	tailRight.windupFrame = 23;
+	tailRight.recoveryFrame = 10;
 
 	// 被弾リアクションと吹き飛ばし量
 	tailRight.reaction = HIT_REACTION::KNOCKBACK;
@@ -483,9 +484,8 @@ void Boss::InitAttackParam(void)
 	tailLeft.hitVolumes.push_back(tailVolume);
 
 	// 溜めと隙
-	tailLeft.windupFrame = 45;
-	tailLeft.recoveryFrame = 60;
-	tailLeft.isManualActive = true;
+	tailLeft.windupFrame = 23;
+	tailLeft.recoveryFrame = 10;
 
 	// 被弾リアクションと吹き飛ばし量
 	tailLeft.reaction = HIT_REACTION::KNOCKBACK;
