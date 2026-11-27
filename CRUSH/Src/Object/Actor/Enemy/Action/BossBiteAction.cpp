@@ -3,6 +3,14 @@
 
 #include "BossBiteAction.h"
 
+BossBiteAction::BossBiteAction(void)
+{
+}
+
+BossBiteAction::~BossBiteAction(void)
+{
+}
+
 bool BossBiteAction::UpdateActive(Boss& owner)
 {
     // アニメが最後まで再生されたら、攻撃本体を終える

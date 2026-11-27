@@ -54,13 +54,16 @@ namespace
 	// 初期位置
 	constexpr VECTOR INIT_POS = { -138.0f, 0.0f, -830.0f };
 
-	// 初期の向き(Y軸、度)
+	// 初期の向き
 	constexpr float INIT_ANGLE_DEG_Y = 255.0f;
 
 	constexpr BossPartParam PART_PARAMS[] =
 	{
-		{ BOSS_PART::HEAD,   "Tongue_3",   "Neck_3",     70.0f, 1.0f },
-		{ BOSS_PART::BODY,   "Chest",  "Tail_01",     100.0f, 1.0f },
+		{ BOSS_PART::HEAD, "Tongue_3", "Neck_3", 80.0f, 1.0f },
+		{ BOSS_PART::BODY, "Chest", "Tail_01", 110.0f, 1.0f },
+		{ BOSS_PART::LEFT_THIGH, "Leg_L", "Knee_L", 50.0f, 1.0f },
+		{ BOSS_PART::RIGHT_THIGH, "Leg_R", "Knee_R", 50.0f, 1.0f },
+		{ BOSS_PART::TAIL, "Tail_01", "Tail_09", 40.0f, 1.0f },
 	};
 
 	// 押し出し用のカプセル
@@ -71,10 +74,10 @@ namespace
 	};
 
 	// 近距離とみなす半径
-	constexpr float NEAR_RADIUS = 900.0f;
+	constexpr float NEAR_RADIUS = 800.0f;
 
 	// 長距離とみなす半径
-	constexpr float FAR_RADIUS = 3000.0f;
+	constexpr float FAR_RADIUS = 2000.0f;
 
 	// 火の玉を出す口のフレーム名
 	constexpr const char* MOUTH_FRAME_NAME = "Jaw";
@@ -200,7 +203,6 @@ void Boss::StartAttack(void)
 	// プレイヤーの方向
 	FacePlayer();
 
-	// 溜めで流すアニメ（溜め専用がなければ、本体のアニメを溜めから流す）
 	int windupAnim = param.animType;
 	if (param.windupAnimType != NO_ANIM)
 	{
@@ -372,10 +374,10 @@ void Boss::InitPost(void)
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::BITE, 0.0f, NEAR_RADIUS, 80.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_RIGHT, 0.0f, NEAR_RADIUS, 10.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::TAIL_LEFT, 0.0f, NEAR_RADIUS, 10.0f);
-	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 40.0f);
-	attackSelector_.AddCandidate(BOSS_ATTACK_ID::FIRE_BALL, NEAR_RADIUS, FAR_RADIUS, 50.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::RUSH, NEAR_RADIUS, FAR_RADIUS, 30.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::FIRE_BALL, NEAR_RADIUS, FAR_RADIUS, 10.0f);
 	attackSelector_.AddCandidate(BOSS_ATTACK_ID::FLY_FIRE, NEAR_RADIUS, FAR_RADIUS, 20.0f);
-	attackSelector_.AddCandidate(BOSS_ATTACK_ID::LEAP_BITE, NEAR_RADIUS, FAR_RADIUS, 10.0f);
+	attackSelector_.AddCandidate(BOSS_ATTACK_ID::LEAP_BITE, NEAR_RADIUS, FAR_RADIUS, 40.0f);
 
 	mouthFrameIndex_ = MV1SearchFrame(modelId_, MOUTH_FRAME_NAME);
 }
@@ -521,14 +523,20 @@ void Boss::InitAttackParam(void)
 	AttackParam& leapBite = attackParams_[static_cast<int>(BOSS_ATTACK_ID::LEAP_BITE)];
 	leapBite.animType = static_cast<int>(ANIM_TYPE::BITE_LEAP);
 	leapBite.damage = 10;
+	headVolume.activeStart = 32.0f;
+	headVolume.activeEnd = 36.0f;
 
 	// 頭のカプセル
 	leapBite.hitVolumes.push_back(headVolume);
 
 	// 溜めと隙
-	leapBite.windupFrame = 35;
-	leapBite.windupAnimRate = 0.2f;
+	leapBite.windupFrame = 23;
 	leapBite.recoveryFrame = 20;
+
+	// 被弾リアクションと吹き飛ばし量
+	leapBite.reaction = HIT_REACTION::KNOCKBACK;
+	leapBite.knockbackSpeed = 30.0f;
+	leapBite.knockbackSideRate = 0.7f;
 
 	// 攻撃ごとの動き
 	attackActions_[static_cast<int>(BOSS_ATTACK_ID::BITE)] = std::make_unique<BossBiteAction>();

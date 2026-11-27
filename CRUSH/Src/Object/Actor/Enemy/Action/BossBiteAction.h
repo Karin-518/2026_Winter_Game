@@ -5,6 +5,12 @@ class BossBiteAction : public BossAttackAction
 {
 public:
 
+	// コンストラクタ
+	BossBiteAction(void);
+
+	// デストラクタ
+	~BossBiteAction(void) override;
+
 	// 攻撃本体の間、舞フレーム呼ばれる
 	bool UpdateActive(Boss& owner) override;
 
